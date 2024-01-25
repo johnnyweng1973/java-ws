@@ -1,0 +1,4 @@
+i create a new dir for workspace and add this new project for sprint boot security. Considering there may be many small projects so I dont want to create a github repo for each of them.
+  so I create a repo for this workspace and all projects will under same repo.
+  this repo is created with spring starter option.
+  project will build automatically once you create it. 
