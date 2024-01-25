@@ -1,5 +1,7 @@
 # java-ws
 eclipse workspace 
+please remote use git pull to update local git repo after modify this readme
+
 steps to add this workspace including one project to github
 1. create repo in github and rename branch name main to master
 2. add eclipse-ws to git repo with "git init"
