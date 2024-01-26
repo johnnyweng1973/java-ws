@@ -2,3 +2,8 @@ i create a new dir for workspace and add this new project for sprint boot securi
   so I create a repo for this workspace and all projects will under same repo.
   this project is created with spring starter option.
   project will build automatically once you create it. 
+
+1. create project with eclipse spring starter with option web. eclipse starter is a plugin in eclipse market that support spring boot projects.
+the new project will start building automatically once created
+2. create a controller class in the same package as app and create a requestmapping for "/". add dependency jasper to support jsp page. its version should be same with tomcat
+version, you can find tomcat version in maven dependency.
