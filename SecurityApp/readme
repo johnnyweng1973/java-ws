@@ -7,3 +7,5 @@ i create a new dir for workspace and add this new project for sprint boot securi
 the new project will start building automatically once created
 2. create a controller class in the same package as app and create a requestmapping for "/". add dependency jasper to support jsp page. its version should be same with tomcat
 version, you can find tomcat version in maven dependency.
+3. add dependency spring-boot-starter-security. a login form will appear at index page. username by default is user. and password is printed at log output.
+4. 
