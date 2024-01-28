@@ -44,7 +44,9 @@ we need to override many methods. please remember @Override just mean it impleme
 interface has a default implementation for this method. So its meaning is a little bit different from c++
 7. UserRepository interface is defined and marked with @Repository. we just declare a method findByUsername and spring will implement it.
 this reop is used by service class.
-
+8. compared with restful api. authenticationprovider is like a controller and it will pass request to service and service to database.
+service class will return userdetails instance to authenticationprovider. the methods in userdetails will be called by
+provider to do authentication. in restful api, user info will be written to message body in json format.
 
 
 
