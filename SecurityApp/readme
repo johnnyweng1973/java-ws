@@ -21,4 +21,21 @@ to put it into git because if multiple users are using this project and people m
 6. git add . to add all changes to stage area and commit and push them
 
 1.27
+create a in memory username/password without database.
+create a class annotated with @Configuration and create a method annotated with bean and return UserDetailsService.
+springframe will use this UserDetailService to get username and password. 
+UserDetailService is an interface and in the factory method that create it, we new a class that implement this interface.
+This class is a InMemoryUserDetailsManager, we can create users by using method of this class and then return it. 
+so we can call this is a configuration procedure. we configure a UserDetailsService for springframe and configure user in this manager.
+
+1.27
+add mysql support
+1. install mysql and mysql bench. create a database "mydatabase" and a table "User" which is the name of model class using workbench
+2. create applicatiaon.properties file to configure sql information.
+3. since springboot 3.0, we change javarx to jakarta which defines interface to database.
+4. create factory method for AuthenticationProvider for spring will use to authenticate user. AuthenticationProvider is a 
+interface, we new a instance of class DaoAuthenticationProvider which implement this interface. in Dao instance, we configure it with
+an instance of class MyUserDetailService that implement interface UserDetailService.
+5. create a class MyUserDetailsService, spring will call methods of it to get username/password, etc. 
+
 
