@@ -36,6 +36,15 @@ add mysql support
 4. create factory method for AuthenticationProvider for spring will use to authenticate user. AuthenticationProvider is a 
 interface, we new a instance of class DaoAuthenticationProvider which implement this interface. in Dao instance, we configure it with
 an instance of class MyUserDetailService that implement interface UserDetailService.
-5. create a class MyUserDetailsService, spring will call methods of it to get username/password, etc. 
+5. create a class MyUserDetailsService, similar to RestAPI service class, it will provide service. spring will call its method loadUserByUsername when user input username and password. 
+it has a member repo. it will call findByUsername to get user info. Once user info is availabe, a UserDetail is created and returned.
+spring will decide if user is permitted or not 
+6. A class UserPrincipal implement interface UserDetail. spring will call its method to get username/password and other info.
+we need to override many methods. please remember @Override just mean it implement the method defined by interface. It doesnt mean 
+interface has a default implementation for this method. So its meaning is a little bit different from c++
+7. UserRepository interface is defined and marked with @Repository. we just declare a method findByUsername and spring will implement it.
+this reop is used by service class.
+
+
 
 
