@@ -16,4 +16,9 @@ to put these changes to github, the following need to be done.
 2. git status to check unstaged files and changes
 3. create .gitignore to remove .metadata from git "echo .meta/ >> .gitignore" and "git add .gitignore". This file is used by eclipse and you dont want 
 to put it into git because if multiple users are using this project and people may have different eclipse configurations.
-4. 
+4. remove .metadata from git by running "git rm --cached -r .metadata". please use --cached otherwise .metadata will be removed from both git repo and filesystem
+5. git commit and git push this change
+6. git add . to add all changes to stage area and commit and push them
+
+1.27
+
