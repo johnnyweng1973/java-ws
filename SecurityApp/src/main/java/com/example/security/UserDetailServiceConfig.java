@@ -20,9 +20,13 @@ public class UserDetailServiceConfig {
 	public AuthenticationProvider authProvider() {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
 		provider.setUserDetailsService(userDetailsService);
-		provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+		//provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());
+	    provider.setPasswordEncoder(new BCryptPasswordEncoder());
 		return provider;
 	}
+	
+	
+	
 	/*
 	@Bean
 	public UserDetailsService userDetailsService(BCryptPasswordEncoder bCryptPasswordEncoder) {
