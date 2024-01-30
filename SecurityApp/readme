@@ -63,3 +63,5 @@ create a new project at eclipse by cloning it from github
 we can build it right away after we clone it.
 there is a problem that User class need a default constructor, it can compile before but i dont know why there is an error now. 
 i use a lombok annotation to create a default constructor.
+another problem I had today is something wrong when i move home.jsp to folder template. it seems jsp pages should be under webapp.
+static/template are used for html pages and template engines like thymeleaf.
