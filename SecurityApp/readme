@@ -54,4 +54,7 @@ add support to Bcrypt support
 spring framework will bcrypte the password and store the resulted hash to mysql database.
 2. different from SIP. SIP is digest authentication. we pass digest in the chanllenge-response. web use form-authentication, web form is 
 used to carry username/password. they are stored in html body. html is in the http post request body.
+3. call changePasswordEncode method of Authentication provider to set encoder to be Bcrypted one.
+4. I havent generate my own SecurityFilterChain to filter request, we enable authentication through this filterchain. 
+but authentication are different if we enable authentication in this filterchain. 
 
