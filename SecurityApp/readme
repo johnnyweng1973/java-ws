@@ -48,5 +48,10 @@ this reop is used by service class.
 service class will return userdetails instance to authenticationprovider. the methods in userdetails will be called by
 provider to do authentication. in restful api, user info will be written to message body in json format.
 
-
+1.28
+add support to Bcrypt support
+1. We will store Bcrypt hashed password in mysql, sea salt(random number) and number of runs are also stored along with hashed password.
+spring framework will bcrypte the password and store the resulted hash to mysql database.
+2. different from SIP. SIP is digest authentication. we pass digest in the chanllenge-response. web use form-authentication, web form is 
+used to carry username/password. they are stored in html body. html is in the http post request body.
 
