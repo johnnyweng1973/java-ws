@@ -2,10 +2,12 @@ package com.example.security;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class User {
 	@Id
