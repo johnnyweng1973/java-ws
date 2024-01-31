@@ -6,6 +6,8 @@
 	</section>
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="C:\Users\johnn\java-ws\complete"/>
+			<item value="C:\Users\johnn\java-ws\SecurityApp"/>
 			<item value="C:\Users\johnn\java-tutorial\tutorials\spring-security-modules\spring-security-web-boot-4"/>
 		</list>
 		<list key="projectNameTemplate">
