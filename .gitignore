@@ -1,4 +1,8 @@
 .metadata/
+
+### eclpse log folder ###
+none/
+
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
