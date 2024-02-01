@@ -17,4 +17,12 @@ http flow of login is:
 3. user request login page 
 4. server return login page
 5. user send username and password in html body with post method
-6. if authentication success, server return with 302 which indicate a new page like /hello?continue
+6. if authentication success, server return with 302 which indicate a new page like /hello?continue.
+7. user request that /hello page.
+
+I added mysql support for this project. move related java files from SecurityApp
+1.add mysql packages in pom.xml
+2. add user/model class, userDetailsService class, repository class, userDetail class(this class is used by authenticaion process)
+, so remember, it need a service class which connects to repo class, but this service will
+retrieve userDetail and authenticaiton will call the method of userDetail to authentication the user.
+
