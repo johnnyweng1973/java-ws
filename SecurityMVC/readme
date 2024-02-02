@@ -1,0 +1,28 @@
+this project originated from spring boot web security example.
+The framework of the project is :
+1. A configure file which adds viewcontroller with endopoint and html pages. we dont need to use
+@Controller. In Restapi, we dont need to assign endpoint with a html page.
+2. A security configure file. It create a SecurityFilterChain and A in memoery usersevice manager.
+
+The logic is :
+1. we need to apply the following security rule:
+   1. everyone can access /home
+   2. other requests should be authenticated
+   3. we need a customized login form. everyone can access that form.
+   4. need a logout form. I guess if we dont specify it, it will reuse login form.
+
+http flow of login is:
+1. user request a endpoint that require authentication
+2. server return with 430 to redirect to login page
+3. user request login page 
+4. server return login page
+5. user send username and password in html body with post method
+6. if authentication success, server return with 302 which indicate a new page like /hello?continue.
+7. user request that /hello page.
+
+I added mysql support for this project. move related java files from SecurityApp
+1.add mysql packages in pom.xml
+2. add user/model class, userDetailsService class, repository class, userDetail class(this class is used by authenticaion process)
+, so remember, it need a service class which connects to repo class, but this service will
+retrieve userDetail and authenticaiton will call the method of userDetail to authentication the user.
+
