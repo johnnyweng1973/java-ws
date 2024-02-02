@@ -1,0 +1,46 @@
+/* Reset default margin and padding */
+body, h1, p {
+    margin: 0;
+    padding: 0;
+}
+
+/* Set background color and font */
+body {
+/*     background-color: #f0f0f0; */
+    font-family: Arial, sans-serif;
+    background-color: #00ff00;
+}
+
+/* Style the header */
+h1 {
+    color: #333;
+    background-color: #f4f4f4;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Style paragraphs */
+p {
+    margin: 20px;
+    line-height: 1.6;
+}
+
+/* Style links */
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Simple layout */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
