@@ -8,5 +8,5 @@ c)@Test is used to annotate the test method. Junit framework will call methods w
        for (Method method: methods) {
            method.invoke(object); // invoke is run by java runtime ,  methods from clazz and method are called reflection API.
        }
-d) inside method with @Test: it represent a unit test. use Assertion methods provided by Junit to check return value of the method() you are gonna test.
-
+d) inside method with @Test: it represent a unit test. Use Assertion methods provided by Junit to check return value of the method() you are gonna test.
+   assertEquals, assertTrue, assertFalse, assertNotNull, compare with return value of tested method
