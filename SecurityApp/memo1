@@ -1,5 +1,1 @@
-1)JUNIT
-a)JUNIT is a unit test framework provided by java. org.junit.jupiter.* 
-b)its source code is in src/test/a.b.c. it is in the same package with the java code. 
-c)@Test is used to annotate the test method. Junit framework will call methods with @Test automatically
-   
+
