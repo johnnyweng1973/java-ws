@@ -1,12 +1,12 @@
 1)JUNIT
-a)JUNIT is a unit test framework provided by java. org.junit.jupiter.*. it is used to test methods (simplied use) or other (springboot) 
-b)its source code is in src/test/a.b.c. it is in the same package with the java code. 
+a)JUNIT is a unit test framework provided by Java. org.junit.jupiter.*. it is used to test methods (simplied use) or other (springboot) 
+b)its source code is in src/test/a.b.c. it is in the same package with the Java code. TestClass normally includes instance of Tested Class.
 c)@Test is used to annotate the test method. Junit framework will call methods with @Test automatically
        Class<?> clazz = YouTestClass.class; // every class has a Class object named class. 
        Object object = clazz.newInstance();
        Method[] methods = clazz.getTestMethods();  //get methods with @Test annotation, this is a conceptual method
        for (Method method: methods) {
-           method.invoke(object); // invoke is run by java runtime ,  methods from clazz and method are called reflection API.
+           method.invoke(object); // invoke is run by java runtime,  methods from clazz and method are called reflection API.
        }
-d) inside method with @Test: it represent a unit test. Use Assertion methods provided by Junit to check return value of the method() you are gonna test.
-   assertEquals, assertTrue, assertFalse, assertNotNull, compare with return value of tested method
+d) inside method with @Test: it represent a unit test. Use Assertion methods provided by Junit to check the return value of the method() you are gonna test.
+   assertEquals, assertTrue, assertFalse, assertNotNull, compare with the return value of a tested method
