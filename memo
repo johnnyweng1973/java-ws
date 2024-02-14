@@ -11,3 +11,12 @@ c)@Test is used to annotate the test method. Junit framework will call methods w
 d) inside method with @Test: it represent a unit test. Use Assertion methods provided by Junit to check the return value of the method() you are gonna test.
    assertEquals, assertTrue, assertFalse, assertNotNull, compare with the return value of a tested method
 e) Fixture: @BeforeEach @AfterEach  methods to run after/before test method 
+f) conditions to control if @Test should run
+   @EnabledIfEnvironmentVariable(named = "DEBUG", matches = "true")
+g) @ParameterizedTest
+   @CsvFileSource(resources = { "/test-capitalize.csv" })
+   void testCapitalizeUsingCsvFile(String input, String result) {
+      assertEquals(result, StringUtils.capitalize(input));
+   }
+h) exception test
+    assertException()
