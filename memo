@@ -19,4 +19,14 @@ g) @ParameterizedTest
       assertEquals(result, StringUtils.capitalize(input));
    }
 h) exception test
-    assertException()
+    assertException(IllegalInputArgument.class, ()->{Factorial.fact(-1);})
+    implementation of this assertException:
+     void assertException(Class<? extends Throwable> expectedException, Runnable operation) {
+         try {
+               operation.run()
+              fail();
+         } catch (Throwable actualException) {
+             if (!expectedException.isInstance(actualException)) {
+                fail();
+         }
+     }
