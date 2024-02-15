@@ -1,3 +1,9 @@
-This project has the following parts:
+This project is a web security project, it requires authentication for HTTP requests. It has the following parts:
 controller, service, repository, model, configuration.
-Thed difference from dfadfa 
+The difference from normal projects:
+   1. The service is embedded in authentication provider. This service implements interface UserDetailedService. we need to 
+implement method loadUserInfo() to return UserDetail to framework.
+   2. Unlike return user data to framework in the case of Restful API, framework need an instance
+that implements interface UserDetail. framework will invoke methods of this interface to perform actions such as comparing username and password, etc.
+so when we get user data from DAO, we need to create an instance of UserDetail which includes user data.
+   3. repository implements JPA interface. 
