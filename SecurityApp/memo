@@ -6,4 +6,5 @@ implement method loadUserInfo() to return UserDetail to framework.
    2. Unlike return user data to framework in the case of Restful API, framework need an instance
 that implements interface UserDetail. framework will invoke methods of this interface to perform actions such as comparing username and password, etc.
 so when we get user data from DAO, we need to create an instance of UserDetail which includes user data.
-   3. repository implements JPA interface. 
+   3. repository is a JPA interface. JPA is a Java persistent API specification. 
+   4. User class implements Jarkata persistent API, it has @Entitiy and @Id tag defined. 
