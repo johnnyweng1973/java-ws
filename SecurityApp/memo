@@ -10,8 +10,16 @@ so when we get user data from DAO, we need to create an instance of UserDetail w
    4. User class implements Jarkata persistent API, it has @Entitiy and @Id tag defined. 
 
 How configuration class receive an injected UserDetail instance?
-   UserDetail is a private member of configuration class and it is annotated with Autowire.
+   UserDetail is a private member of the configuration class and it is annotated with Autowire.
 so spring framework will scan the classes with has @service/controller/bean/etc to find class
-that implement UserDetail.
+that implements UserDetail.
+
+How service class recieve an injected repo instance?
+    same as above, it declares a private member of repo instance and annotated with autowire. spring framework
+will create a constructor and pass in the instance in this constructor. 
+
+How framework know which endpoints it supports?
+    It searches the class with @Controller and searches RequestMapping inside. All endpoints it supports 
+are defined in RequestMapping. 
 
 
