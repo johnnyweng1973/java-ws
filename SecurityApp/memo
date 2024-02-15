@@ -8,3 +8,10 @@ that implements interface UserDetail. framework will invoke methods of this inte
 so when we get user data from DAO, we need to create an instance of UserDetail which includes user data.
    3. repository is a JPA interface. JPA is a Java persistent API specification. 
    4. User class implements Jarkata persistent API, it has @Entitiy and @Id tag defined. 
+
+How configuration class receive an injected UserDetail instance?
+   UserDetail is a private member of configuration class and it is annotated with Autowire.
+so spring framework will scan the classes with has @service/controller/bean/etc to find class
+that implement UserDetail.
+
+
