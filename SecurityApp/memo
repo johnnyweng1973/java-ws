@@ -22,4 +22,7 @@ How framework know which endpoints it supports?
     It searches the class with @Controller and searches RequestMapping inside. All endpoints it supports 
 are defined in RequestMapping. 
 
+how this servlet works?
+Servlet container is implemented on Tomcat web server, it will create servlet for each http request and assign a thread for 
+this handling, it will pass thread and servlet to spring framework, spring framework will locate the endpoint and its handling method to run it.
 
