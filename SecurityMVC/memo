@@ -1,1 +1,10 @@
+This project provides authentication feature, the same as SecurityApp. But it can configure
+authentication filter, adding filters to the filter chain.
+The policies it configures are:
+    allow everybody access home page, access css page, access login page
+    other requests need to be authenticated.
+    customize login page. 
+user submit login data by http post to login page with username and password. spring framework
+will handle authentication of username and password automatically
+    
 
