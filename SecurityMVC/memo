@@ -6,5 +6,7 @@ The policies it configures are:
     customize login page. 
 user submit login data by http post to login page with username and password. spring framework
 will handle authentication of username and password automatically
-    
+
+Thymeleaf is used to render the web page. it is better than java server page in that it does not use java code
+css is used.    
 
