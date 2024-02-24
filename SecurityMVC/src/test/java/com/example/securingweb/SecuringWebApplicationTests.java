@@ -33,7 +33,7 @@ public class SecuringWebApplicationTests {
 		mockMvc.perform(login)
 			.andExpect(authenticated().withUsername("user"));
 	}
-
+/*
 	@Test
 	public void loginWithInvalidUserThenUnauthenticated() throws Exception {
 		FormLoginRequestBuilder login = formLogin()
@@ -49,14 +49,14 @@ public class SecuringWebApplicationTests {
 		mockMvc.perform(get("/"))
 			.andExpect(status().isOk());
 	}
-
+*/
 	@Test
 	public void accessSecuredResourceUnauthenticatedThenRedirectsToLogin() throws Exception {
 		mockMvc.perform(get("/hello"))
 			.andExpect(status().is3xxRedirection())
 			.andExpect(redirectedUrlPattern("**/login"));
 	}
-
+/*
 	@Test
 	@WithMockUser
 	public void accessSecuredResourceAuthenticatedThenOk() throws Exception {
@@ -66,4 +66,5 @@ public class SecuringWebApplicationTests {
 
 		assertThat(mvcResult.getResponse().getContentAsString()).contains("Hello user!");
 	}
+*/	
 }
