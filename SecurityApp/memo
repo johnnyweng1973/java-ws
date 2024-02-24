@@ -1,0 +1,30 @@
+This project is a web security project, it requires authentication for HTTP requests. It has the following parts:
+controller, service, repository, model, configuration.
+The difference from normal projects:
+   1. The service is embedded in authentication provider. This service implements interface UserDetailedService. we need to 
+implement method loadUserInfo() to return UserDetail to framework.
+   2. Unlike return user data to framework in the case of Restful API, framework need an instance
+that implements interface UserDetail. framework will invoke methods of this interface to perform actions such as comparing username and password, etc.
+so when we get user data from DAO, we need to create an instance of UserDetail which includes user data.
+   3. repository is a JPA interface. JPA is a Java persistent API specification. 
+   4. User class implements Jarkata persistent API, it has @Entitiy and @Id tag defined. 
+
+How configuration class receive an injected UserDetail instance?
+   UserDetail is a private member of the configuration class and it is annotated with Autowire.
+so spring framework will scan the classes with has @service/controller/bean/etc to find class
+that implements UserDetail.
+
+How service class recieve an injected repo instance?
+    same as above, it declares a private member of repo instance and annotated with autowire. spring framework
+will create a constructor and pass in the instance in this constructor. 
+
+How framework know which endpoints it supports?
+    It searches the class with @Controller and searches RequestMapping inside. All endpoints it supports 
+are defined in RequestMapping. 
+
+how this works?
+ In Tomcat there is a servlet container. When Http request arrives, it will allocate a HttpServletRequest and assign a thread from free thread pool.
+it will pass the thread and servlet to spring framework, spring framework has a front controller dispacherservlet to handle it.
+httprequest will pass a filterchain. and then springframe work will assign a servlet to handle it. 
+Normally its method doGet() will run in a dedicated thread.
+
