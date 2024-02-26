@@ -7,6 +7,7 @@ import com.example.mvc.model.Memo;
 import com.example.mvc.repository.MemoRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class MVCService {
@@ -21,4 +22,13 @@ public class MVCService {
     public Memo addMemo(Memo memo) {
         return memoRepository.save(memo);
     }
+
+	public Optional<Memo> findById(Long memoId) {
+		return memoRepository.findById(memoId);
+	}
+
+	public void updateMemo(Memo memo) {
+		memoRepository.save(memo);
+		return;
+	}
 }

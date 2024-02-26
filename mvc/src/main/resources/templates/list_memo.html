@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"><head>
+    <title>Edit Memo</title>
+</head>
+<body>
+    <h2>Memo List</h2>
+    <ul id="memoList">
+        <!-- Generate memo buttons dynamically using Thymeleaf -->
+        <li th:each="memo : ${memos}">
+            <button class="editButton" th:attr="data-memo-id=${memo.id}" th:text="${memo.title}">Edit</button>
+        </li>
+    </ul>
+
+    <script src="list_memo.js"></script>
+</body>
+</html>

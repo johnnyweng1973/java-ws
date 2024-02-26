@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Manage Memos</title>
+    <style>
+        /* Style the text area to set width and height */
+        #textArea {
+            width: 900px; /* Set the width of the text area */
+            height: 400px; /* Set the height of the text area */
+            overflow-y: auto; /* Add a vertical scroll bar */
+            overflow-x:auto;
+            resize: none; /* Disable resizing of the text area */
+        }
+    </style>
+    
+</head>
+<body>
+    <form action="#" th:action="@{/memo/update/{id}(id=${memo.id})}" th:object="${memo}" method="post">
+        <input type="text" th:field="*{id}" />
+        <p>Title: <input type="text" th:field="*{title}" size=60 /></p>
+        <p>Description: <input type="text" th:field="*{description}" size=60 /></p>
+        <p>Category: <input type="text" th:field="*{category}" /></p>
+        <p>Content: <textarea id="textArea" th:field="*{content}"></textarea> /></p>
+        <p><input type="submit" value="Update" /></p>
+    </form>
+
+    <hr/>
+</body>
+</html>
