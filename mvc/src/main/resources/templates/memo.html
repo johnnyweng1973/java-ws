@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Manage Memos</title>
+    <style>
+        .container-left {
+            width: 200px; /* Set the width of the left container */
+            float: left; /* Float the left container to the left */
+            padding: 0;
+        }
+
+        .container-right {
+            flex:1; /* Set the margin to accommodate the width of the left container */
+            display:flex;
+        }
+    
+        /* Style the text area to set width and height */
+        #textArea {
+            width: 900px; /* Set the width of the text area */
+            height: 400px; /* Set the height of the text area */
+            overflow-y: auto; /* Add a vertical scroll bar */
+            overflow-x:auto;
+            resize: none; /* Disable resizing of the text area */
+        }
+    </style>
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+   
+</head>
+<body>
+    <div class="container-left">
+    <div class="container my-5">
+    <ul id="memoList">
+        <!-- Generate memo buttons dynamically using Thymeleaf -->
+        <li th:each="memo : ${memos}">
+            <button class="editButton" th:attr="data-memo-id=${memo.id}" th:text="${memo.title}">Edit</button>
+        </li>
+    </ul>
+    </div>
+    </div>
+    <div class="container my-5">
+    <div class="container-right">
+     <form id="myForm" action="" method="post">
+        <p>Id: <input type="text" id="id" name="id"  readonly/></p>
+        <p>Title: <input type="text" id="title" name="title" size=60 /></p>
+        <p>Description: <input type="text" id="description" name="description" size=60 /></p>
+        <p>Category: <input type="text" id="category" name="category" /></p>
+        <p>Content: <textarea id="textArea" name="content"></textarea></p>
+        <p><input type="submit" value="Update" /></p>
+    </form>
+    
+
+    <hr/>
+    </div>
+    </div>
+    <script src="memo/memo.js"></script>
+</body>
+</html>
