@@ -1,0 +1,67 @@
+description,id,title,category,content
+html and css,1,html and css,html,1. html loading
+    Parsing HTML: When a browser loads an HTML document, it starts parsing the HTML from top to bottom. As it parses the HTML, it constructs the DOM tree representing the structure of the document.
+2. use thymeleaf in html tag
+   <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+    namespace is html and thymeleaf
+3. use bootstrap at update_memo HTML to beautify form
+   a) in html header add:
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha38..
+   b) in HTML body add:
+     <div class="container my-5">
+      bootstrap container will manage the layout of your HTML elements.
+4. use <div> to divide web page into two parts vertically.
+    div with class "left-container" and div with class "right-container".  in style tag at header, you define left-container takes up 20% width and right-container use flex to take the remaining space.
+    then, inside each container, you define bootstrap container to manager your layout, one is a button list, the other is form.
+5. padding and margin
+    they are used to add space between content and border, add space after border.
+
+ 
+html and css,2,hi,html,ddddfffffggggghhhhhh
+several javacript,3,javascript for memo project,javacript,this javascript is an external file 
+1) when javascript run
+   web browser loads html file first, while parsing the content, it constructs a tree to manage the elements. if there is a javascript file as external file, it will request this file. until javascripts are loaded, DOMContentLoaded event gets triggered.
+
+2)what javascript can do
+   it can create/change/delete the elements of the tree representing that html file and also performs Ajax function
+
+3)what does it do in your project?
+       
+web browser will request it after receiving HTML file. there is an ref in this HTML to this javascript.
+if you update this javascript, you need to hard refresh web browser to retrieve this. otherwise web client will use cached
+javascript file.
+document represents this HTML file. it will add an anonymous function to execute when event DOMContentLoaded fires.
+This event will fire after javascript file get retrieved but it doesn't wait for other things such as image files.  
+Normally in HTML form, submitting a  button will start a post request with parameters inside HTML body. but in this
+function, submitting button will start a HTTP GET request with record id. 
+
+normally you can define button submit action through a HTML form. it is not convenient as javascript which can create
+dynamic URL. 
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    var memoList = document.getElementById('memoList');
+
+    memoList.addEventListener('click', function(event) {
+        var target = event.target;
+        if (target && target.classList.contains('editButton')) {
+            var memoId = target.getAttribute('data-memo-id');
+            // Redirect to the edit page with memoId
+            window.location.href = '/memo/update/' + memoId;
+        }
+    });
+});
+
+-------------------------------------------------------------------------------------------
+this file registers a function for a timer
+
+// Define the autoSubmitForm function to submit the form
+function autoSubmitForm() {
+    document.getElementById('myForm').submit();
+}
+
+// Set up a timer to call autoSubmitForm every 2 minutes (120,000 milliseconds)
+setInterval(autoSubmitForm, 120000); // 2 minutes = 2 * 60 * 1000 milliseconds
+
+
+

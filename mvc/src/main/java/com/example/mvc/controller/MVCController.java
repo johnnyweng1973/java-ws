@@ -13,11 +13,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.example.mvc.model.Memo;
 import com.example.mvc.service.MVCService;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+@Slf4j
 @Controller
 @RequestMapping("/memo")
 public class MVCController {
@@ -48,8 +50,24 @@ public class MVCController {
         	memos = new ArrayList<>();
         }
 
+        // Logging the number of elements in the 'memos' list
+        log.info("Number of elements in the 'memos' list: {}", memos.size());
+
         model.addAttribute("memos", memos);
         return "memo";
+    }
+
+    @ResponseBody
+    @GetMapping("/list-rest")
+    public List<Memo> getListFromRestful() {
+        List<Memo> memos;
+        try {
+        	memos = memoService.getAllMemos();
+        } catch (Exception e) {
+        	memos = new ArrayList<>();
+        }
+
+        return memos;
     }
 
     @GetMapping("/list")
