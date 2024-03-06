@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.mvc.model.Memo;
-import com.example.mvc.service.MVCService;
+import com.example.mvc.service.MemoService;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,10 +22,10 @@ import java.util.Optional;
 @Slf4j
 @Controller
 @RequestMapping("/memo")
-public class MVCController {
+public class MemoController {
 
     @Autowired
-    private MVCService memoService;
+    private MemoService memoService;
 
     @GetMapping("/manage")
     public String manageMemos(Model model) {

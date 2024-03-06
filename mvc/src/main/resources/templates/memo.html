@@ -29,12 +29,12 @@
 <body>
     <div class="container-left">
     <div class="container my-5">
-    <ul id="memoList">
-        <!-- Generate memo buttons dynamically using Thymeleaf -->
-        <li th:each="memo : ${memos}">
-            <button class="editButton" th:attr="data-memo-id=${memo.id}" th:text="${memo.title}">Edit</button>
-        </li>
-    </ul>
+		<ul id="memoList" style="list-style-type: none; padding: 0;">
+		   <!-- Generate memo buttons dynamically using Thymeleaf -->
+		   <li th:each="memo : ${memos}" style="margin-bottom: 5px;">
+		       <button class="editButton" th:attr="data-memo-id=${memo.id}" th:text="${memo.title}" style="width: 90%; text-align: left; padding-right: 1px;">Edit</button>
+		    </li>
+		</ul>
     </div>
     </div>
     <div class="container my-5">

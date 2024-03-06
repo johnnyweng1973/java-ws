@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class MVCService {
+public class MemoService {
 
     @Autowired
     private MemoRepository memoRepository;
