@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Manage MathProblems</title>
+    <style>
+        /* Style the text area to set width and height */
+        #textArea {
+            width: 800px; /* Set the width of the text area */
+            height: 200px; /* Set the height of the text area */
+            overflow-y: auto; /* Add a vertical scroll bar */
+            overflow-x:auto;
+            resize: none; /* Disable resizing of the text area */
+        }
+    </style>
+    
+</head>
+<body>
+  <form action="/add-test" method="post">
+    <table>
+        <thead>
+            <tr>
+                <th>Problem Description</th>
+                <th>Solution</th>
+                <th>Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="problem : ${problems}">
+                <td th:text="${problem.problemDescription}"></td>
+                <td>
+                    <input type="text" th:value="${problem.solution}" name="solutions"/>
+                    <!-- Hidden fields for other properties -->
+                    <input type="hidden" th:value="${problem.id}" name="ids"/>
+                    <input type="hidden" th:value="${problem.problemId}" name="problemIds"/>
+                    <input type="hidden" th:value="${problem.category}" name="categories"/>
+                    <input type="hidden" th:value="${problem.subcategory}" name="subcategories"/>
+                    <input type="hidden" th:value="${problem.subcategoryId}" name="subcategoryIds"/>
+                </td>
+                <td>
+                    <input type="text" name="answers"/>
+                    <!-- Hidden field for the isCorrect property -->
+                    <input type="hidden" th:value="${problem.isCorrect}" name="isCorrects"/>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <button type="submit">Submit</button>
+</form>
+</body>
+</html>

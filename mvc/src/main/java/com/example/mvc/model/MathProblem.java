@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,16 +20,19 @@ public class MathProblem {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 	private String category;
-	@Column(name = "subcategory") // Specify custom column name
-    private String subcategory;
-    private String description;
+	
+	@ManyToOne
+    @JoinColumn(name = "subcategory_id")
+    private MathSubCategory mathSubCategory;
+    
+	private String description;
     private String solution;
     private String answer;
     
     public MathProblem(MathProblem problem){
 		this.id = problem.id;
 		this.category = problem.category;
-		this.subcategory = problem.subcategory;
+		this.mathSubCategory = problem.mathSubCategory;
 		this.description = problem.description;
 		this.solution = problem.solution;
 		this.answer = problem.answer;

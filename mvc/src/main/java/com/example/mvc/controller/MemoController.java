@@ -29,13 +29,10 @@ public class MemoController {
 
     @GetMapping("/manage")
     public String manageMemos(Model model) {
-        List<Memo> memos;
-        try {
-        	memos = memoService.getAllMemos();
-        } catch (Exception e) {
-        	memos = new ArrayList<>();
+        List<Memo> memos = memoService.getAllMemos();
+        if (memos == null) {
+            memos = new ArrayList<>();
         }
-
         model.addAttribute("memos", memos);
         model.addAttribute("newMemo", new Memo());
         return "manage_memo";

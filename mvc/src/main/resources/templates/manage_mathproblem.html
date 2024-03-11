@@ -18,7 +18,7 @@
     <h2>Add New MathProblem</h2>
     <form action="#" th:action="@{/math/add}" th:object="${newMathProblem}" method="post">
         <p>category: <input type="text" th:field="*{category}" size=60 /></p>
-        <p>subcategory: <input type="text" th:field="*{subcategory}" size=60 /></p>
+        <p>subcategory: <input type="text" th:field="*{subcategory.name}" size=60 /></p>
         <p>description: <textarea id="textArea" th:field="*{description}" /></textarea></p>
         <p>solution: <textarea id="textArea" th:field="*{solution}" /></textarea></p>
         <p>answer: <input type="text" th:field="*{answer}"></p>
@@ -40,7 +40,7 @@
         <tr th:each="mathproblem : ${mathProblems}">
             <td th:text="${mathproblem.id}"></td>
             <td th:text="${mathproblem.category}"></td>
-            <td th:text="${mathproblem.subcategory}"></td>
+            <td th:text="${mathproblem.subcategory.name}"></td>
             <td th:text="${mathproblem.description}"></td>
             <td th:text="${mathproblem.solution}"></td>
             <td th:text="${mathproblem.answer}"></td>
