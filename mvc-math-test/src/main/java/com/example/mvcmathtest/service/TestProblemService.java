@@ -32,4 +32,8 @@ public class TestProblemService {
         testProblemRepository.save(testProblem);
         return;
     }
+    
+    public void saveAll(List<TestProblem> problems) {
+    	testProblemRepository.saveAll(problems);
+    }
 }

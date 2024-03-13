@@ -16,52 +16,113 @@
 		    width: 50%; /* Set width to 50% */
 		}
 		.input-match-height {
-    width: 100%;
-    height: 100%;
-    border: none;
-    padding: 0;
-    margin: 0;
-    resize: none; /* Prevent resizing of textarea */
-    outline: none; /* Remove the outline when focused */
-}
-		
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 0;
+            margin: 0;
+            resize: none; /* Prevent resizing of textarea */
+            outline: none; /* Remove the outline when focused */
+        }
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 </head>
 <body>
   <div class="container my-5">
-  <form action="/add-test" method="post">
-    <table>
-        <thead>
-            <tr>
-                <th>Problem Description</th>
-                <th>Solution</th>
-                <th>Answer</th>
-            </tr>
-        </thead>
-        <tbody>
-   <tr th:each="problem : ${problems}">
-    <td class="framed-cell", style="width: 40%;" th:text="${problem.problemDescription}"></td>
-    <td class="framed-cell", style="width: 40%;">
-        <textarea th:text="${problem.solution}" name="solutions" class="input-match-height"></textarea>
-        <!-- Hidden fields for other properties -->
-        <input type="hidden" th:value="${problem.id}" name="ids"/>
-        <input type="hidden" th:value="${problem.problemId}" name="problemIds"/>
-        <input type="hidden" th:value="${problem.category}" name="categories"/>
-        <input type="hidden" th:value="${problem.subcategory}" name="subcategories"/>
-        <input type="hidden" th:value="${problem.subcategoryId}" name="subcategoryIds"/>
-    </td>
-    <td class="framed-cell", style="width: 20%;">
-        <textarea th:text="${problem.answer}" name="answers" class="input-match-height"></textarea>
-        <!-- Hidden field for the isCorrect property -->
-        <input type="hidden" th:value="${problem.isCorrect}" name="isCorrects"/>
-    </td>
-</tr>
-
-        </tbody>
-    </table>
-    <button type="submit">Submit</button>
+    <form id="myForm">
+        <table>
+            <thead>
+                <tr>
+                    <th>Problem Description</th>
+                    <th>Solution</th>
+                    <th>Answer</th>
+                </tr>
+            </thead>
+            <tbody>
+                 <tr th:each="problem : ${problems}">
+                    <td class="framed-cell" style="width: 40%;" th:text="${problem.problemDescription}"></td>
+                    <td class="framed-cell" style="width: 40%;">
+                        <textarea th:text="${problem.solution}" name="solution" class="input-match-height"></textarea>
+                        <!-- Hidden fields for other properties -->
+                        <input type="hidden" th:value="${problem.id}" name="id"/>
+                        <input type="hidden" th:value="${problem.problemId}" name="problemId"/>
+                        <input type="hidden" th:value="${problem.category}" name="category"/>
+                        <input type="hidden" th:value="${problem.subcategory}" name="subcategory"/>
+                        <input type="hidden" th:value="${problem.subcategoryId}" name="subcategoryId"/>
+                    </td>
+                    <td class="framed-cell" style="width: 20%;">
+                        <textarea th:text="${problem.answer}" name="answer" class="input-match-height"></textarea>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button type="button" onclick="submitForm()">Submit</button>
     </form>
-    </div>
+  </div>
+
+  <script>
+    function submitForm() {
+    	// Define MyClass
+    	function MyClass2(field1) {
+    	    this.field1 = field1;
+            //this.isCorrect = field2;
+    	}
+
+    	// Create an instance of MyClass
+    	//var formData = new MyClass2("example");
+
+    	function MyClass(field1,field2, answer) {
+    	    this.category = field1;
+    	    this.subcategory = field2;
+    	    this.answer = answer;
+    	}
+
+    	// Create an instance of MyClass
+    	//var formData = new MyClass("example", "test", "helloanswer");
+        var formData = []; 
+        document.querySelectorAll('tr').forEach(function(row, index) {
+            
+            if (index >= 1){
+            	var problem = {};
+            	problem['problemDescription'] = row.cells[0].textContent;
+	            
+ 	            var solutionTextarea = row.cells[1].querySelector('textarea');
+ 	            problem['solution'] = solutionTextarea ? solutionTextarea.value : null;
+	
+	              var answerTextarea = row.cells[2].querySelector('textarea');
+	              problem['answer'] = answerTextarea ? answerTextarea.value : null;
+ 	            problem['id'] = getValueFromInput(row.cells[1].querySelector('input[name="id"]'));
+ 	            problem['problemId'] = getValueFromInput(row.cells[1].querySelector('input[name="problemId"]'));
+ 	            problem['category'] = getValueFromInput(row.cells[1].querySelector('input[name="category"]'));
+ 	            problem['subcategory'] = getValueFromInput(row.cells[1].querySelector('input[name="subcategory"]'));
+ 	            problem['subcategoryId'] = getValueFromInput(row.cells[1].querySelector('input[name="subcategoryId"]'));
+	            formData.push(problem);
+            }
+            
+        });
+
+        function getValueFromInput(inputElement) {
+            return inputElement ? inputElement.value : null;
+        }
+        
+        fetch('/test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        }).then(response => {
+        	if (response.ok) {
+        	    // If the POST request is successful, redirect to another page
+        	    window.location.href = '/test-success';
+        	  } else {
+        		  window.location.href = '/test-fail';
+        	  }
+        }).catch(error => {
+            // Handle error
+            console.error('Error:', error);
+        });
+    }
+  </script>
 </body>
 </html>

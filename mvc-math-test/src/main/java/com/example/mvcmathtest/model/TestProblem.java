@@ -1,5 +1,8 @@
 package com.example.mvcmathtest.model;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 import com.example.mvcmathtest.dto.MathProblemDTO;
 
 import jakarta.persistence.Column;
@@ -25,6 +28,9 @@ public class TestProblem {
     @Column(name = "problem_id")
     private Long problemId;
     
+    //@Column(name = "date_created")
+    //private LocalDate dateCreated;
+   
     @Column(name = "category")
     private String category;
     
@@ -46,13 +52,19 @@ public class TestProblem {
     @Column(name = "is_correct")
     private boolean isCorrect;
     
+    @Column(name = "timestamp")
+    private LocalDateTime timestamp;
+    
  // Constructor
     public TestProblem(MathProblemDTO dto) {
+    	this.id = (long) 0;
+    	this.problemId = dto.getId();
         this.category = dto.getCategory();
         this.subcategory = dto.getMathSubCategory().getName();
         this.subcategoryId = dto.getMathSubCategory().getId();
         this.problemDescription = dto.getDescription();
         this.solution = dto.getSolution();
         this.answer = dto.getAnswer();
+        this.isCorrect = false;
     }
 }

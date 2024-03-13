@@ -3,6 +3,8 @@ package com.example.mvcmathtest.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -13,18 +15,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-
+import com.example.mvcmathtest.controller.TestController;
 import com.example.mvcmathtest.dto.MathProblemDTO;
 import com.example.mvcmathtest.model.TestProblem;
 
 @Service
 public class RestService {
+	private static final Logger log = LoggerFactory.getLogger(TestController.class);
+	
 	@Autowired
 	private RestTemplate restTemplate;
 	
@@ -44,6 +46,8 @@ public class RestService {
             if (problemListResponse.getStatusCode() == HttpStatus.OK) {
             	String jsonString = problemListResponse.getBody(); 
             	 // Deserialize JSON string into MathProblemDTO object
+            	log.info("json data from service {}", jsonString);
+                
                 List<MathProblemDTO> mathProblems= objectMapper.readValue(jsonString, new TypeReference<List<MathProblemDTO>>(){});
                 for(MathProblemDTO problem : mathProblems) {
                 	TestProblem testProblem = new TestProblem(problem);
