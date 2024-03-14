@@ -26,20 +26,5 @@
 
     <hr/>
 
-    <h2>Existing Memos</h2>
-    <table border="1">
-        <tr>
-            <th>Id</th>
-            <th>Title</th>
-            <th>Description</th>
-            <th>Category</th>
-        </tr>
-        <tr th:each="memo : ${memos}">
-            <td th:text="${memo.id}"></td>
-            <td th:text="${memo.title}"></td>
-            <td th:text="${memo.description}"></td>
-            <td th:text="${memo.category}"></td>
-        </tr>
-    </table>
-</body>
+  </body>
 </html>

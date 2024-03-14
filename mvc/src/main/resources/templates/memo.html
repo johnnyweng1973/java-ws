@@ -29,7 +29,9 @@
 <body>
     <div class="container-left">
     <div class="container my-5">
-		<ul id="memoList" style="list-style-type: none; padding: 0;">
+        <button id="newMemoButton" onclick="window.location.href='/memo/add'" style="width: 100%; background-color: yellow; margin-bottom: 10px;">New Memo</button>
+        <p style="margin-top: 15px; padding-bottom: 0; margin-bottom: 0;">Memo List</p>
+        <ul id="memoList" style="list-style-type: none; padding: 0;">
 		   <!-- Generate memo buttons dynamically using Thymeleaf -->
 		   <li th:each="memo : ${memos}" style="margin-bottom: 5px;">
 		       <button class="editButton" th:attr="data-memo-id=${memo.id}" th:text="${memo.title}" style="width: 90%; text-align: left; padding-right: 1px;">Edit</button>
