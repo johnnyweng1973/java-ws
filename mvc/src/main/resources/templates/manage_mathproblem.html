@@ -17,11 +17,21 @@
 <body>
     <h2>Add New MathProblem</h2>
     <form action="#" th:action="@{/math/add}" th:object="${newMathProblem}" method="post">
+        <p>
+        subject:
+        <select th:field="*{subject}">
+            <option th:each="value : ${subjects}"
+                    th:value="${value}"
+                    th:text="${value}">
+            </option>
+        </select>
+        </p>
         <p>category: <input type="text" th:field="*{category}" size=60 /></p>
         <p>subcategory: <input type="text" th:field="*{mathSubCategory.name}" size=60 /></p>
         <p>description: <textarea id="textArea" th:field="*{description}" /></textarea></p>
         <p>solution: <textarea id="textArea" th:field="*{solution}" /></textarea></p>
         <p>answer: <input type="text" th:field="*{answer}"></p>
+        <p>Multiple Answers: <input type="checkbox" th:field="*{multipleAnswers}" /></p>
         <p><input type="submit" value="Add Math" /></p>
     </form>
 

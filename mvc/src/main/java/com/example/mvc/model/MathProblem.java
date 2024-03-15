@@ -2,6 +2,8 @@ package com.example.mvc.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,6 +18,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class MathProblem {
+	public enum SubjectType {
+        math,
+        science,
+        history
+    }
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -29,6 +37,13 @@ public class MathProblem {
     private String solution;
     private String answer;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subject")
+    private SubjectType subject;
+    
+    @Column(name = "multiple_answers")
+    private boolean multipleAnswers;
+    
     public MathProblem(MathProblem problem){
 		this.id = problem.id;
 		this.category = problem.category;
@@ -36,6 +51,8 @@ public class MathProblem {
 		this.description = problem.description;
 		this.solution = problem.solution;
 		this.answer = problem.answer;
+		this.subject = problem.subject;
+		this.multipleAnswers = problem.multipleAnswers;
 	}
 	
 }

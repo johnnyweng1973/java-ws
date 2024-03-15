@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.mvc.model.MathProblem;
+import com.example.mvc.model.MathProblem.SubjectType;
 import com.example.mvc.model.MathSubCategory;
 import com.example.mvc.service.MathProblemService;
 import com.example.mvc.service.MathSubCategoryService;
@@ -50,6 +51,7 @@ public class MathProblemsController {
 		log.info("Number of elements in the 'problems' list: {}", mathProblems.size());
 
 		model.addAttribute("mathProblems", mathProblems);
+        model.addAttribute("subjects", SubjectType.values());
 		model.addAttribute("newMathProblem", new MathProblem());
 		return "manage_mathproblem";
 	}
@@ -59,22 +61,31 @@ public class MathProblemsController {
 		MathSubCategory subcategory = mathSubcategoryService.findOrCreateSubcategory(newMathProblem.getMathSubCategory().getName());
 
 		String[] problemsArray = newMathProblem.getDescription().split("Problem:");
+		List<MathProblem> problemList = new ArrayList<>();
 		//newMathProblem.setId(1); 
 		if(problemsArray.length > 1) {
 			for(String problem: problemsArray) {
 				if(problem.trim().length() > 0) {
-					// Logging the number of elements in the 'memos' list
 					MathProblem mathProblem = new MathProblem(newMathProblem);
-					mathProblem.setDescription(problem);
+					String[] problemAnswer = problem.split("Answer:");
+					if (problemAnswer.length <= 1) {
+						problemAnswer = problem.split("Answers:");
+					}
+					mathProblem.setDescription(problemAnswer[0].trim());
+					if (problemAnswer.length > 1) {
+					    mathProblem.setAnswer(problemAnswer[1].trim());
+					}
+					mathProblem.setMathSubCategory(subcategory);
 					log.info("create a new problem {}", mathProblem.toString());
-					mathProblemService.add(mathProblem);		
+					problemList.add(mathProblem);		
 				}
 			}
 		}
 		else {
 			newMathProblem.setMathSubCategory(subcategory);
-			mathProblemService.add(newMathProblem);
+			problemList.add(newMathProblem);
 		}
+		mathProblemService.saveAll(problemList);
 		return "redirect:/math";
 	}
 	

@@ -14,6 +14,7 @@ import com.example.mvc.model.MathProblem;
 import com.example.mvc.model.MathSubCategory;
 import com.example.mvc.repository.MathProblemsRepository;
 import com.example.mvc.repository.MathSubCategoryRepository;
+//import com.example.mvc.mathtest.model.TestProblem;
 
 @Service
 public class MathProblemService {
@@ -69,4 +70,7 @@ public class MathProblemService {
 	    }
 		return combinedMathProblems;
 	}
+	public void saveAll(List<MathProblem> problems) {
+    	mathProblemsRepository.saveAll(problems);
+    }
 }
