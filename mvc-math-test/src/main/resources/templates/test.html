@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body>
+<form id="myForm" action="/test_subject">
+    <label for="subject">Select a Subject:</label>
+    <select id="subject" name="subject" onchange="toggleNoSpellingCheckbox()">
+        <option value="math">Math</option>
+        <option value="science">Science</option>
+        <option value="chinese">Chinese</option>
+    </select>
+
+    <div id="noSpellingCheckboxDiv" style="display: none;">
+        <input type="checkbox" id="noSpellingCheckbox" name="noSpellingCheckbox" value="true" >
+        <label for="noSpellingCheckbox">No Spelling</label>
+    </div>
+
+    <button type="submit">Submit</button>
+</form>
+<script>
+    function toggleNoSpellingCheckbox() {
+        var subjectSelect = document.getElementById("subject");
+        var noSpellingCheckboxDiv = document.getElementById("noSpellingCheckboxDiv");
+
+        if (subjectSelect.value === "chinese") {
+            noSpellingCheckboxDiv.style.display = "block";
+        } else {
+            noSpellingCheckboxDiv.style.display = "none";
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -4,9 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.example.mvcmathtest.dto.MathProblemDTO;
+import com.example.mvcmathtest.util.TestSubjectType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -20,7 +23,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TestProblem {
-    @Id
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
@@ -55,6 +58,14 @@ public class TestProblem {
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
     
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subject")
+    private TestSubjectType subject;
+    
+    @Column(name = "multiple_answers")
+    private boolean multipleAnswers;
+  
+    
  // Constructor
     public TestProblem(MathProblemDTO dto) {
     	this.id = (long) 0;
@@ -66,5 +77,7 @@ public class TestProblem {
         this.solution = dto.getSolution();
         this.answer = dto.getAnswer();
         this.isCorrect = false;
+        this.subject = dto.getSubject();
+        this.multipleAnswers = dto.isMultipleAnswers();
     }
 }

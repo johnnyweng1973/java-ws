@@ -17,12 +17,13 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.mvc.model.MathProblem;
-import com.example.mvc.model.MathProblem.SubjectType;
 import com.example.mvc.model.MathSubCategory;
 import com.example.mvc.service.MathProblemService;
 import com.example.mvc.service.MathSubCategoryService;
+import com.example.mvc.util.TestSubjectType;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -51,7 +52,7 @@ public class MathProblemsController {
 		log.info("Number of elements in the 'problems' list: {}", mathProblems.size());
 
 		model.addAttribute("mathProblems", mathProblems);
-        model.addAttribute("subjects", SubjectType.values());
+        model.addAttribute("subjects", TestSubjectType.values());
 		model.addAttribute("newMathProblem", new MathProblem());
 		return "manage_mathproblem";
 	}
@@ -90,7 +91,7 @@ public class MathProblemsController {
 	}
 	
     @PostMapping("/test-rest")
-    public ResponseEntity<List<MathProblem>> handleRequestBody(@RequestBody String requestBody) {
+    public ResponseEntity<List<MathProblem>> handleRequestBody(@RequestParam TestSubjectType subject,@RequestBody String requestBody) {
         try {
             // Convert the JSON string from the request body into a map
             Map<Long, List<Long>> requestBodyMap = objectMapper.readValue(
@@ -99,7 +100,7 @@ public class MathProblemsController {
             );
 
             // Handle the map as needed (e.g., perform database queries)
-            List<MathProblem> mathProblems = mathProblemService.findMathProblems(requestBodyMap);
+            List<MathProblem> mathProblems = mathProblemService.findMathProblems(subject, requestBodyMap);
 
             // Return the map in the response
             return ResponseEntity.ok(mathProblems);

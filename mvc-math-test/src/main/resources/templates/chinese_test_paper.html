@@ -29,6 +29,12 @@
 </head>
 <body>
   <div class="container my-5">
+  <div>
+    Start Index: <input type="number" id="startIndexInput" value="1">
+    End Index: <input type="number" id="endIndexInput" value="5">
+    <button type="button" onclick="filterRecords()">Filter</button>
+   
+</div>
     <form id="myForm">
     <h2 th:text="${sub} + ' Test'"></h2>
    
@@ -42,9 +48,9 @@
             </thead>
             <tbody>
                  <tr th:each="problem, index : ${problems}">
-                    <td class="framed-cell" style="width: 40%;" th:text="${problem.problemDescription}"></td>
+                    <td class="framed-cell" style="width: 40%;font-family: 楷体, KaiTi, serif;font-size: 24px;" th:text="${problem.problemDescription}"></td>
                     <td class="framed-cell" style="width: 40%;">
-                        <textarea th:text="${problem.solution}" name="solution" class="input-match-height" ></textarea>
+                        <textarea th:text="${problem.solution}" name="solution" class="input-match-height" id="'solutionField-' + ${index.index}"></textarea>
                         <!-- Hidden fields for other properties -->
                         <input type="hidden" th:value="${problem.id}" name="id"/>
                         <input type="hidden" th:value="${problem.problemId}" name="problemId"/>
@@ -53,8 +59,10 @@
                         <input type="hidden" th:value="${problem.subcategoryId}" name="subcategoryId"/>
                     </td>
                     <td class="framed-cell" style="width: 20%;">
-                        <textarea th:text="${problem.answer}" name="answer" class="input-match-height"></textarea>
-                    
+                        <textarea th:text="${problem.answer}" name="answer" onpaste="return false;" class="input-match-height"></textarea>
+                    </td>
+                    <td><button type="button" th:onclick="'toggleSolution(' + ${index.index} + ');'">Toggle Solution</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -63,17 +71,48 @@
   </div>
 
   <script>
+  //Function to filter records when the document is loaded
+  document.addEventListener("DOMContentLoaded", function() {
+      filterRecords();
+  });
+  
+  function filterRecords() {
+      var startIndex = parseInt(document.getElementById("startIndexInput").value);
+      var endIndex = parseInt(document.getElementById("endIndexInput").value);
+      
+      var rows = document.querySelectorAll("tbody tr");
+      rows.forEach(function(row, index) {
+          if (index + 1 >= startIndex && index + 1 <= endIndex) {
+              row.style.display = "";
+          } else {
+              row.style.display = "none";
+          }
+      });
+  }
+    function toggleSolution(rowIndex) {
+    	  // Get the row array corresponding to the given index
+        var rowArray = document.querySelectorAll('tr')[rowIndex+1];
+        
+        // Find the solution textarea within the row array
+        var solutionField = rowArray.querySelector('textarea[name="solution"]');
+        
+        // Toggle the visibility of the solution textarea
+        if (solutionField) {
+            solutionField.style.display = (solutionField.style.display === "none") ? "block" : "none";
+        } else {
+            console.error("Solution textarea not found within the row array.");
+        }
+    }    
     function submitForm() {
         // Disable the button to prevent multiple submissions
         document.getElementById("submitButton").disabled = true;
         //var subject = /*[[${sub}]]*/ ''; // Get the Thymeleaf subject variable value
-        var subject = "math";
         var formData = []; 
         document.querySelectorAll('tr').forEach(function(row, index) {
             
             if (index >= 1){
             	var problem = {};
-            	problem['subject']=subject;
+            	problem['subject']="chinese";
             	problem['problemDescription'] = row.cells[0].textContent;
 	            
  	            var solutionTextarea = row.cells[1].querySelector('textarea');
@@ -112,6 +151,7 @@
             console.error('Error:', error);
         });
     }
+  
   </script>
 </body>
 </html>

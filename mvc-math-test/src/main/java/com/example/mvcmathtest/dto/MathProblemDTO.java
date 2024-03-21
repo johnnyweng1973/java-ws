@@ -1,5 +1,7 @@
 package com.example.mvcmathtest.dto;
 
+import com.example.mvcmathtest.util.TestSubjectType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,5 +17,6 @@ public class MathProblemDTO {
 	private String description;
     private String solution;
     private String answer;
-
+    private TestSubjectType subject;
+    private boolean multipleAnswers;
 }

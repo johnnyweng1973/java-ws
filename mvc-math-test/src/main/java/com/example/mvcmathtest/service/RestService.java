@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.mvcmathtest.controller.TestController;
 import com.example.mvcmathtest.dto.MathProblemDTO;
 import com.example.mvcmathtest.model.TestProblem;
+import com.example.mvcmathtest.util.TestSubjectType;
 
 @Service
 public class RestService {
@@ -35,14 +36,15 @@ public class RestService {
     // Create ObjectMapper instance
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public List<TestProblem> fetchMathProblems(String excludeListString) {
+    public List<TestProblem> fetchMathProblems(TestSubjectType subject, String excludeListString) {
     	List<TestProblem> testProblems = new ArrayList<>();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<>(excludeListString, headers);
 
         try {
-            ResponseEntity<String> problemListResponse = restTemplate.postForEntity(mathProblemServiceUrl, requestEntity, String.class);
+        	String url = mathProblemServiceUrl + "?subject=" + subject.toString();
+            ResponseEntity<String> problemListResponse = restTemplate.postForEntity(url, requestEntity, String.class);
             if (problemListResponse.getStatusCode() == HttpStatus.OK) {
             	String jsonString = problemListResponse.getBody(); 
             	 // Deserialize JSON string into MathProblemDTO object

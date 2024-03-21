@@ -1,5 +1,7 @@
 package com.example.mvc.model;
 
+import com.example.mvc.util.TestSubjectType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,11 +20,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class MathProblem {
-	public enum SubjectType {
-        math,
-        science,
-        history
-    }
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +36,7 @@ public class MathProblem {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "subject")
-    private SubjectType subject;
+    private TestSubjectType subject;
     
     @Column(name = "multiple_answers")
     private boolean multipleAnswers;

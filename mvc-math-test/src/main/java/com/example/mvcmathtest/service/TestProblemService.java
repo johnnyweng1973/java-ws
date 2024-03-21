@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.mvcmathtest.model.TestProblem;
 import com.example.mvcmathtest.repository.TestProblemRepository;
+import com.example.mvcmathtest.util.TestSubjectType;
 
 @Service
 public class TestProblemService {
@@ -17,7 +18,7 @@ public class TestProblemService {
     public List<TestProblem> getAll() {
         return testProblemRepository.findAll();
     }
-
+    
     public TestProblem add(TestProblem testProblem) {
         TestProblem savedTestProblem = testProblemRepository.save(testProblem);
         testProblemRepository.flush(); // Flush changes to the database
@@ -36,4 +37,8 @@ public class TestProblemService {
     public void saveAll(List<TestProblem> problems) {
     	testProblemRepository.saveAll(problems);
     }
+
+	public List<TestProblem> getBySubject(TestSubjectType subject) {
+		return testProblemRepository.findBySubject(subject);
+	}
 }

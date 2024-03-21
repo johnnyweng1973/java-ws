@@ -15,6 +15,7 @@ import com.example.mvc.model.MathSubCategory;
 import com.example.mvc.repository.MathProblemsRepository;
 import com.example.mvc.repository.MathSubCategoryRepository;
 //import com.example.mvc.mathtest.model.TestProblem;
+import com.example.mvc.util.TestSubjectType;
 
 @Service
 public class MathProblemService {
@@ -43,15 +44,20 @@ public class MathProblemService {
 		return;
 	}
 
-	public List<MathProblem> findMathProblems(Map<Long, List<Long>> excludeMap) {
+	public List<MathProblem> findMathProblems(TestSubjectType subject, Map<Long, List<Long>> excludeMap) {
 		List<MathProblem> combinedMathProblems = new ArrayList<>();
+		
+		if (subject == TestSubjectType.chinese) {
+			return mathProblemsRepository.findTop20BySubject(subject);
+            
+		}
 
 		// Check if the excludeMap is empty
 	    if (excludeMap.isEmpty()) {
 	        // Retrieve two problems for each available subcategory
 	        List<MathSubCategory> availableSubcategories = mathSubCategoryRepository.findAll();
 	        for (MathSubCategory subcategory : availableSubcategories) {
-	            List<MathProblem> mathProblemsForSubcategory = mathProblemsRepository.findTop2ByMathSubCategory_Id(subcategory.getId());
+	            List<MathProblem> mathProblemsForSubcategory = mathProblemsRepository.findTop2ByMathSubCategory_IdAndSubject(subcategory.getId(), subject);
 	            combinedMathProblems.addAll(mathProblemsForSubcategory);
 	        }
 	    } else {
@@ -62,7 +68,7 @@ public class MathProblemService {
 
 	            // Query the database to retrieve math problems for the given subcategory ID,
 	            // excluding specified problem IDs
-	            List<MathProblem> mathProblems = mathProblemsRepository.findTop2ByMathSubCategoryIdAndIdNotIn(subcategoryId, excludeProblemIds);
+	            List<MathProblem> mathProblems = mathProblemsRepository.findTop2ByMathSubCategoryIdAndIdNotInAndSubject(subcategoryId, excludeProblemIds, subject);
 
 	            // Add the retrieved math problems to the combined list
 	            combinedMathProblems.addAll(mathProblems);

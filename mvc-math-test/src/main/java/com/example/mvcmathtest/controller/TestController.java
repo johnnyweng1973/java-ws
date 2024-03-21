@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -30,6 +31,7 @@ import com.example.mvcmathtest.model.TestProblem;
 import com.example.mvcmathtest.service.RestService;
 import com.example.mvcmathtest.service.TestProblemService;
 import com.example.mvcmathtest.util.ExcludeListGenerator;
+import com.example.mvcmathtest.util.TestSubjectType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -51,16 +53,34 @@ public class TestController {
 	}
 
 	@GetMapping("/test")
-	public String getATest(Model model) {
+	public String home() {
+		
+		return "test";
+	}
+
+	@GetMapping("/test_subject")
+	public String getATest(Model model, 
+			               @RequestParam TestSubjectType subject,
+			               @RequestParam(name = "noSpellingCheckbox", defaultValue = "false")boolean noSpelling) {
 		// get all test problems
-		List<TestProblem> oldTestProblems = testProblemService.getAll();
+		List<TestProblem> oldTestProblems = testProblemService.getBySubject(subject);
 		// convert list to map and serialize map to json string, if map is empty, return
 		// {}
 		String excludeListString = ExcludeListGenerator.generateExcludeList(oldTestProblems);
 		// Make a POST request to the math problem service
-		List<TestProblem> testProblems = restService.fetchMathProblems(excludeListString);
+		List<TestProblem> testProblems = restService.fetchMathProblems(subject, excludeListString);
+		if(noSpelling) {
+			testProblems.forEach(testProblem -> testProblem.setSolution(null));
+		}
+		model.addAttribute("sub", subject.toString());
 		model.addAttribute("problems", testProblems);
-		return "test_paper";
+		if (subject == TestSubjectType.chinese) {
+		    return "chinese_test_paper";
+		}
+		else {
+			return "test_paper";
+		}
+			
 	}
 
 	@PostMapping("/test")

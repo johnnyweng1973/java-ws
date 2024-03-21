@@ -30,7 +30,7 @@
         <p>subcategory: <input type="text" th:field="*{mathSubCategory.name}" size=60 /></p>
         <p>description: <textarea id="textArea" th:field="*{description}" /></textarea></p>
         <p>solution: <textarea id="textArea" th:field="*{solution}" /></textarea></p>
-        <p>answer: <input type="text" th:field="*{answer}"></p>
+        <p>answer: <input type="text" th:field="*{answer}"  onpaste="return false;"></p>
         <p>Multiple Answers: <input type="checkbox" th:field="*{multipleAnswers}" /></p>
         <p><input type="submit" value="Add Math" /></p>
     </form>
