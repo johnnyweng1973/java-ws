@@ -70,7 +70,6 @@ public class ChineseNumberConverter {
 
     public static void main(String[] args) {
         String chineseNumber = "十五"; // Example Chinese number
-        int intValue = convertChineseToInteger(chineseNumber);
-        System.out.println("Converted Chinese number to integer: " + intValue);
+        System.out.println("Converted Chinese number to integer: " );
     }
 }

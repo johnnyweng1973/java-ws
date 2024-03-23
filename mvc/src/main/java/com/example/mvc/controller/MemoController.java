@@ -19,7 +19,9 @@ import com.example.mvc.service.MemoService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Controller
@@ -52,6 +54,32 @@ public class MemoController {
         model.addAttribute("memos", memos);
         return "memo";
     }
+    
+    @GetMapping("list")
+    public String list(Model model) {
+        List<Memo> memos;
+        try {
+        	memos = memoService.getAllMemos();
+        } catch (Exception e) {
+        	memos = new ArrayList<>();
+        }
+
+        // Logging the number of elements in the 'memos' list
+        log.info("Number of elements in the 'memos' list: {}", memos.size());
+        // Group memos by category
+        Map<String, List<Memo>> groupedMemos = new HashMap<>();
+        for (Memo memo : memos) {
+            groupedMemos
+                .computeIfAbsent(memo.getCategory(), k -> new ArrayList<>())
+                .add(memo);
+        }
+        log.info("map is {}", groupedMemos);
+        model.addAttribute("categories", groupedMemos.keySet());
+        model.addAttribute("groupedMemos", groupedMemos);
+
+        return "memo_newlist";
+    }
+
 
     @ResponseBody
     @GetMapping("/list-rest")

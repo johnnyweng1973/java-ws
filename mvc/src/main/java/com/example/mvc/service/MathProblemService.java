@@ -48,7 +48,7 @@ public class MathProblemService {
 		List<MathProblem> combinedMathProblems = new ArrayList<>();
 		
 		if (subject == TestSubjectType.chinese) {
-			return mathProblemsRepository.findTop20BySubject(subject);
+			return mathProblemsRepository.findTop30BySubject(subject);
             
 		}
 
