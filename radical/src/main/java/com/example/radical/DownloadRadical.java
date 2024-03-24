@@ -1,4 +1,4 @@
-package radical;
+package com.example.radical;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -16,11 +16,27 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
 
 public class DownloadRadical {
-	private static final StringBuilder stringBuilder = new StringBuilder();
-	private static final String fileName = "radical.txt";
+	private static final Map<String, ChineseCharacter> characterWholeMap = new HashMap<>();
+    private static final StringBuilder stringBuilder = new StringBuilder();
+	private static final String jsonFile = "中文字库1.txt";
+    private static final String fileName = "radical.txt";
 	private static int numOfCharacters = 0;
+	
+	public static void writeToJsonFile() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            objectMapper.writeValue(new File(jsonFile), characterWholeMap);
+            System.out.println("Data has been written to JSON file successfully.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 	public static void saveStringToFile() {
 		Path path = Paths.get(fileName);
@@ -49,7 +65,7 @@ public class DownloadRadical {
 
 	}
 
-	public static Map<Integer, List<ChineseCharacter>> downloadCharacterMap(String strokeUrl) {
+	public static Map<Integer, List<ChineseCharacter>> downloadCharacterMap(String strokeUrl, String strokeName) {
 		Map<Integer, List<ChineseCharacter>> characterMap = new HashMap<>();
 
 		try {
@@ -67,9 +83,9 @@ public class DownloadRadical {
 			Elements dtElements = doc.select("dt.bsbhTitle");
 
 			for (int i = 0; i < dtElements.size(); i++) {
-				Element dtElement = dtElements.get(i);
+			 	Element dtElement = dtElements.get(i);
 				int strokeNumber = ChineseNumberConverter.convert(dtElement.text(), "笔画数");
-
+             
 				List<ChineseCharacter> characterList = new ArrayList<>();
 				Element nextSibling = dtElement.nextElementSibling();
 				while (nextSibling != null && nextSibling.tagName().equals("dd")) {
@@ -79,7 +95,9 @@ public class DownloadRadical {
 						String href = aElement.attr("href");
 						String rawHtml = aElement.outerHtml();
 						numOfCharacters++;
-						characterList.add(new ChineseCharacter(character, href));
+						ChineseCharacter characterInstance = new ChineseCharacter(character, strokeName); 
+						characterList.add(characterInstance);
+						characterWholeMap.put(character, characterInstance);
 					}
 					nextSibling = nextSibling.nextElementSibling();
 				}
@@ -114,8 +132,9 @@ public class DownloadRadical {
 			Elements dlElements = doc.select("dl");
         
 			// Iterate over each <dl> element
-			for (Element dl : dlElements) {
-				// Find the stroke number within the <dt> element
+			for (int i = 0; i < dlElements.size(); i++) {
+			    Element dl = dlElements.get(i);
+			    // Find the stroke number within the <dt> element
 				Element dt = dl.selectFirst("dt");
 				int strokeNumber = ChineseNumberConverter.convert(dt.text(), "部首笔画数");
 				String str = "stroke number " + strokeNumber + "\r\n";
@@ -136,7 +155,7 @@ public class DownloadRadical {
 					String radicalUrl = "https:" + dd.selectFirst("a").attr("href");
 					System.out.println(radicalName);
 					stringBuilder.append(radicalName);
-					Map<Integer, List<ChineseCharacter>> map = downloadCharacterMap(radicalUrl);
+					Map<Integer, List<ChineseCharacter>> map = downloadCharacterMap(radicalUrl, radicalName);
 					Radical radical = new Radical(radicalName, map);
 					radicalList.add(radical);
 				}
@@ -144,9 +163,10 @@ public class DownloadRadical {
 				// Add the list of radicals to the map
 				collection.addListOfRadicalByStrokeNum(strokeNumber, radicalList);
 			}
-
+            
 			System.out.println("total num " + numOfCharacters);
 			saveStringToFile();
+			writeToJsonFile();
 			
 
 		} catch (IOException e) {

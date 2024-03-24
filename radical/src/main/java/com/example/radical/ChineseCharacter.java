@@ -1,27 +1,38 @@
-package radical;
-
+package com.example.radical;
 public class ChineseCharacter {
-    private final String character;
-    private final String href;
-    private final String hexAscii;
-    private final String rawBytes;
-    
-    ChineseCharacter(String character, String href) {
-        this.character = character;
-        this.href = href;
-        this.hexAscii = "0x" + toHexAscii(character);
-        this.rawBytes = getRawBytes(character);
+    private String radical;
+    private String name;
+
+    public ChineseCharacter() {
+        // Default constructor
     }
-    
-    public String getCharacter() {
-        return character;
+
+    public ChineseCharacter(String name, String radical) {
+        this.name = name;
+        this.radical = radical;
     }
-    
+
+    public String getRadical() {
+        return radical;
+    }
+
+    public void setRadical(String radical) {
+        this.radical = radical;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String toString() {
-    	return character + " " + hexAscii + " " + rawBytes;
+        return name + " " + radical;
     }
-    
+
     // Method to convert Unicode character to ASCII representation in hexadecimal format
     private String toHexAscii(String character) {
         StringBuilder sb = new StringBuilder();
@@ -30,7 +41,7 @@ public class ChineseCharacter {
         }
         return sb.toString();
     }
-    
+
     // Method to get the raw bytes of the character in the platform's default encoding
     private String getRawBytes(String character) {
         byte[] bytes = character.getBytes();

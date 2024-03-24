@@ -1,4 +1,4 @@
-package radical;
+package com.example.radical;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,7 +30,7 @@ public class Radical {
         List<String> characters = new ArrayList<>();
         for (List<ChineseCharacter> characterList : characterListMap.values()) {
             for (ChineseCharacter character : characterList) {
-                characters.add(character.getCharacter());
+                characters.add(character.getName());
             }
         }
         return characters;

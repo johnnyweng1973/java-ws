@@ -12,7 +12,7 @@ import com.example.mvc.util.TestSubjectType;
 public interface MathProblemsRepository extends JpaRepository<MathProblem, Long> {
 	 List<MathProblem> findTop2ByMathSubCategoryIdAndIdNotInAndSubject(Long subcategoryId, List<Long> excludeProblemIds, TestSubjectType subject);
 	 List<MathProblem> findTop2ByMathSubCategory_IdAndSubject(Long subcategoryId, TestSubjectType subject);
-	 List<MathProblem> findTop30BySubject(TestSubjectType subject);
+	 List<MathProblem> findTop40BySubject(TestSubjectType subject);
      
 	// @Query("SELECT * FROM MathProblem WHERE mathSubCategory.id = :subcategoryId AND id NOT IN :excludeProblemIds ORDER BY id LIMIT 2")
 	// List<MathProblem> findTop2ByMathSubCategoryIdAndIdNotIn(@Param("subcategoryId") Long subcategoryId, @Param("excludeProblemIds") List<Long> excludeProblemIds);

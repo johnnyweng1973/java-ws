@@ -1,4 +1,4 @@
-package radical;
+package com.example.radical;
 import java.util.HashMap;
 import java.util.Map;
 public class ChineseNumberConverter {
