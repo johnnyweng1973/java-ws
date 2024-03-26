@@ -15,9 +15,21 @@ html and css,1,html and css,html,1. html loading
     then, inside each container, you define bootstrap container to manager your layout, one is a button list, the other is form.
 5. padding and margin
     they are used to add space between content and border, add space after border.
+6. container in container
+   to display list of buttons, the outer container is 'li', and inside it is 'li' and 'button' element is nested inside a 'li'. Inside the 'button' elements are text content. You can modify the attributes of any container.
 
+note:
+1. add changes to set button width to 90% of list item container to make all buttons same width. 
+2. 
  
-html and css,2,hi,html,ddddfffffggggghhhhhh
+,2,project mvc-test data flow,springboot,test service when start creating a test, first retrieve a list of current test problems- a list of problems 
+then create a map of subcategory to problem id key-value pairs- map 
+thirdly, serialization map to json string-- json
+fourth, send the string in REST API to the problem service-- ajax HTTP get
+fifth, the problem service sends back the test problem in JSON string -- Ajax HTTP get response
+sixth, the test service deserializes JSON to List of MathProblems, -- a list of problems
+seven, the test service sends a test form with MathProblems to the client. -- test form in HTTP GET response
+
 several javacript,3,javascript for memo project,javacript,this javascript is an external file 
 1) when javascript run
    web browser loads html file first, while parsing the content, it constructs a tree to manage the elements. if there is a javascript file as external file, it will request this file. until javascripts are loaded, DOMContentLoaded event gets triggered.
@@ -65,3 +77,194 @@ setInterval(autoSubmitForm, 120000); // 2 minutes = 2 * 60 * 1000 milliseconds
 
 
 
+installing docker desktop, creating jars for application, writing docker files, build images, run images  ,4,dockerizing mvc application,docker,1. steps to do dockerize
+	1. install docker desktop.
+	    The Docker desktop needs to be installed with admin privileges. but running it doesn't require them.
+	2. create jar files.
+	    The maven-jar-plugin creates jar files and should be included in pom.xml. The jar should contain a manifest file with 
+            the class name and main method.
+	3. write a dockerfile.
+	    This file is used to build a Docker image, and the build command is simplified by reading configurations directly 
+            from             
+            the Dockerfile.
+	4. build an image.
+	    run the command "docker build -t appname ." to build a docker image.
+	5.  run image
+	    run the command " docker run" to run the image. A container will be created and you can see it in docker desktop.
+
+2. important project configurations
+        1. all locahost should be replaced with IP address
+        2.  add permits to access tables in MySQL from the container. Due to a domain name modification in a SQL request by Docker, MySQL denies its access since it is new to mysql. Therefore, we need to configure MySQL to allow all hosts to access the related tables.
+      
+Problems encountered while using Eclipse.,5,eclipse debugging problems,bug,Problems encountered while using Eclipse.
+1. breakpoint doesn't work.
+   You need to know what is a breakpoint icon. and then remove all existing breakpoints and toggle the one you want.
+2. lombok @Slf4j log function cannot be found.
+   Lombok adds log field during compile time. my solution is to define the log member manually instead of using @slf4j. Slf4j module will be added by spring framework automatically.  maybe we can check out the output class file of controller class to see if log member is there.
+3. configuration change in applicaiton.properties cannot take effect.
+   rebuild the project doesn't work. finally after removing and restoring  some lines around the change, it take effect. maybe nexttime i should check the application.property file in jar file first to see it has changed.
+ 
+   
+come from chatgpt,6,spring framwwork practice,spring app design,Certainly! In addition to separating controllers by entities, there are several other common and recommended practices in Spring MVC applications:
+
+Use Service Layer: Implement a service layer to encapsulate business logic and coordinate transactions across multiple repositories. Controllers should delegate business logic to service classes, promoting separation of concerns and reusability.
+
+DTOs (Data Transfer Objects): Use DTOs to transfer data between controllers, services, and views. DTOs help decouple the presentation layer from the domain model and prevent over-fetching or under-fetching of data.
+
+Exception Handling: Implement global exception handling mechanisms to gracefully handle errors and provide meaningful error messages to clients. Use Spring's @ControllerAdvice and @ExceptionHandler annotations to centralize exception handling logic.
+
+Validation: Perform input validation using Spring's validation framework (@Valid, @Validated, javax.validation.constraints). Validate user input in the controller layer and return appropriate error messages to clients.
+
+RESTful Principles: Adhere to RESTful principles when designing REST APIs. Use HTTP methods (GET, POST, PUT, DELETE) and status codes (200, 201, 400, 404, 500) appropriately. Follow resource naming conventions and use hypermedia (HATEOAS) where applicable.
+
+Security: Implement authentication and authorization mechanisms to secure your application. Use Spring Security to configure access control, authentication providers, and security filters. Protect sensitive endpoints and resources from unauthorized access.
+
+Testing: Write unit tests and integration tests to verify the behavior of controllers, services, and repositories. Use frameworks like JUnit, Mockito, and Spring Test for testing Spring MVC components. Aim for high test coverage to ensure the reliability and maintainability of your codebase.
+
+Dependency Injection: Utilize Spring's dependency injection mechanism to manage bean dependencies and promote loose coupling between components. Use constructor injection or setter injection to inject dependencies into controllers, services, and repositories.
+
+Internationalization (i18n): Externalize user-facing strings and messages to resource bundles for easy localization and internationalization. Use Spring's MessageSource abstraction to resolve message codes and format messages based on the user's locale.
+
+Logging: Use logging frameworks like Logback or Log4j to log application events and errors. Configure logging levels and appenders to capture relevant information and troubleshoot issues in production environments.
+
+By following these best practices, you can build robust, maintainable, and scalable Spring MVC applications that meet the needs of your users and stakeholders.
+
+
+
+
+
+
+,7,preparation for daisy friends,ff,Saturday 10am 2pm
+sunday:  daisy clean bathroom and i will check faucet and toilet cover.
+i fixed faucet problem, fixed toilet cover problem.
+
+dd,8,mvc controller interface,spring boot,1. view of /memo 
+   /memo is a view that displays summaries for all memos and includes a form to view and edit a specific memo. the request of detail is submitted through javascript fetch. The update is submitted through JavaScript AJAX.
+   1. Requesting view through HTTP GET.  server return webpage which includes memo data rendered through thymeleaf. 
+   2. Request display of a full memo. User click on item button, trigger javascript function, it sends fetch() HTTP request to /update-ajax/{memoId}. memoId is in PathVariable passed to controller method. Fetch() is a promise based HTTP request.
+   3.  Server sends back memo info in JSON format in the HTTP Response body. client update memo.
+   4.  Client click update button to send update of memo. Javascript Ajax is used to send this HTTP POST request to /update-ajax/{memoId} . form data is included in HTTP request body as form-data content, not json format
+   5.  at /update-ajax/{memoId}, controller method receive memo object as input parameter with @ModelAttribute. This annotation will bind form-data to java object and pass to application.
+
+2.  view of /memo/add
+     1. user request add view through /memo/manage, server return HTML page with add form.
+      2. user submit form to /memo/add as HTTP POST request with form data in HTTP body as form-data.
+     3. spring binds form data to Java object memo, passes it to handling method. the method add it to repository and return the redirect URL /memo/. 
+
+ 3.  rest interface for microservice
+     /memo/list-rest for retrieval all memos in json format. This is a microservice interface.   
+ddd,9,ddddd,ddd,ddd
+fff,10,ffff,fff,fff
+,11,form checkbox value send wrong,debug,the way it works is : if it is checked, the value will sent as a key-value pair in request parameter. by default this box is set to checked.  
+
+<div id="noSpellingCheckboxDiv" style="display: none;">
+        <input type="checkbox" id="noSpellingCheckbox" name="noSpellingCheckbox" value="true" checked>
+        <label for="noSpellingCheckbox">No Spelling</label>
+</div>
+
+in controller spring boot will bind the value to the parameter you specified. if you define the type is boolean, the value must be true or false. otherwise exception will happen.
+	@GetMapping("/test_subject")
+	public String getATest(Model model, 
+			               @RequestParam TestSubjectType subject,
+			               @RequestParam(name = "noSpellingCheckbox", defaultValue = "false")boolean noSpelling) {
+
+forget set subcategory to new problem instance,12,adding problem to table error,bug,problem table and subcategory table are related. 
+so before you add a problem to the table, you must get its subcategory ID in the category table. set it in the problem instance and then insert the problem into the table. This way, consistency between the two tables will be kept. 
+
+public String addMathProblem(@ModelAttribute("newMathProblem") MathProblem newMathProblem) {
+
+//create in the category first.		
+MathSubCategory subcategory = mathSubcategoryService.findOrCreateSubcategory(newMathProblem.getMathSubCategory().getName());
+
+//insert in the end
+mathProblemService.saveAll(problemList);
+for radicals, we first group radical by stroke number, then under each number, we have a list of strokes,13,use 2D List wrong,bug,private List<List<Radical>> radicalsByStroke;
+this is a correct declaration.
+
+at beginning , i want to design this way
+private List<Radical>
+this is wrong.
+
+it is like you have a list of character {1,2,3,4,5,6,7,8,9,....}
+now, you want to divide it into several lists,  {1,2,3}, {4,5,6}, {..}} we divide it by the common property of element: stroke number.
+radical with same stroke number belong to same group
+
+use map is more efficient ,14,use map<Integer, List<Radical>> instead of List<List<Radical>>,bug,because stroke number is fixed, like from 1-50, but there may be some stroke number we don't have radicals.
+so it is better to use map.
+use a view to limit user access to sqltable. ,15,use sql view,todo,if you want to exclude some records from user query. you can create a view using a SQL. and you bind your model class
+to that view. 
+but you can only read from that view and cannot modify it.
+,16,create a mulitple module in a project in eclipse,todo,i want to export a package to a module in my project.
+but it requires my current project have a pom file that is a parent project type but unluckily. mine is not that type.
+to my understanding, i have to change my current pom file to create a new module in my project
+
+i don't have any clue now 
+,17,java string does not support [],but,i try to use for (char c: string) to iterate string, but it is wrong
+you need to change it to array like string.toCharArray() to make it return a char[]
+
+String s="2121212";
+char array=s.toCharArray();
+array[0] = '5';
+
+please remember, array [] in java cannot be resized, its reference cannot be changed. but the content can be modified.
+
+all containers in java don't support []
+string cannot be changed so it is a special container class. it is immutable.
+,18,use rasberry pi to run spring boot app,todo,
+,19,chinese character encoding and decoding problem,bug,1. relationship between utf-16 utf-8 and unicode
+each character , ascii or chinese character, has a corresponding unicode code point. 
+utf-16 and utf-8 are encoding schemes to encode unicode.
+
+2. how java store a Chinese character
+1.) java use string to store Chinese letter. 2)from my experiment, I saw a character store in two codings,  physically it is utf-8, but represent as unicode when you use
+char[] to retrieve its value.
+
+in java, a character is encoded with utf-16. that is why char is two byte length.
+for example 丰 0x4E30 E4 B8 B0 ,  0x4e30 is its two character value of 16bits. but its raw data is E4b8b0. 
+so in java, a Chinese character must be defined as a string. 
+String chineseCharacter = "丰"; because three bytes are stored as UTF. but when you check its value, char[1] char[2], the content is its unicode 0x4E30.
+
+3. how jsoup decode Chinese letter
+1.) you can specify charsetname in its parse method. in my case, charset is "GBK"
+2)  before you set charsetname, check HTML meta tag for its encoding type. in my case it is a Chinese encoding
+
+,20,jsoup dependency is not included in jar file,bug,jar file cannot run because of this.
+1. meta file in jar file does not include jsoup info
+
+2. run app in cli with java command with classpath parameter 
+my current solution is use java command to run with parameter classpath = "target/classes;xxxxxxxxx.jsoup.jar" this class path include two paths
+, one is class file for a current project and the other is where jsoup jar is.
+
+3. jsoup is in eclipse mavern dependencies category. 
+
+
+
+,21,maven project ,todo,maven project tips
+
+1. build plugins
+  plugins are tools used to complete code, create jar file, etc. 
+  to create a jar file, you need to include maven jar plugin in pom.xml. you must specify main class in its configuration tag.
+  normally you don't need to specify compiler plugin. but if you want to configure it you need to include this plugin and specify the configurations in configuration tab such as source and target java verion  
+,22,add a chinese character test,todo,1. test include: all new characters: spelling  radical
+   we already has a Chinesecharacter class which include character, pinyi and radical
+   now we need to create a list of this character for each level and put it on a map which represent whole tests.
+   this whole map will be stored in a text file. 
+2. create a test character. it will create that list of character and put it on map
+3. start a test. which will retrieve that list and put it on a form and send to user.
+
+4. prerequisite to step 2: 
+    1. done already. we need a database of 短语，which has a level. so we can create a list of character from selected 短语 for a specific level.  This table is math_problem which includes are kinds of problems for all subjects. 
+    2. todo. create a Chinese character database which include pinyin radical for each.
+        Map[String, ChineseCharacter]  characterMap
+
+    3. todo this, we need a map of Chinese character by radicals, we iterater this map and create characterMap 
+        Map[Integer, List<Radical>]  characterMapByStroke;
+        Map[Integer, List<Chinese>]  radicalMap;
+
+5. request of the HTML form to add a character test
+    1. form show all problems with subject="Chinese" and of specified level ,  with fields  <th>Problem Description</th>Solution</th>                   <th>Answer</th> and field names description, solution, answer,
+    2. a text area show a problem with subject="ChineseCharacter" and of the level of the form. 
+    3.  provide a button to retrieve the records of specified level with javascript function and fill the form. if record for text area available , retrieve that records too.
+    4. if text area has no content, click a button named "create character" to create a list of all unique characters from all description fields of form
+    5. provide a add button to add the content of text area 
+   

@@ -11,7 +11,7 @@ public class HanziRadicalCollection {
     private static final Map<String, ChineseCharacter> characterWholeMap = new HashMap<>();
     
     public static Map<String, ChineseCharacter> getCharacterMap() throws IOException {
-        String filePath = "中文字库.txt"; // Adjust the path relative to the root of the JAR
+        String filePath = "/中文字库.txt"; // Adjust the path relative to the root of the JAR
         InputStream inputStream = ChineseCharacter.class.getClassLoader().getResourceAsStream(filePath);
 
         if (inputStream == null) {

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.antlr.v4.runtime.atn.SemanticContext.AND;
 import org.slf4j.Logger;
@@ -32,8 +33,12 @@ import com.example.mvcmathtest.service.RestService;
 import com.example.mvcmathtest.service.TestProblemService;
 import com.example.mvcmathtest.util.ExcludeListGenerator;
 import com.example.mvcmathtest.util.TestSubjectType;
+import com.example.radical.ChineseCharacter;
+import com.example.radical.HanziRadicalCollection;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+
 
 @Controller
 public class TestController {
@@ -54,13 +59,21 @@ public class TestController {
 
 	@GetMapping("/test")
 	public String home() {
+//		try {
+//            Map<String, ChineseCharacter> characterMap = HanziRadicalCollection.getCharacterMap();
+//            System.out.println(characterMap);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 		
-		return "test";
+		return "test2";
 	}
 
 	@GetMapping("/test_subject")
 	public String getATest(Model model, 
 			               @RequestParam TestSubjectType subject,
+			               @RequestParam(name = "category", required = false)String category,
+			               @RequestParam(name = "subcategory", required = false)String subcategory,
 			               @RequestParam(name = "noSpellingCheckbox", defaultValue = "false")boolean noSpelling) {
 		// get all test problems
 		List<TestProblem> oldTestProblems = testProblemService.getBySubject(subject);
@@ -68,16 +81,27 @@ public class TestController {
 		// {}
 		String excludeListString = ExcludeListGenerator.generateExcludeList(oldTestProblems);
 		// Make a POST request to the math problem service
-		List<TestProblem> testProblems = restService.fetchMathProblems(subject, excludeListString);
+		List<TestProblem> testProblems = restService.fetchMathProblems(subject, category, subcategory, excludeListString);
 		if(noSpelling) {
 			testProblems.forEach(testProblem -> testProblem.setSolution(null));
 		}
-		model.addAttribute("sub", subject.toString());
-		model.addAttribute("problems", testProblems);
 		if (subject == TestSubjectType.chinese) {
-		    return "chinese_test_paper";
+			log.info("categor is {}", category);
+			if ("短句".equals(category)) {
+				model.addAttribute("sub", subject.toString());
+				model.addAttribute("problems", testProblems);
+				return "chinese_test_paper";
+			}
+			else {
+				List<TestProblem> newTestProblems = TestProblem.cloneAndModify(testProblems);
+				model.addAttribute("sub", subject.toString());
+				model.addAttribute("problems", newTestProblems);
+				return "chinese_test_paper_character";
+			}
 		}
 		else {
+			model.addAttribute("sub", subject.toString());
+			model.addAttribute("problems", testProblems);
 			return "test_paper";
 		}
 			
@@ -106,4 +130,6 @@ public class TestController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing JSON data");
 		}
 	}
+	
+	
 }

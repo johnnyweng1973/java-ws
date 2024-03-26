@@ -57,6 +57,11 @@ public class MathProblemsController {
 		return "manage_mathproblem";
 	}
 
+	@GetMapping("/add-chinese-character")
+	public String addCharacter() {
+			return "add_chinese_character_test";
+	}
+
 	@PostMapping("/add")
 	public String addMathProblem(@ModelAttribute("newMathProblem") MathProblem newMathProblem) {
 		MathSubCategory subcategory = mathSubcategoryService.findOrCreateSubcategory(newMathProblem.getMathSubCategory().getName());
@@ -91,17 +96,28 @@ public class MathProblemsController {
 	}
 	
     @PostMapping("/test-rest")
-    public ResponseEntity<List<MathProblem>> handleRequestBody(@RequestParam TestSubjectType subject,@RequestBody String requestBody) {
-        try {
-            // Convert the JSON string from the request body into a map
-            Map<Long, List<Long>> requestBodyMap = objectMapper.readValue(
-                    requestBody,
-                    new TypeReference<Map<Long, List<Long>>>() {}
-            );
+    public ResponseEntity<List<MathProblem>> handleRequestBody(
+    	    @RequestParam TestSubjectType subject,
+    	    @RequestParam(name = "category", required = false) String category,
+      	    @RequestParam(name = "subcategory", required = false) String subcategory,
+    	    @RequestBody String requestBody)
+    {
+    	try {
+    		 List<MathProblem> mathProblems;
+    		if (subject != TestSubjectType.chinese) {
+	            // Convert the JSON string from the request body into a map
+	            Map<Long, List<Long>> requestBodyMap = objectMapper.readValue(
+	                    requestBody,
+	                    new TypeReference<Map<Long, List<Long>>>() {}
+	            );
+	            // Handle the map as needed (e.g., perform database queries)
+	            mathProblems = mathProblemService.findMathProblems(subject,category,subcategory, requestBodyMap);
+	        }
+    		else {
+    			mathProblems = mathProblemService.findMathProblems(subject,category,subcategory, null);
+    		}
 
-            // Handle the map as needed (e.g., perform database queries)
-            List<MathProblem> mathProblems = mathProblemService.findMathProblems(subject, requestBodyMap);
-
+           
             // Return the map in the response
             return ResponseEntity.ok(mathProblems);
         } catch (JsonParseException | JsonMappingException e) {

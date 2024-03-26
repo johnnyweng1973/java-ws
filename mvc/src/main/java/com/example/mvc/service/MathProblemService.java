@@ -44,12 +44,29 @@ public class MathProblemService {
 		return;
 	}
 
-	public List<MathProblem> findMathProblems(TestSubjectType subject, Map<Long, List<Long>> excludeMap) {
+	public List<MathProblem> findMathProblems(TestSubjectType subject, 
+			                                  String category,
+			                                  String chineseSubcategory,
+			                                  Map<Long, List<Long>> excludeMap) {
 		List<MathProblem> combinedMathProblems = new ArrayList<>();
 		
 		if (subject == TestSubjectType.chinese) {
-			return mathProblemsRepository.findTop40BySubject(subject);
-            
+			if ("字".equals(category) ) {
+				// Fetch the subcategoryId from mathSubCategoryRepository
+			    Optional<MathSubCategory> optionalMathSubCategory = mathSubCategoryRepository.findByName(chineseSubcategory);
+			    
+			    // Check if mathSubCategory is present in Optional
+			    if (optionalMathSubCategory.isPresent()) {
+			    	MathSubCategory mathSubCategory = optionalMathSubCategory.get();
+			    	Long subcategoryId = mathSubCategory.getId();
+			        return mathProblemsRepository.findByMathSubCategory_IdAndSubjectAndCategory(subcategoryId, subject, category);
+			    } else {
+			        return combinedMathProblems;
+			    }
+			}
+			else {
+			     return mathProblemsRepository.findTop40BySubject(subject);
+			}
 		}
 
 		// Check if the excludeMap is empty

@@ -36,14 +36,26 @@ public class RestService {
     // Create ObjectMapper instance
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public List<TestProblem> fetchMathProblems(TestSubjectType subject, String excludeListString) {
+    public List<TestProblem> fetchMathProblems(TestSubjectType subject,String category, String subcategory, String excludeListString) {
     	List<TestProblem> testProblems = new ArrayList<>();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> requestEntity = new HttpEntity<>(excludeListString, headers);
 
         try {
-        	String url = mathProblemServiceUrl + "?subject=" + subject.toString();
+        	StringBuilder urlBuilder = new StringBuilder(mathProblemServiceUrl);
+        	urlBuilder.append("?subject=").append(subject.toString());
+
+        	if (category != null && !category.isEmpty()) {
+        	    urlBuilder.append("&category=").append(category);
+        	}
+
+        	if (subcategory != null && !subcategory.isEmpty()) {
+        	    urlBuilder.append("&subcategory=").append(subcategory);
+        	}
+
+        	String url = urlBuilder.toString();
+
             ResponseEntity<String> problemListResponse = restTemplate.postForEntity(url, requestEntity, String.class);
             if (problemListResponse.getStatusCode() == HttpStatus.OK) {
             	String jsonString = problemListResponse.getBody(); 

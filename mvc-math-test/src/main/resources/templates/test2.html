@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Title</title>
+</head>
+<body>
+    <h2>HTML Image</h2>
+    <img src="test/dog.jpg" alt="Trulli" width="500" height="333">
+
+    <div id="buttonContainer">
+        <button onclick="selectSubject('math')">Math</button>
+        <button onclick="selectSubject('science')">Science</button>
+        <button onclick="selectSubject('chinese')">Chinese</button>
+    </div>
+
+    <div id="noSpellingCheckboxDiv" style="display: none;">
+        <input type="checkbox" id="noSpellingCheckbox" name="noSpellingCheckbox" value="true">
+        <label for="noSpellingCheckbox">No Spelling</label>
+    </div>
+
+    <div id="categorySelectDiv" style="display: none;">
+        <label for="category">Category:</label>
+        <select id="category" name="category">
+            <option value="短句">短句</option>
+            <option value="字">字</option>
+        </select>
+    </div>
+
+   <div id="subcategorySelectDiv" style="display: none;">
+    <label for="subcategory">Subcategory:</label>
+    <select id="subcategory" name="subcategory">
+        <option value="一级">一级</option>
+        <option value="二级">二级</option>
+        <option value="三级">三级</option>
+    </select>
+   </div>
+
+    <form id="myForm" action="/test_subject" method="get" onsubmit="handleSubmit(event)">
+        <input type="hidden" id="subjectInput" name="subject" value="">
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        function selectSubject(subject) {
+            var noSpellingCheckboxDiv = document.getElementById("noSpellingCheckboxDiv");
+            var categorySelectDiv = document.getElementById("categorySelectDiv");
+            var subcategorySelectDiv = document.getElementById("subcategorySelectDiv");
+            var subjectInput = document.getElementById("subjectInput");
+
+            if (subject === "chinese") {
+                noSpellingCheckboxDiv.style.display = "block";
+                categorySelectDiv.style.display = "block";
+                subcategorySelectDiv.style.display = "block";
+            } else {
+                noSpellingCheckboxDiv.style.display = "none";
+                categorySelectDiv.style.display = "none";
+                subcategorySelectDiv.style.display = "none";
+            }
+
+            subjectInput.value = subject;
+        }
+
+        function handleSubmit(event) {
+            var category = document.getElementById("category").value;
+            var subcategory = document.getElementById("subcategory").value;
+            var noSpelling = document.getElementById("noSpellingCheckbox").checked;
+
+            var url = "/test_subject?subject=" + subjectInput.value + "&category=" + category + "&subcategory=" + subcategory;
+            
+            if (noSpelling) {
+                url += "&noSpelling=true";
+            }
+
+            window.location.href = url;
+
+            event.preventDefault();
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Fetch Data from /test-rest</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  
+</head>
+<body>
+
+<h2>Fetch Data from /test-rest</h2>
+
+<label for="subcategory">Subcategory:</label>
+<input type="text" id="subcategory" name="subcategory">
+<button onclick="fetchData()">Fetch Data</button>
+
+<p id="output"></p>
+<p id="secondOutput"></p>
+
+
+<form id="mathProblemForm" action="/math/add" method="post">
+    
+    <!-- Hidden Fields -->
+    <input type="hidden" name="category" value="字">
+    <input type="hidden" name="subject" value="chinese">
+    <input type="hidden" name="answers" value="">
+    <input type="hidden" name="solution" value="">
+
+    <!-- Description (Set to Unique Chinese Character List) -->
+    <div class="form-group">
+        <label for="description">Description (Unique Chinese Character List):</label>
+        <textarea class="form-control" id="description" name="description"></textarea>
+    </div>
+
+    <!-- Subcategory -->
+    <div class="form-group">
+        <label for="subcategoryInput">Subcategory:</label>
+        <input type="text" class="form-control" id="subcategoryInput" name="mathSubCategory.name" required>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-success">Create MathProblem</button>
+
+</form>
+
+<script>
+    function fetchData() {
+        var subcategory = document.getElementById('subcategory').value;
+        var url1 = '/math/test-rest?subject=chinese&category=短句&subcategory=' + subcategory; 
+        var url2 = '/math/test-rest?subject=chinese&category=字&subcategory=' + subcategory;  // Second fetch URL
+
+        fetch(url1, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: 'hello'
+        })
+        .then(response => response.json())
+        .then(data => {
+            var descriptions = data.map(item => item.description).join('');
+            document.getElementById('output').innerText = descriptions;
+
+            // Extract all unique Chinese letters from descriptions
+            var uniqueChineseLetters = [...new Set(descriptions.split(''))].join('');
+            var uniqueChineseString = "\nUnique Chinese Letters in Descriptions: " + uniqueChineseLetters;
+            
+           
+            // Append unique Chinese letters to the output
+            document.getElementById('output').innerText += uniqueChineseString;
+
+        })
+        .catch(error => {
+            console.error('Error fetching data:', error);
+            document.getElementById('output').innerText = 'Error fetching data';
+        });
+
+        // Fetch data from the second URL
+        fetch(url2, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: 'hello'
+        })
+        .then(response => response.json())
+        .then(data => {
+            var descriptions = data.map(item => item.description).join('');
+            document.getElementById('secondOutput').innerText = descriptions;
+
+            // Extract all unique Chinese letters from descriptions
+            var uniqueChineseLetters = [...new Set(descriptions.split(''))].join('');
+            var uniqueChineseString = "\n数据库中字列表: " + uniqueChineseLetters;
+
+            // Append unique Chinese letters to the secondOutput
+            document.getElementById('secondOutput').innerText += uniqueChineseString;
+
+        })
+        .catch(error => {
+            console.error('Error fetching data from second URL:', error);
+            document.getElementById('secondOutput').innerText = 'Error fetching data from second URL';
+        });
+    }
+</script>
+
+</body>
+</html>
