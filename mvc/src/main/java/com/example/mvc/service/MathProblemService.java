@@ -65,7 +65,7 @@ public class MathProblemService {
 			    }
 			}
 			else {
-			     return mathProblemsRepository.findTop40BySubject(subject);
+			     return mathProblemsRepository.findBySubjectAndCategory(subject, category);
 			}
 		}
 

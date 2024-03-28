@@ -74,7 +74,7 @@ public class TestController {
 			               @RequestParam TestSubjectType subject,
 			               @RequestParam(name = "category", required = false)String category,
 			               @RequestParam(name = "subcategory", required = false)String subcategory,
-			               @RequestParam(name = "noSpellingCheckbox", defaultValue = "false")boolean noSpelling) {
+			               @RequestParam(name = "noSpelling", defaultValue = "false")boolean noSpelling) {
 		// get all test problems
 		List<TestProblem> oldTestProblems = testProblemService.getBySubject(subject);
 		// convert list to map and serialize map to json string, if map is empty, return
