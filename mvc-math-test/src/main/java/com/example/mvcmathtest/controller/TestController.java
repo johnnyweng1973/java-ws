@@ -96,7 +96,7 @@ public class TestController {
 				List<TestProblem> newTestProblems = TestProblem.cloneAndModify(testProblems);
 				model.addAttribute("sub", subject.toString());
 				model.addAttribute("problems", newTestProblems);
-				return "chinese_test_paper_character";
+				return "chinese_test_paper";
 			}
 		}
 		else {
