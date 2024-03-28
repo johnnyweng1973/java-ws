@@ -90,7 +90,7 @@ public class TestProblem {
         this.multipleAnswers = dto.isMultipleAnswers();
     }
     
-    public static List<TestProblem> cloneAndModify(List<TestProblem> testProblems) {
+    public static List<TestProblem> cloneAndModify(List<TestProblem> testProblems, boolean bRandomize) {
         List<TestProblem> clonedProblems = new ArrayList<>();
         Random random = new Random();
 
@@ -108,11 +108,20 @@ public class TestProblem {
             shuffleList(indices);
 
             for (int index = 0; index < length; index++) {
+            	
             	log.info("index {} char{}", indices.get(index), originalDescription.charAt(indices.get(index)));
                 TestProblem clonedProblem = new TestProblem();
+                
+                String charString;
+                if (bRandomize) {
+                	charString = String.valueOf(originalDescription.charAt(indices.get(index)));
+                }
+                else {
+                	charString = String.valueOf(originalDescription.charAt(index));
+                }
 
                 // Set the problem description to the character at the shuffled index
-                clonedProblem.setProblemDescription(String.valueOf(originalDescription.charAt(indices.get(index))));
+                clonedProblem.setProblemDescription(charString);
 
                 // Clone other fields using getters and setters
                 clonedProblem.setId(originalProblem.getId());

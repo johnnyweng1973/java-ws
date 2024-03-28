@@ -93,7 +93,13 @@ public class TestController {
 				return "chinese_test_paper";
 			}
 			else {
-				List<TestProblem> newTestProblems = TestProblem.cloneAndModify(testProblems);
+				List<TestProblem> newTestProblems;
+				if ("字".equals(category)) {
+					newTestProblems = TestProblem.cloneAndModify(testProblems, true);
+				}
+				else {
+					newTestProblems = TestProblem.cloneAndModify(testProblems, false);
+				}
 				model.addAttribute("sub", subject.toString());
 				model.addAttribute("problems", newTestProblems);
 				return "chinese_test_paper";
