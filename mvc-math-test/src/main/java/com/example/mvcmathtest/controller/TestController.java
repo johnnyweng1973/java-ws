@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -89,6 +90,12 @@ public class TestController {
 		List<TestProblem> testProblems = restService.fetchMathProblems(subject, category, subcategory, excludeListString);
 		if(noSpelling) {
 			testProblems.forEach(testProblem -> testProblem.setSolution(null));
+		}
+		// Shuffle the testProblems list
+		Collections.shuffle(testProblems);
+
+		if(noSpelling) {
+		    testProblems.forEach(testProblem -> testProblem.setSolution(null));
 		}
 		if (subject == TestSubjectType.chinese) {
 			log.info("categor is {}", category);
