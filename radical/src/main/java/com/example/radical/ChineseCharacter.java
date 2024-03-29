@@ -2,35 +2,51 @@ package com.example.radical;
 public class ChineseCharacter {
     private String radical;
     private String name;
+    private String pinyin;
+    private int strokeNum;
+    
 
     public ChineseCharacter() {
         // Default constructor
     }
 
-    public ChineseCharacter(String name, String radical) {
-        this.name = name;
-        this.radical = radical;
-    }
-
+    // Getter methods
     public String getRadical() {
         return radical;
-    }
-
-    public void setRadical(String radical) {
-        this.radical = radical;
     }
 
     public String getName() {
         return name;
     }
 
+    public String getPinyin() {
+        return pinyin;
+    }
+
+    public int getStrokeNum() {
+        return strokeNum;
+    }
+
+    // Setter methods
+    public void setRadical(String radical) {
+        this.radical = radical;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
+    public void setPinyin(String pinyin) {
+        this.pinyin = pinyin;
+    }
+
+    public void setStrokeNum(int strokeNum) {
+        this.strokeNum = strokeNum;
+    }
+    
     @Override
     public String toString() {
-        return name + " " + radical;
+        return name + " " + radical + " " + pinyin + " " + strokeNum + "画";
     }
 
     // Method to convert Unicode character to ASCII representation in hexadecimal format

@@ -1,6 +1,8 @@
 package com.example.mvc.controller;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +26,7 @@ import com.example.mvc.model.MathSubCategory;
 import com.example.mvc.service.MathProblemService;
 import com.example.mvc.service.MathSubCategoryService;
 import com.example.mvc.util.TestSubjectType;
+import com.example.radical.ChineseCharacter;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -66,6 +69,43 @@ public class MathProblemsController {
 	public String addMathProblem(@ModelAttribute("newMathProblem") MathProblem newMathProblem) {
 		MathSubCategory subcategory = mathSubcategoryService.findOrCreateSubcategory(newMathProblem.getMathSubCategory().getName());
 
+		if ("生字".equals(newMathProblem.getCategory())) {
+			try {
+	            // Read JSON file and convert to Map
+			    ObjectMapper objectMapper = new ObjectMapper();
+			    // Read the file from the classpath
+	            InputStream inputStream = MathProblemsController.class.getResourceAsStream("/中文字库.txt");
+	            
+	            Map<String, ChineseCharacter> characterWholeMap = objectMapper.readValue(
+	            		inputStream, 
+	                new TypeReference<Map<String, ChineseCharacter>>() {}
+	            );
+	            
+	            // Create a list to hold the new MathProblem objects
+	            List<MathProblem> mathProblems = new ArrayList<>();
+
+	            for (char character : newMathProblem.getDescription().toCharArray()) {
+	                String characterString = String.valueOf(character);
+	                ChineseCharacter chineseCharacter = characterWholeMap.get(characterString);
+	                
+	                if (chineseCharacter != null) {
+	                    // Create a new MathProblem object
+	                    MathProblem mathProblem = new MathProblem(newMathProblem);
+	                    mathProblem.setDescription(characterString);
+	                    mathProblem.setSolution(chineseCharacter.toString());
+	                    mathProblem.setMathSubCategory(subcategory);
+
+	                    // Add the new MathProblem object to the list
+	                    mathProblems.add(mathProblem);
+	                }
+	            }
+	            mathProblemService.saveAll(mathProblems);
+
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+						return "redirect:/math";
+		}
 		String[] problemsArray = newMathProblem.getDescription().split("Problem:");
 		List<MathProblem> problemList = new ArrayList<>();
 		//newMathProblem.setId(1); 

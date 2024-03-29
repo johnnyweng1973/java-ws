@@ -23,8 +23,7 @@ import java.io.IOException;
 public class DownloadRadical {
 	private static final Map<String, ChineseCharacter> characterWholeMap = new HashMap<>();
     private static final StringBuilder stringBuilder = new StringBuilder();
-	private static final String jsonFile = "中文字库1.txt";
-    private static final String fileName = "radical.txt";
+	private static final String jsonFile = "中文字库.txt";
 	private static int numOfCharacters = 0;
 	
 	public static void writeToJsonFile() {
@@ -38,34 +37,7 @@ public class DownloadRadical {
         }
     }
 
-	public static void saveStringToFile() {
-		Path path = Paths.get(fileName);
-
-		// Try block to check for exceptions
-		try {
-			// Now calling Files.writeString() method
-			// with path , content & standard charsets
-			Files.writeString(path, stringBuilder.toString(), StandardCharsets.UTF_8);
-		}
-
-		// Catch block to handle the exception
-		catch (IOException ex) {
-			// Print messqage exception occurred as
-			// invalid. directory local path is passed
-			System.out.print("Invalid Path");
-		}
-	}
-
-	public static void main(String[] args) {
-		// URL of the HTML page
-		String url = "https://mzd.diyifanwen.com/zidian/bs/";
-
-		HanziRadicalCollection collection = new HanziRadicalCollection();
-		downloadCollection(collection, url);
-
-	}
-
-	public static Map<Integer, List<ChineseCharacter>> downloadCharacterMap(String strokeUrl, String strokeName) {
+	public static Map<Integer, List<ChineseCharacter>> downloadCharacterMap(String strokeUrl) {
 		Map<Integer, List<ChineseCharacter>> characterMap = new HashMap<>();
 
 		try {
@@ -92,10 +64,26 @@ public class DownloadRadical {
 					Element aElement = nextSibling.selectFirst("a");
 					if (aElement != null) {
 						String character = aElement.text();
-						String href = aElement.attr("href");
-						String rawHtml = aElement.outerHtml();
-						numOfCharacters++;
-						ChineseCharacter characterInstance = new ChineseCharacter(character, strokeName); 
+						String title = aElement.attr("title");
+					        
+				        // Extract 拼音, 部首, and 笔画 from the title
+				        String pinyin = extractValue(title, "拼音：", ",\n");
+				        String radical = extractValue(title, "部首：", "\n");
+				        int strokeNum = Integer.parseInt(extractValue(title, "笔画：", ""));
+				        
+				        // Create a ChineseCharacter instance and set the values
+				        ChineseCharacter characterInstance = new ChineseCharacter();
+				        characterInstance.setName(character);
+				        characterInstance.setPinyin(pinyin);
+				        characterInstance.setRadical(radical);
+				        characterInstance.setStrokeNum(strokeNum);
+				        // Print the values to verify
+				        System.out.println("拼音: " + characterInstance.getPinyin());
+				        System.out.println("部首: " + characterInstance.getRadical());
+				        System.out.println("笔画: " + characterInstance.getStrokeNum());
+				  
+				        
+					
 						characterList.add(characterInstance);
 						characterWholeMap.put(character, characterInstance);
 					}
@@ -112,6 +100,20 @@ public class DownloadRadical {
 
 		return characterMap;
 	}
+	private static String extractValue(String text, String prefix, String suffix) {
+        int startIndex = text.indexOf(prefix);
+        if (startIndex == -1) {
+            return "";
+        }
+        startIndex += prefix.length();
+        
+        int endIndex = suffix.isEmpty() ? text.length() : text.indexOf(suffix, startIndex);
+        if (endIndex == -1) {
+            endIndex = text.length();
+        }
+        
+        return text.substring(startIndex, endIndex).trim();
+    }
 
 	private static void downloadCollection(HanziRadicalCollection collection, String url) {
 
@@ -155,7 +157,7 @@ public class DownloadRadical {
 					String radicalUrl = "https:" + dd.selectFirst("a").attr("href");
 					System.out.println(radicalName);
 					stringBuilder.append(radicalName);
-					Map<Integer, List<ChineseCharacter>> map = downloadCharacterMap(radicalUrl, radicalName);
+					Map<Integer, List<ChineseCharacter>> map = downloadCharacterMap(radicalUrl);
 					Radical radical = new Radical(radicalName, map);
 					radicalList.add(radical);
 				}
@@ -173,4 +175,16 @@ public class DownloadRadical {
 			e.printStackTrace();
 		}
 	}
+	
+
+	public static void main(String[] args) {
+		// URL of the HTML page
+		String url = "https://mzd.diyifanwen.com/zidian/bs/";
+
+		HanziRadicalCollection collection = new HanziRadicalCollection();
+		downloadCollection(collection, url);
+
+	}
+
+
 }
