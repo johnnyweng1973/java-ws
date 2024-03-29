@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chinese Handwriting Recognition</title>
+    <script src="https://cdn.jsdelivr.net/npm/handwriting.js@latest/dist/handwriting.min.js"></script>
+    <style>
+        #canvas {
+            border: 1px solid #ccc;
+            cursor: crosshair;
+        }
+        #result {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas" width="400" height="200"></canvas>
+<button onclick="recognize()">Recognize</button>
+<div id="result"></div>
+
+<script>
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var points = [];
+    var strokes = [];
+
+    canvas.addEventListener('mousedown', function(e) {
+        console.log('mousedown event');
+        points = [];
+        points.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
+    });
+
+    canvas.addEventListener('mousemove', function(e) {
+        if (points.length > 0) {
+            points.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
+            draw();
+        }
+    });
+
+    canvas.addEventListener('mouseup', function() {
+        if (points.length > 0) {
+            strokes.push(points);
+            points = [];
+            console.log('mouseup event: strokes', strokes);
+        }
+    });
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < strokes.length; i++) {
+            ctx.beginPath();
+            ctx.moveTo(strokes[i][0].x, strokes[i][0].y);
+            for (let j = 1; j < strokes[i].length; j++) {
+                ctx.lineTo(strokes[i][j].x, strokes[i][j].y);
+            }
+            ctx.stroke();
+        }
+        if (points.length > 1) {
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.stroke();
+        }
+    }
+
+    function recognize() {
+        console.log('Recognize button clicked');
+        
+        // Check if Handwriting is defined
+        if (typeof Handwriting !== 'undefined') {
+            var handwriting = new Handwriting.Handwriting({
+                strokes: strokes,
+                recognitionHandler: function(result) {
+                    console.log('Recognition result:', result);
+                    document.getElementById('result').innerText = result.text;
+                },
+                // Optional: You can customize recognition options here
+            });
+
+            handwriting.recognize();
+        } else {
+            console.log('Handwriting is not defined');
+            alert('Handwriting is not defined. Please check the script inclusion.');
+        }
+    }
+</script>
+
+</body>
+</html>

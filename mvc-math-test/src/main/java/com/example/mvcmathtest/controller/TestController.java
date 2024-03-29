@@ -57,6 +57,11 @@ public class TestController {
 		return "test_success";
 	}
 
+	@GetMapping("/trial")
+	public String handleTest() {
+		return "trial";
+	}
+	
 	@GetMapping("/test")
 	public String home() {
 //		try {
@@ -87,7 +92,7 @@ public class TestController {
 		}
 		if (subject == TestSubjectType.chinese) {
 			log.info("categor is {}", category);
-			if ("短句".equals(category)) {
+			if ("短句".equals(category) || "生字".equals(category)) {
 				model.addAttribute("sub", subject.toString());
 				model.addAttribute("problems", testProblems);
 				return "chinese_test_paper";

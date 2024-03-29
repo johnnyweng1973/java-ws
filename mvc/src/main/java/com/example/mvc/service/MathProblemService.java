@@ -51,7 +51,7 @@ public class MathProblemService {
 		List<MathProblem> combinedMathProblems = new ArrayList<>();
 		
 		if (subject == TestSubjectType.chinese) {
-			if ("字".equals(category) ) {
+			if ("字".equals(category) || "生字".equals(category)) {
 				// Fetch the subcategoryId from mathSubCategoryRepository
 			    Optional<MathSubCategory> optionalMathSubCategory = mathSubCategoryRepository.findByName(chineseSubcategory);
 			    
