@@ -65,8 +65,12 @@ public class MathProblemService {
 			    }
 			}
 			else {
-			     return mathProblemsRepository.findBySubjectAndCategory(subject, category);
-			}
+				List<MathProblem> list1 = mathProblemsRepository.findBySubjectAndCategory(subject, category);
+				List<MathProblem> list2 = mathProblemsRepository.findBySubjectAndCategory(subject, "生字");
+
+				list1.addAll(list2);
+
+				return list1;			}
 		}
 
 		// Check if the excludeMap is empty
@@ -93,7 +97,10 @@ public class MathProblemService {
 	    }
 		return combinedMathProblems;
 	}
+	
+	@Transactional
 	public void saveAll(List<MathProblem> problems) {
     	mathProblemsRepository.saveAll(problems);
+    	mathProblemsRepository.flush();
     }
 }

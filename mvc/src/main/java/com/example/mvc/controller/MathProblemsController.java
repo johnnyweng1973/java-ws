@@ -3,6 +3,7 @@ package com.example.mvc.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.mvc.model.MathProblem;
 import com.example.mvc.model.MathSubCategory;
@@ -63,6 +65,11 @@ public class MathProblemsController {
 	@GetMapping("/add-chinese-character")
 	public String addCharacter() {
 			return "add_chinese_character_test";
+	}
+
+	@GetMapping("/add-chinese")
+	public String addChinese() {
+			return "add_chinese_character_test_original";
 	}
 
 	@PostMapping("/add")
@@ -170,4 +177,26 @@ public class MathProblemsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+    
+    @PostMapping("/addAll")
+	@ResponseBody
+	public ResponseEntity<String> handleFormSubmission(@RequestBody String jsonData) {
+		List<MathProblem> mathProblem = new ArrayList<>();
+		try {
+			// MyClass myInstance = objectMapper.readValue(jsonData, MyClass.class);
+			List<MathProblem> problems = objectMapper.readValue(jsonData, new TypeReference<List<MathProblem>>() {
+			});
+			log.info("starting to saveAll");
+			mathProblemService.saveAll(problems);
+		    // Return a success message
+			String message = "Form submitted successfully";
+			return ResponseEntity.status(HttpStatus.OK).body(message);
+		} catch (Exception e) {
+			log.info("exception in addAll handling");
+			
+			// Handle any exceptions that occur during JSON decoding
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing JSON data");
+		}
+	}
+	
 }

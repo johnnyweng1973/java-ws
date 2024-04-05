@@ -13,11 +13,6 @@
         <button onclick="selectSubject('chinese')">Chinese</button>
     </div>
 
-    <div id="noSpellingCheckboxDiv" style="display: none;">
-        <input type="checkbox" id="noSpellingCheckbox" name="noSpellingCheckbox" value="true">
-        <label for="noSpellingCheckbox">No Spelling</label>
-    </div>
-
     <div id="categorySelectDiv" style="display: none;">
         <label for="category">Category:</label>
         <select id="category" name="category">
@@ -42,17 +37,14 @@
 
     <script>
         function selectSubject(subject) {
-            var noSpellingCheckboxDiv = document.getElementById("noSpellingCheckboxDiv");
             var categorySelectDiv = document.getElementById("categorySelectDiv");
             var subcategorySelectDiv = document.getElementById("subcategorySelectDiv");
             var subjectInput = document.getElementById("subjectInput");
 
             if (subject === "chinese") {
-                noSpellingCheckboxDiv.style.display = "block";
                 categorySelectDiv.style.display = "block";
                 subcategorySelectDiv.style.display = "block";
             } else {
-                noSpellingCheckboxDiv.style.display = "none";
                 categorySelectDiv.style.display = "none";
                 subcategorySelectDiv.style.display = "none";
             }
@@ -63,14 +55,9 @@
         function handleSubmit(event) {
             var category = document.getElementById("category").value;
             var subcategory = document.getElementById("subcategory").value;
-            var noSpelling = document.getElementById("noSpellingCheckbox").checked;
 
             var url = "/test_subject?subject=" + subjectInput.value + "&category=" + category + "&subcategory=" + subcategory;
             
-            if (noSpelling) {
-                url += "&noSpelling=true";
-            }
-
             window.location.href = url;
 
             event.preventDefault();

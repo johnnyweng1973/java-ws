@@ -65,13 +65,6 @@ public class TestController {
 	
 	@GetMapping("/test")
 	public String home() {
-//		try {
-//            Map<String, ChineseCharacter> characterMap = HanziRadicalCollection.getCharacterMap();
-//            System.out.println(characterMap);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-		
 		return "test2";
 	}
 
@@ -91,29 +84,23 @@ public class TestController {
 		if(noSpelling) {
 			testProblems.forEach(testProblem -> testProblem.setSolution(null));
 		}
-		// Shuffle the testProblems list
-		Collections.shuffle(testProblems);
-
+		
 		if(noSpelling) {
 		    testProblems.forEach(testProblem -> testProblem.setSolution(null));
 		}
 		if (subject == TestSubjectType.chinese) {
 			log.info("categor is {}", category);
-			if ("短句".equals(category) || "生字".equals(category)) {
+			if ("短句".equals(category)) {
 				model.addAttribute("sub", subject.toString());
 				model.addAttribute("problems", testProblems);
 				return "chinese_test_paper";
 			}
 			else {
-				List<TestProblem> newTestProblems;
-				if ("字".equals(category)) {
-					newTestProblems = TestProblem.cloneAndModify(testProblems, true);
-				}
-				else {
-					newTestProblems = TestProblem.cloneAndModify(testProblems, false);
-				}
+				// Shuffle the testProblems list
+				Collections.shuffle(testProblems);
+		
 				model.addAttribute("sub", subject.toString());
-				model.addAttribute("problems", newTestProblems);
+				model.addAttribute("problems", testProblems);
 				return "chinese_test_paper";
 			}
 		}

@@ -30,13 +30,15 @@
 </head>
 <body>
   <div class="container my-5">
+  <a href="radical.html" target="_blank" th:text="'部首表'" class="btn btn-primary mb-3"></a>
+  
   <div>
     Start Index: <input type="number" id="startIndexInput" value="1">
-    End Index: <input type="number" id="endIndexInput" value="40">
+    End Index: <input type="number" id="endIndexInput" value="60">
     <button type="button" onclick="filterRecords()">Filter</button>
-    <button type="button" onclick="shuffleRows()">Shuffle Rows</button> 
+    <button type="button" onclick="startTesting()">Start Testing</button> 
     <button type="button" onclick="toggleAllSolutions()">Toggle All Solutions</button>
-   
+      
 </div>
     <form id="myForm">
     <h2 th:text="${sub} + ' Test'"></h2>
@@ -74,27 +76,76 @@
         <button id="submitButton" type="button" onclick="submitForm()">Submit</button>
     </form>
   </div>
+  
+  <!-- Modal to display first 10 rows -->
+<!-- Modal to display first 10 rows -->
+<div class="modal" tabindex="-1" id="firstTenRowsModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">First 10 Rows</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="firstTenRowsTable" class="table">
+                    <!-- Rows will be populated here -->
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="shuffleRowsInModal()">Shuffle Rows</button> <!-- Added shuffle button -->
+            </div>
+        </div>
+    </div>
+</div>
+  
+<!-- jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap Bundle with Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
   <script>
   //Function to filter records when the document is loaded
   document.addEventListener("DOMContentLoaded", function() {
       filterRecords();
+      // Re-enable the submit button
+      document.getElementById("submitButton").disabled = true;
+
   });
   
+  var onlyDuanju = false;
+//Array to store out-of-range rows
+  var outOfRangeRows = [];
+
   function filterRecords() {
-      var startIndex = parseInt(document.getElementById("startIndexInput").value);
-      var endIndex = parseInt(document.getElementById("endIndexInput").value);
-      
-      var rows = document.querySelectorAll("tbody tr");
-      rows.forEach(function(row, index) {
-          if (index + 1 >= startIndex && index + 1 <= endIndex) {
-              row.style.display = "";
-          } else {
-              row.style.display = "none";
-          }
-      });
-  }
-    function toggleSolution(rowIndex) {
+	    var startIndex = parseInt(document.getElementById("startIndexInput").value);
+	    var endIndex = parseInt(document.getElementById("endIndexInput").value);
+	    
+	    var rows = document.querySelectorAll("tbody tr");
+	    
+	    var categoryToShow = null; // Initialize categoryToShow variable
+	    
+	    rows.forEach(function(row, index) {
+	        if (index === 0) { // When index is 0, set the categoryToShow
+	            if (row.querySelector('input[name="category"]').value == "短句"){
+	            	onlyDuanju = true;
+	            }
+	        } else { 
+	        	if (row.querySelector('input[name="category"]').value != "短句" && onlyDuanju){
+	        		row.style.display = "none";
+	        		return;
+	        	}
+	        }
+	        	// For the rest of the rows
+            if (index + 1 >= startIndex && index + 1 <= endIndex) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+	}
+  function toggleSolution(rowIndex) {
     	  // Get the row array corresponding to the given index
         var rowArray = document.querySelectorAll('tr')[rowIndex+1];
         
@@ -151,9 +202,8 @@
             body: JSON.stringify(formData)
         }).then(response => {
         	if (response.ok) {
-        	    // If the POST request is successful, redirect to another page
-        	    window.location.href = '/test-success';
-        	  } else {
+                  afterSubmit();
+        	} else {
         		  window.location.href = '/test-fail';
         	  }
         }).catch(error => {
@@ -170,43 +220,188 @@
         });
     }
  // Global variable to track test mode state
-    var testMode = false;
+    var testMode = 0;
 
-    function shuffleRows() {
-        if (!testMode) {
+    function startTesting() {
+        if (testMode == 0) {
+        	var container = document.querySelector('.container'); // Select the container element
+        	   
             // Disable the Toggle All Solutions button
             var toggleButton = document.querySelector('button[onclick="toggleAllSolutions()"]');
             toggleButton.disabled = true;
             
+         // Disable filter
+            var filterButton = document.querySelector('button[onclick="filterRecords()"]');
+            filterButton.disabled = true;
+                        
             // Set all solution fields to none
             var solutionFields = document.querySelectorAll('textarea[name="solution"]');
             solutionFields.forEach(function(solutionField) {
                 solutionField.style.display = "none";
             });
             
+            
+            // Re-enable the submit button
+            document.getElementById("submitButton").disabled = false;
+
+            // Change background color to pink
+            container.style.backgroundColor = "pink";
+            
+            // Disable start button
+            var startTestingButton = document.querySelector('button[onclick="startTesting()"]');
+            startTestingButton.disabled = true;
+             
             // Enter test mode
-            testMode = true;
+            testMode = 1;
         }
+        removeOutOfRangeRows();          
+    }
+ 
+    function removeOutOfRangeRows() {
+        var startIndex = parseInt(document.getElementById("startIndexInput").value);
+        var endIndex = parseInt(document.getElementById("endIndexInput").value);
         
-        var tbody = document.querySelector('tbody');
-        var rows = Array.from(tbody.querySelectorAll('tr'));
-        
-        // Shuffle the rows
-        for (var i = rows.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            [rows[i], rows[j]] = [rows[j], rows[i]]; // Swap rows
+        var rows = document.querySelectorAll("tbody tr");
+        var characterSet = new Set();
+
+        // Collect all descriptions within the range and add their characters to the set
+        rows.forEach(function(row, index) {
+            if (index + 1 >= startIndex && index + 1 <= endIndex) {
+                var description = row.querySelector('.problem-description').textContent.trim();
+                for (let char of description) {
+                    characterSet.add(char);
+                }
+            }
+        });
+
+        // Remove rows that are out of range and not '字' category or not having characters in characterSet
+        rows.forEach(function(row, index) {
+            if (index + 1 < startIndex || index + 1 > endIndex) {
+                var category = row.querySelector('input[name="category"]').value;
+                var description = row.querySelector('.problem-description').textContent.trim();
+                
+                if (category !== '生字' || !characterSet.has(description)) {
+                	console.log("remove " + description);
+                	row.remove(); // Remove the row that is out of range and not meeting the criteria
+                }
+            }
+        });
+
+        if (onlyDuanju) {
+            shuffleRowsByCategory('短句');    	
+        } else {
+            shuffleRowsByCategory('生字');
         }
-        
-        // Re-append shuffled rows to tbody
-        rows.forEach(row => {
+    }
+
+    function shuffleRowsByCategory(categoryName) {
+        var rows = document.querySelectorAll("tbody tr");
+
+        // Filter rows by the specified category
+        var filteredRows = Array.from(rows).filter(function(row) {
+            var category = row.querySelector('input[name="category"]').value;
+            return category === categoryName;
+        });
+
+        // Shuffle the filtered rows
+        var shuffledRows = shuffleArray(filteredRows);
+
+        // Clear the tbody
+        var tbody = document.querySelector("tbody");
+    
+        // Append shuffled rows back to the tbody
+        shuffledRows.forEach(function(row) {
+        	row.querySelector('textarea[name="answer"]').value = '';
             tbody.appendChild(row);
         });
     }
+
+    function shuffleRows() {
+        var rows = document.querySelectorAll("tbody tr");
+
+        // Shuffle the filtered rows
+        var shuffledRows = shuffleArray(rows);
+
+        // Clear the tbody
+        var tbody = document.querySelector("tbody");
+    
+        // Append shuffled rows back to the tbody
+        shuffledRows.forEach(function(row) {
+            tbody.appendChild(row);
+        });
+    }
+
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+        }
+        return array;
+    }
+    
+    function removeCategory(name) {
+        var rows = document.querySelectorAll("tbody tr"); // Select all rows in the tbody
+
+        rows.forEach(function(row) {
+            var category = row.querySelector('input[name="category"]').value; // Get the category value of the current row
+
+            if (category === name) {
+                row.remove(); // Remove the row if its category matches the input name
+            }
+        });
+    }
+    
+    function enableCategory(name) {
+        var rows = document.querySelectorAll("tbody tr"); // Select all rows in the tbody
+
+        rows.forEach(function(row) {
+            var category = row.querySelector('input[name="category"]').value; // Get the category value of the current row
+
+            if (category === name) {
+            	row.style.display = "";
+            }
+        });
+    }
+    
  
-   
-
-
+    function afterSubmit() {
+        switch (testMode){
+            case 0:
+        	    // If the POST request is successful, redirect to another page
+        	    window.location.href = '/test-success';
+                break;
+            case 1:
+                // Re-enable the submit button
+                document.getElementById("submitButton").disabled = false;
+                shuffleRowsByCategory('短句');    
+                testMode = testMode + 1;
+                break;
+            case 2:
+                // Re-enable the submit button
+                document.getElementById("submitButton").disabled = false;
+                removeCategory('短句');
+                enableCategory('生字');
+            	shuffleRowsByCategory('生字');
+                testMode = testMode + 1;
+                break;
+            case 3:
+                // Re-enable the submit button
+                document.getElementById("submitButton").disabled = false;
+            	shuffleRowsByCategory('生字');
+                testMode = testMode + 1;
   
+                break;
+            case 4:
+                // Handle case when TestMode is 4
+        	    window.location.href = '/test-success';
+
+                break;
+            default:
+                // Handle default case
+                break;
+        }
+    }
+    
   </script>
 </body>
 </html>

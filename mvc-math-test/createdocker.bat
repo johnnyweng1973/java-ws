@@ -20,6 +20,6 @@ docker build -t mvc-test-v%version% .
 
 REM Run Docker container
 echo Running Docker container with tag mvc-v%version% on port 8080...
-docker run -p 8080:8080 mvc-test-v%version%
+docker run -p 8084:8084 mvc-test-v%version%
 
 endlocal
