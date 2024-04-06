@@ -31,6 +31,9 @@
 <body>
   <div class="container my-5">
   <a href="radical.html" target="_blank" th:text="'部首表'" class="btn btn-primary mb-3"></a>
+    <div  class="text-primary mb-3">
+      已学部首：    现在学习：氵（三点水）木（木字旁）亻（单人旁）彳（双人旁）讠（言字旁）扌（提手旁）忄（竖心旁）
+    </div>
   
   <div>
     Start Index: <input type="number" id="startIndexInput" value="1">
@@ -108,6 +111,7 @@
   <script>
   //Function to filter records when the document is loaded
   document.addEventListener("DOMContentLoaded", function() {
+	  collectRadicals();
       filterRecords();
       // Re-enable the submit button
       document.getElementById("submitButton").disabled = true;
@@ -117,6 +121,7 @@
   var onlyDuanju = false;
 //Array to store out-of-range rows
   var outOfRangeRows = [];
+
 
   function filterRecords() {
 	    var startIndex = parseInt(document.getElementById("startIndexInput").value);
@@ -401,7 +406,43 @@
                 break;
         }
     }
-    
+
+ // Function to collect radicals
+ function collectRadicals() {
+     var radicals = []; // Array to store radicals
+     var text = document.querySelector('.text-primary').textContent.trim(); // Get the text content of the div
+     var matches = text.match(/[\u4e00-\u9fa5]+(?=（)/g); // Use regular expression to find radicals before '（'
+     
+     // Check if matches exist
+     if (matches) {
+         // Iterate through matches and add them to the radicals array
+         matches.forEach(function(match) {
+             radicals.push(match);
+         });
+     }
+     
+     // Call the function to highlight rows containing radicals in their solutions
+     highlightRowsWithRadicals(radicals);
+ }
+
+ // Function to highlight rows containing radicals in their solutions
+ function highlightRowsWithRadicals(radicals) {
+     var rows = document.querySelectorAll("tbody tr");
+
+     rows.forEach(function(row) {
+         var category = row.querySelector('input[name="category"]').value;
+         var solution = row.querySelector('textarea[name="solution"]').value;
+
+         // Check if the row category is "生字" and the solution contains any of the radicals
+         if (category === "生字" && solution) {
+             radicals.forEach(function(radical) {
+                 if (solution.includes(radical)) {
+                     row.style.backgroundColor = "yellow"; // Set background color to yellow
+                 }
+             });
+         }
+     });
+ }    
   </script>
 </body>
 </html>
