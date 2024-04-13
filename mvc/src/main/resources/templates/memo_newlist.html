@@ -5,10 +5,9 @@
     <title>Memo Table</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-      .limited-cell {
-            max-height: 4.4em; /* Adjust based on your font size */
-            overflow-y: scroll;
-            line-height: 1.1em; /* Adjust based on your line height */
+        .table tbody tr {
+            height: 100px; /* Adjust the height as needed */
+            white-space: pre-wrap;
         }
     </style>
 </head>
@@ -16,6 +15,7 @@
 
 <div class="container mt-5">
     <h2>Memo Table</h2>
+    <button id="newMemoButton" onclick="window.location.href='/memo/add'" style="width: 100%; background-color: yellow; margin-bottom: 10px;">New Memo</button>
     
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="myTabs">
@@ -36,29 +36,28 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
+                        <th></th> <!-- Select Box -->
                         <th>ID</th>
                         <th>Title</th>
                         <th>Description</th>
                         <th>Content</th>
+                        <th>Category</th>
                     </tr>
                 </thead>
                 <tbody>
-                     <!-- Iterate through all memos from all memo lists -->
                 <th:block th:each="memoList : ${groupedMemos}">
                     <tr th:each="memo : ${memoList.value}">
+                        <td><input type="checkbox" class="memo-checkbox" th:attr="value=${memo.id}"></td>
                         <td th:text="${memo.id}"></td>
-                        <td th:text="${memo.title}"></td>
-                        <td>
-                            <div class="limited-cell" th:text="${memo.description}"></div>
-                        </td>
-                        <td>
-                            <div class="limited-cell" th:text="${memo.content}"></div>
-                        </td>
+                        <td contenteditable="true" th:id="'title_'+${memo.id}" th:text="${memo.title}"></td>
+                        <td contenteditable="true" th:id="'description_'+${memo.id}" th:text="${memo.description}"></td>
+                        <td contenteditable="true" th:id="'content_'+${memo.id}" th:text="${memo.content}"></td>
+                        <td contenteditable="true" th:id="'category_'+${memo.id}" th:text="${memo.category}"></td>
                     </tr>
                 </th:block>
- 
                 </tbody>
             </table>
+            <button id="updateSelected" style="background-color: blue; color: white;">Update Selected</button>
         </div>
         
         <div th:each="category : ${categories}" th:id="${#strings.replace(category, ' ', '-')}" class="tab-pane fade">
@@ -68,26 +67,30 @@
             <table class="table table-bordered">
                 <thead>
                     <tr>
+                        <th></th> <!-- Select Box -->
                         <th>ID</th>
                         <th>Title</th>
                         <th>Description</th>
                         <th>Content</th>
+                        <th>Category</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="memo : ${groupedMemos['__${category}__']}">
+                        <td><input type="checkbox" class="memo-checkbox" th:attr="value=${memo.id}"></td>
                         <td th:text="${memo.id}"></td>
-                        <td th:text="${memo.title}"></td>
-                        <td>
-                            <div class="limited-cell" th:text="${memo.description}"></div>
-                        </td>
-                        <td>
-                            <div class="limited-cell" th:text="${memo.content}"></div>
-                        </td>
+                        <td contenteditable="true" th:id="'title_'+${memo.id}" th:text="${memo.title}"></td>
+                        <td contenteditable="true" th:id="'description_'+${memo.id}" th:text="${memo.description}"></td>
+                        <td contenteditable="true" th:id="'content_'+${memo.id}" th:text="${memo.content}"></td>
+                        <td contenteditable="true" th:id="'category_'+${memo.id}" th:text="${memo.category}"></td>
                     </tr>
                 </tbody>
             </table>
+            <button id="updateSelected" style="background-color: blue; color: white;">Update Selected</button>
         </div>
+        
+        <!-- Delete Selected button inside tab-content but outside tab-pane -->
+        <button id="deleteSelected" style="background-color: red;">Delete Selected</button>
     </div>
 </div>
 
@@ -100,6 +103,70 @@
         $('#myTabs a').click(function (e) {
             e.preventDefault();
             $(this).tab('show');
+        });
+
+        $('#deleteSelected').click(function() {
+            var selectedIds = [];
+            $('.memo-checkbox:checked').each(function() {
+                selectedIds.push($(this).val());
+            });
+            
+            // Delete selected rows from active tab
+            var activeTab = $('.tab-pane.active');
+            selectedIds.forEach(function(id) {
+                activeTab.find('tr').has('input[value="' + id + '"]').remove();
+            });
+            
+            // Send selectedIds to server for deletion
+            $.ajax({
+                url: '/memo/deleteAll',
+                type: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify(selectedIds),
+                success: function(response) {
+                    console.log('Successfully deleted memos:', response);
+                },
+                error: function(error) {
+                    console.error('Error deleting memos:', error);
+                }
+            });
+
+            // Log selectedIds
+            console.log("id " + selectedIds);
+        });
+
+        $('#updateSelected').click(function() {
+            var updatedMemos = [];
+            
+            $('.tab-pane.active tbody tr').each(function() {
+                if ($(this).find('.memo-checkbox').is(':checked')) {
+                    var memo = {
+                        id: $(this).find('.memo-checkbox').val(),
+                        title: $('#' + 'title_' + $(this).find('.memo-checkbox').val()).text(),
+                        description: $('#' + 'description_' + $(this).find('.memo-checkbox').val()).text(),
+                        content: $('#' + 'content_' + $(this).find('.memo-checkbox').val()).text(),
+                        category: $('#' + 'category_' + $(this).find('.memo-checkbox').val()).text()
+                    };
+                    updatedMemos.push(memo);
+                }
+            });
+            
+            // Send updatedMemos to server for update
+            $.ajax({
+                url: '/memo/updateAll',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedMemos),
+                success: function(response) {
+                    console.log('Successfully updated memos:', response);
+                },
+                error: function(error) {
+                    console.error('Error updating memos:', error);
+                }
+            });
+
+            // Log updatedMemos
+            console.log("Updated memos:", updatedMemos);
         });
     });
 </script>

@@ -46,7 +46,6 @@
     function fetchData() {
         var subcategory = document.getElementById('subcategory').value;
         var url1 = '/math/test-rest?subject=chinese&category=短句&subcategory=' + subcategory; 
-        var url2 = '/math/test-rest?subject=chinese&category=字&subcategory=' + subcategory;  // Second fetch URL
 
         fetch(url1, {
             method: 'POST',
@@ -74,31 +73,6 @@
             document.getElementById('output').innerText = 'Error fetching data';
         });
 
-        // Fetch data from the second URL
-        fetch(url2, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'text/plain'
-            },
-            body: 'hello'
-        })
-        .then(response => response.json())
-        .then(data => {
-            var descriptions = data.map(item => item.description).join('');
-            document.getElementById('secondOutput').innerText = descriptions;
-
-            // Extract all unique Chinese letters from descriptions
-            var uniqueChineseLetters = [...new Set(descriptions.split(''))].join('');
-            var uniqueChineseString = "\n数据库中字列表: " + uniqueChineseLetters;
-
-            // Append unique Chinese letters to the secondOutput
-            document.getElementById('secondOutput').innerText += uniqueChineseString;
-
-        })
-        .catch(error => {
-            console.error('Error fetching data from second URL:', error);
-            document.getElementById('secondOutput').innerText = 'Error fetching data from second URL';
-        });
     }
 </script>
 

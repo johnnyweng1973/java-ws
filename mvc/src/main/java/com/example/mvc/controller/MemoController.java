@@ -3,12 +3,16 @@ package com.example.mvc.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -110,7 +114,7 @@ public class MemoController {
     @PostMapping("/add")
     public String addMemo(@ModelAttribute("newMemo") Memo newMemo) {
         memoService.addMemo(newMemo);
-        return "redirect:/memo";
+        return "redirect:/memo/list";
     }
     
     @ResponseBody
@@ -130,21 +134,31 @@ public class MemoController {
         String responseData = "Response data from server";
         return responseData;
     }
-//  
-//    @GetMapping("/update/{memoId}")
-//    public String showEditForm(@PathVariable Long memoId, Model model) {
-//        // Fetch memo details based on memoId and add them to the model
-//        Memo memo = memoService.findById(memoId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + memoId));
-//        model.addAttribute("memo", memo);
-//        return "update_Memo"; // Return the name of the edit form template
-//    }
-  
-//    @PostMapping("/update/{memoId}")
-//    public String editMemo(@PathVariable Long memoId, @ModelAttribute Memo memo, Model model) {
-//        // Update the memo with the provided memoId
-//        memoService.updateMemo(memo);
-//        model.addAttribute("memo", memo);
-//        return "update_Memo"; // Return the name of the edit form template
-//        //return "redirect:/memo/list"; // Redirect to the memo list page after editing
-//    }
+    
+
+    @DeleteMapping("/deleteAll")
+    @ResponseBody
+    public ResponseEntity<String> handleDelete(@RequestBody List<Long> ids) {
+    	try {
+    		 memoService.deleteMemos(ids);
+             return new ResponseEntity<>("Records deleted successfully", HttpStatus.OK);
+		} catch (Exception e) {
+			log.info("exception in deleteAll handling");
+			
+			// Handle any exceptions that occur during JSON decoding
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing JSON data");
+		}
+
+    }
+    
+    @PutMapping("/updateAll")
+    @ResponseBody
+    public ResponseEntity<String> updateAllMemos(@RequestBody List<Memo> updatedMemos) {
+        try {
+        	memoService.saveAll(updatedMemos);
+        	return ResponseEntity.ok().body("Memos updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Error updating memos: " + e.getMessage());
+        }
+    }
 }

@@ -90,7 +90,7 @@ public class TestController {
 		}
 		if (subject == TestSubjectType.chinese) {
 			log.info("categor is {}", category);
-			if ("短句".equals(category)) {
+			if (!"生字".equals(category)) {
 				model.addAttribute("sub", subject.toString());
 				model.addAttribute("problems", testProblems);
 				return "chinese_test_paper";

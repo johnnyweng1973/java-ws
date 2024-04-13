@@ -31,4 +31,15 @@ public class MemoService {
 		memoRepository.save(memo);
 		return;
 	}
+	
+	public void deleteMemos(List<Long> ids) {
+		 List<Memo> memosToDelete = memoRepository.findAllById(ids);
+		 memoRepository.deleteAll(memosToDelete);
+	}
+
+	public void saveAll(List<Memo> updatedMemos) {
+		memoRepository.saveAll(updatedMemos);
+		// TODO Auto-generated method stub
+		
+	}
 }

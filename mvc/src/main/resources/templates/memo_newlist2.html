@@ -41,23 +41,21 @@
                         <th>Title</th>
                         <th>Description</th>
                         <th>Content</th>
-                        <th>Category</th>
                     </tr>
                 </thead>
                 <tbody>
+                     <!-- Iterate through all memos from all memo lists -->
                 <th:block th:each="memoList : ${groupedMemos}">
                     <tr th:each="memo : ${memoList.value}">
-                        <td><input type="checkbox" class="memo-checkbox" th:attr="value=${memo.id}"></td>
+                        <td><input type="checkbox" class="memo-checkbox"  th:attr="value=${memo.id}"></td>
                         <td th:text="${memo.id}"></td>
-                        <td contenteditable="true" th:text="${memo.title}"></td>
-                        <td contenteditable="true" th:text="${memo.description}"></td>
-                        <td contenteditable="true" th:text="${memo.content}"></td>
-                        <td contenteditable="true" th:text="${memo.category}"></td>
+                        <td th:text="${memo.title}"></td>
+                        <td th:text="${memo.description}"></td>
+                        <td th:text="${memo.content}"></td>
                     </tr>
                 </th:block>
                 </tbody>
             </table>
-            <button id="updateSelected" style="background-color: blue; color: white;">Update Selected</button>
         </div>
         
         <div th:each="category : ${categories}" th:id="${#strings.replace(category, ' ', '-')}" class="tab-pane fade">
@@ -72,21 +70,18 @@
                         <th>Title</th>
                         <th>Description</th>
                         <th>Content</th>
-                        <th>Category</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr th:each="memo : ${groupedMemos['__${category}__']}">
-                        <td><input type="checkbox" class="memo-checkbox" th:attr="value=${memo.id}"></td>
+                        <td><input type="checkbox" class="memo-checkbox"  th:attr="value=${memo.id}"></td>
                         <td th:text="${memo.id}"></td>
-                        <td contenteditable="true" th:text="${memo.title}"></td>
-                        <td contenteditable="true" th:text="${memo.description}"></td>
-                        <td contenteditable="true" th:text="${memo.content}"></td>
-                        <td contenteditable="true" th:text="${memo.category}"></td>
+                        <td th:text="${memo.title}"></td>
+                        <td th:text="${memo.description}"></td>
+                        <td th:text="${memo.content}"></td>
                     </tr>
                 </tbody>
             </table>
-            <button id="updateSelected" style="background-color: blue; color: white;">Update Selected</button>
         </div>
         
         <!-- Delete Selected button inside tab-content but outside tab-pane -->
@@ -133,40 +128,6 @@
 
             // Log selectedIds
             console.log("id " + selectedIds);
-        });
-
-        $('#updateSelected').click(function() {
-            var updatedMemos = [];
-            
-            $('.tab-pane.active tbody tr').each(function() {
-                if ($(this).find('.memo-checkbox').is(':checked')) {
-                    var memo = {
-                        id: $(this).find('.memo-checkbox').val(),
-                        title: $(this).find('td:nth-child(3)').text(),
-                        description: $(this).find('td:nth-child(4)').text(),
-                        content: $(this).find('td:nth-child(5)').text(),
-                        category: $(this).find('td:nth-child(6)').text()
-                    };
-                    updatedMemos.push(memo);
-                }
-            });
-            
-            // Send updatedMemos to server for update
-            $.ajax({
-                url: '/memo/updateAll',
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(updatedMemos),
-                success: function(response) {
-                    console.log('Successfully updated memos:', response);
-                },
-                error: function(error) {
-                    console.error('Error updating memos:', error);
-                }
-            });
-
-            // Log updatedMemos
-            console.log("Updated memos:", updatedMemos);
         });
     });
 </script>

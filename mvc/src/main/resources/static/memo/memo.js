@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	memoList.addEventListener('click', function(event) {
 		var target = event.target;
-		if (target && target.classList.contains('editButton')) {
+		if (target && target.className == 'editButton') {
 			var memoId = target.getAttribute('data-memo-id');
 			// Redirect to the edit page with memoId
 			fetchDataAndPopulateForm(memoId);

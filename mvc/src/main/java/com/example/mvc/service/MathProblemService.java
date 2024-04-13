@@ -51,28 +51,32 @@ public class MathProblemService {
 		List<MathProblem> combinedMathProblems = new ArrayList<>();
 		
 		if (subject == TestSubjectType.chinese) {
-			if ("字".equals(category) || "生字".equals(category)) {
-				// Fetch the subcategoryId from mathSubCategoryRepository
-			    Optional<MathSubCategory> optionalMathSubCategory = mathSubCategoryRepository.findByName(chineseSubcategory);
-			    
-			    // Check if mathSubCategory is present in Optional
-			    if (optionalMathSubCategory.isPresent()) {
-			    	MathSubCategory mathSubCategory = optionalMathSubCategory.get();
-			    	Long subcategoryId = mathSubCategory.getId();
-			        return mathProblemsRepository.findByMathSubCategory_IdAndSubjectAndCategory(subcategoryId, subject, category);
-			    } else {
-			        return combinedMathProblems;
-			    }
-			}
-			else {
-				List<MathProblem> list1 = mathProblemsRepository.findBySubjectAndCategory(subject, category);
-				List<MathProblem> list2 = mathProblemsRepository.findBySubjectAndCategory(subject, "生字");
-
-				list1.addAll(list2);
-
-				return list1;			}
+			// Fetch the subcategoryId from mathSubCategoryRepository
+		    Optional<MathSubCategory> optionalMathSubCategory = mathSubCategoryRepository.findByName(chineseSubcategory);
+		    if (optionalMathSubCategory.isPresent()) {
+		    	MathSubCategory mathSubCategory = optionalMathSubCategory.get();
+		    	Long subcategoryId = mathSubCategory.getId();
+		    	List<MathProblem> list1 = 
+		    	    mathProblemsRepository.findByMathSubCategory_IdAndSubjectAndCategory(subcategoryId, subject, category);
+		    	if ("短句".equals(category)) {
+		    		list1.addAll(
+		    		    mathProblemsRepository.findByMathSubCategory_IdAndSubjectAndCategory(subcategoryId, subject, "生字"));
+		    	}
+		    	return list1;
+		    } else {
+		    	if ("全部".equals(chineseSubcategory)){
+		    		List<MathProblem> list1 = mathProblemsRepository.findBySubjectAndCategory(subject, category);
+		    		if ("短句".equals(category)) {
+			    		list1.addAll(
+			    		    mathProblemsRepository.findBySubjectAndCategory(subject, "生字"));
+			    	}
+		    		return list1;
+		    	}
+		    	else {
+		    		return combinedMathProblems;
+		    	}
+		    }
 		}
-
 		// Check if the excludeMap is empty
 	    if (excludeMap.isEmpty()) {
 	        // Retrieve two problems for each available subcategory
