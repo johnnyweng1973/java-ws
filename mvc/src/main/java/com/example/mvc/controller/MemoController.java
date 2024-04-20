@@ -43,23 +43,13 @@ public class MemoController {
         return "add_memo";
     }
 
-    @GetMapping
-    public String memo(Model model) {
-        List<Memo> memos;
-        try {
-        	memos = memoService.getAllMemos();
-        } catch (Exception e) {
-        	memos = new ArrayList<>();
-        }
-
-        // Logging the number of elements in the 'memos' list
-        log.info("Number of elements in the 'memos' list: {}", memos.size());
-
-        model.addAttribute("memos", memos);
-        return "memo";
+    @PostMapping("/add")
+    public String addMemo(@ModelAttribute("newMemo") Memo newMemo) {
+        memoService.addMemo(newMemo);
+        return "redirect:/memo/list";
     }
-    
-    @GetMapping("list")
+
+    @GetMapping
     public String list(Model model) {
         List<Memo> memos;
         try {
@@ -81,61 +71,10 @@ public class MemoController {
         model.addAttribute("categories", groupedMemos.keySet());
         model.addAttribute("groupedMemos", groupedMemos);
 
-        return "memo_newlist";
+        return "memo";
     }
 
-
-    @ResponseBody
-    @GetMapping("/list-rest")
-    public List<Memo> getListFromRestful() {
-        List<Memo> memos;
-        try {
-        	memos = memoService.getAllMemos();
-        } catch (Exception e) {
-        	memos = new ArrayList<>();
-        }
-
-        return memos;
-    }
-//
-//    @GetMapping("/list")
-//    public String listMemos(Model model) {
-//        List<Memo> memos;
-//        try {
-//        	memos = memoService.getAllMemos();
-//        } catch (Exception e) {
-//        	memos = new ArrayList<>();
-//        }
-//
-//        model.addAttribute("memos", memos);
-//        return "list_memo";
-//    }
-
-    @PostMapping("/add")
-    public String addMemo(@ModelAttribute("newMemo") Memo newMemo) {
-        memoService.addMemo(newMemo);
-        return "redirect:/memo/list";
-    }
-    
-    @ResponseBody
-    @GetMapping("/update-ajax/{memoId}")
-    public Memo getMemoById(@PathVariable Long memoId) {
-        // Fetch memo details based on memoId and add them to the model
-        Memo memo = memoService.findById(memoId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + memoId));
-  
-        return memo;
-    }
-    
-    @ResponseBody
-    @PostMapping("/update-ajax/{memoId}")
-    public String updateMemoById(@PathVariable Long memoId, @RequestBody @ModelAttribute Memo memo) {
-        // Update the memo with the provided memoId
-        memoService.updateMemo(memo);
-        String responseData = "Response data from server";
-        return responseData;
-    }
-    
-
+    // following two are for new interface which support batch update and batch delete
     @DeleteMapping("/deleteAll")
     @ResponseBody
     public ResponseEntity<String> handleDelete(@RequestBody List<Long> ids) {
@@ -160,5 +99,53 @@ public class MemoController {
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Error updating memos: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/memo-obsolete")
+    public String memo(Model model) {
+        List<Memo> memos;
+        try {
+        	memos = memoService.getAllMemos();
+        } catch (Exception e) {
+        	memos = new ArrayList<>();
+        }
+
+        // Logging the number of elements in the 'memos' list
+        log.info("Number of elements in the 'memos' list: {}", memos.size());
+
+        model.addAttribute("memos", memos);
+        return "memo_obsolete";
+    }
+    
+    @ResponseBody
+    @GetMapping("/list-rest")
+    public List<Memo> getListFromRestful() {
+        List<Memo> memos;
+        try {
+        	memos = memoService.getAllMemos();
+        } catch (Exception e) {
+        	memos = new ArrayList<>();
+        }
+
+        return memos;
+    }
+    
+    // following two are for obsolete interface 
+    @ResponseBody
+    @GetMapping("/update-ajax/{memoId}")
+    public Memo getMemoById(@PathVariable Long memoId) {
+        // Fetch memo details based on memoId and add them to the model
+        Memo memo = memoService.findById(memoId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + memoId));
+  
+        return memo;
+    }
+    
+    @ResponseBody
+    @PostMapping("/update-ajax/{memoId}")
+    public String updateMemoById(@PathVariable Long memoId, @RequestBody @ModelAttribute Memo memo) {
+        // Update the memo with the provided memoId
+        memoService.updateMemo(memo);
+        String responseData = "Response data from server";
+        return responseData;
     }
 }

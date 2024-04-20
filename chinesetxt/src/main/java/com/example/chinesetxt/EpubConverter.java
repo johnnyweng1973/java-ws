@@ -51,8 +51,8 @@ public class EpubConverter {
 
     public static void main(String[] args) {
         
-        String epubFilePath = "pfsj.epub";
-        String txtFilePath = "pfsj.txt";
+        String epubFilePath = "zyj.epub";
+        String txtFilePath = "zyj.txt";
 
         convertEpubToTxt(epubFilePath, txtFilePath);
     }

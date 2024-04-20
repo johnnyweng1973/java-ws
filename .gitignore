@@ -1,5 +1,9 @@
 .metadata/
 
+chinesetxt/*.txt
+chinesetxt/*.epub
+
+
 ### eclpse log folder ###
 none/
 

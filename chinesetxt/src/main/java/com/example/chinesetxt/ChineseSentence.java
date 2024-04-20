@@ -5,7 +5,7 @@ import java.util.*;
 public class ChineseSentence {
 
     public static void main(String[] args) {
-        String inputFile = "pfsj-clean.txt";
+        String inputFile = "zyj-clean.txt";
         String outputFile = "sorted_separated_sentences.txt";
 
         try {
