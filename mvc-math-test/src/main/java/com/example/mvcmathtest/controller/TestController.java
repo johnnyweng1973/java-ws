@@ -90,19 +90,11 @@ public class TestController {
 		}
 		if (subject == TestSubjectType.chinese) {
 			log.info("categor is {}", category);
-			if (!"生字".equals(category)) {
-				model.addAttribute("sub", subject.toString());
-				model.addAttribute("problems", testProblems);
-				return "chinese_test_paper";
-			}
-			else {
-				// Shuffle the testProblems list
-				Collections.shuffle(testProblems);
 		
-				model.addAttribute("sub", subject.toString());
-				model.addAttribute("problems", testProblems);
-				return "chinese_test_paper";
-			}
+			model.addAttribute("sub", subject.toString());
+			model.addAttribute("problems", testProblems);
+			return "chinese_test_paper";
+		
 		}
 		else {
 			model.addAttribute("sub", subject.toString());

@@ -8,7 +8,7 @@ public class Ranking {
     public static void main(String[] args) {
         String charactersFile = "chinese-character.txt";
         String sentencesFile = "zyj-sentences.txt";
-        String outputFile = "zyj-percentage-ranking.txt";
+        String outputFile = "zyj-percentage-ranking-6.txt";
 
         try {
             String chineseCharacters = readChineseCharacters(charactersFile);

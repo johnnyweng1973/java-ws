@@ -1,93 +1,139 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Chinese Handwriting Recognition</title>
-    <script src="https://cdn.jsdelivr.net/npm/handwriting.js@latest/dist/handwriting.min.js"></script>
-    <style>
-        #canvas {
-            border: 1px solid #ccc;
-            cursor: crosshair;
-        }
-        #result {
-            margin-top: 10px;
-            font-size: 18px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Viewer</title>
+<!-- Include PDF.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+<style>
+    #pdf-container {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        height: 90vh;
+    }
+    #left-container, #right-container {
+        width: 40%;
+    }
+    .pdf-page {
+        height: 100%;
+    }
+    #controls-container {
+        width: 10%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
 </head>
 <body>
-
-<canvas id="canvas" width="400" height="200"></canvas>
-<button onclick="recognize()">Recognize</button>
-<div id="result"></div>
+<div id="pdf-container">
+    <div id="left-container"></div>
+    <div id="controls-container">
+        <div>
+            <button id="prev-page">Previous Page</button>
+            <input type="number" id="page-input" min="1">
+            <button id="go-button">Go</button>
+            <span id="page-info">Page 1 of 1</span>
+            <button id="next-page">Next Page</button>
+        </div>
+    </div>
+    <div id="right-container"></div>
+</div>
 
 <script>
-    var canvas = document.getElementById('canvas');
-    var ctx = canvas.getContext('2d');
-    var points = [];
-    var strokes = [];
+    // Initialize PDF.js
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
 
-    canvas.addEventListener('mousedown', function(e) {
-        console.log('mousedown event');
-        points = [];
-        points.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
-    });
+    // Variables
+    var leftContainer = document.getElementById('left-container');
+    var rightContainer = document.getElementById('right-container');
+    var controlsContainer = document.getElementById('controls-container');
+    var pageInput = document.getElementById('page-input');
+    var goButton = document.getElementById('go-button');
+    var pageInfo = document.getElementById('page-info');
+    var prevButton = document.getElementById('prev-page');
+    var nextButton = document.getElementById('next-page');
+    var pdfDoc = null;
+    var pageNum = 1;
+    var pageRendering = false;
 
-    canvas.addEventListener('mousemove', function(e) {
-        if (points.length > 0) {
-            points.push({ x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop });
-            draw();
-        }
-    });
-
-    canvas.addEventListener('mouseup', function() {
-        if (points.length > 0) {
-            strokes.push(points);
-            points = [];
-            console.log('mouseup event: strokes', strokes);
-        }
-    });
-
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < strokes.length; i++) {
-            ctx.beginPath();
-            ctx.moveTo(strokes[i][0].x, strokes[i][0].y);
-            for (let j = 1; j < strokes[i].length; j++) {
-                ctx.lineTo(strokes[i][j].x, strokes[i][j].y);
-            }
-            ctx.stroke();
-        }
-        if (points.length > 1) {
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (let i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i].x, points[i].y);
-            }
-            ctx.stroke();
-        }
+    // Load the PDF file
+    function loadPDF(url) {
+        pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+            pdfDoc = pdfDoc_;
+            renderPage(11, leftContainer); // Render index page on the left side
+            renderPage(pageNum, rightContainer); // Render first page on the right side
+            updatePageInfo();
+        });
     }
 
-    function recognize() {
-        console.log('Recognize button clicked');
-        
-        // Check if Handwriting is defined
-        if (typeof Handwriting !== 'undefined') {
-            var handwriting = new Handwriting.Handwriting({
-                strokes: strokes,
-                recognitionHandler: function(result) {
-                    console.log('Recognition result:', result);
-                    document.getElementById('result').innerText = result.text;
-                },
-                // Optional: You can customize recognition options here
+    // Render a page
+    function renderPage(num, container) {
+        pageRendering = true;
+        pdfDoc.getPage(num).then(function(page) {
+            var scale = 1.5;
+            var viewport = page.getViewport({ scale: scale });
+
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            var renderContext = {
+                canvasContext: context,
+                viewport: viewport
+            };
+
+            container.innerHTML = '';
+            container.appendChild(canvas);
+
+            page.render(renderContext).promise.then(function() {
+                pageRendering = false;
             });
+        });
+    }
 
-            handwriting.recognize();
-        } else {
-            console.log('Handwriting is not defined');
-            alert('Handwriting is not defined. Please check the script inclusion.');
+    // Go to specified page
+    function goToPage() {
+        var pageNumber = parseInt(pageInput.value);
+        if (pageNumber >= 1 && pageNumber <= pdfDoc.numPages && !pageRendering) {
+            pageNum = pageNumber;
+            renderPage(pageNum, rightContainer);
+            updatePageInfo();
         }
     }
-</script>
 
+    // Update page info
+    function updatePageInfo() {
+        pageInfo.textContent = `Page ${pageNum} of ${pdfDoc.numPages}`;
+    }
+
+    // Button event listeners
+    prevButton.addEventListener('click', function() {
+        if (pageNum <= 1 || pageRendering) {
+            return;
+        }
+        pageNum--;
+        renderPage(pageNum, rightContainer);
+        updatePageInfo();
+    });
+
+    nextButton.addEventListener('click', function() {
+        if (pageNum >= pdfDoc.numPages || pageRendering) {
+            return;
+        }
+        pageNum++;
+        renderPage(pageNum, rightContainer);
+        updatePageInfo();
+    });
+
+    goButton.addEventListener('click', goToPage);
+
+    // Load the PDF file initially
+    loadPDF('/trial/The Secret Garden.pdf');
+</script>
 </body>
 </html>

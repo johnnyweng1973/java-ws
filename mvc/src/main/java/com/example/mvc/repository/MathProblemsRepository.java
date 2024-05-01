@@ -1,6 +1,7 @@
 package com.example.mvc.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +16,7 @@ public interface MathProblemsRepository extends JpaRepository<MathProblem, Long>
 	 List<MathProblem> findBySubjectAndCategory(TestSubjectType subject,String category);
 	 List<MathProblem> findByMathSubCategory_IdAndSubjectAndCategory(Long subcategoryId, TestSubjectType subject, String category);
 	  
-     
+	 Optional<MathProblem> findByDescriptionAndCategory(String description, String category);
 	// @Query("SELECT * FROM MathProblem WHERE mathSubCategory.id = :subcategoryId AND id NOT IN :excludeProblemIds ORDER BY id LIMIT 2")
 	// List<MathProblem> findTop2ByMathSubCategoryIdAndIdNotIn(@Param("subcategoryId") Long subcategoryId, @Param("excludeProblemIds") List<Long> excludeProblemIds);
 

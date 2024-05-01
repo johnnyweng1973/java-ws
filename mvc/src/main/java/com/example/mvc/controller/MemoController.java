@@ -19,9 +19,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.mvc.model.Memo;
 import com.example.mvc.service.MemoService;
+import com.opencsv.CSVWriter;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +35,7 @@ import java.util.Optional;
 @RequestMapping("/memo")
 public class MemoController {
 	private static final Logger log = LoggerFactory.getLogger(MathProblemsController.class);
-
+	private static String csvFileName = new String("memo.csv");
 
     @Autowired
     private MemoService memoService;
@@ -46,7 +49,7 @@ public class MemoController {
     @PostMapping("/add")
     public String addMemo(@ModelAttribute("newMemo") Memo newMemo) {
         memoService.addMemo(newMemo);
-        return "redirect:/memo/list";
+        return "redirect:/memo";
     }
 
     @GetMapping
@@ -148,4 +151,47 @@ public class MemoController {
         String responseData = "Response data from server";
         return responseData;
     }
+    
+    @GetMapping("/archive")
+	@ResponseBody
+	public ResponseEntity<String> archiveMemosToGoogleDrive() {
+
+    	 List<Memo> memos;
+         try {
+         	memos = memoService.getAllMemos();
+         } catch (Exception e) {
+         	memos = new ArrayList<>();
+         }
+       	if (writeMemosToCSV(memos, csvFileName)) {
+			
+			return ResponseEntity.ok("Memo list archived successfully");
+		} else {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Failed to retrieve memo list from Memo Service");
+		}
+	}
+    
+    private boolean writeMemosToCSV(List<Memo> memos, String filePath) {
+        try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
+            // Write header
+            writer.writeNext(new String[]{"ID", "Title", "Description", "Content", "Category"});
+
+            // Write data
+            for (Memo memo : memos) {
+                writer.writeNext(new String[]{
+                        String.valueOf(memo.getId()),
+                        memo.getTitle(),
+                        memo.getDescription(),
+                        memo.getContent(),
+                        memo.getCategory()
+                });
+            }
+            return true; // Writing successful
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false; // Writing failed
+        }
+    }
+
+
 }

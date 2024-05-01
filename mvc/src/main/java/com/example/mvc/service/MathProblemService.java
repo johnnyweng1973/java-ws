@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -16,6 +17,8 @@ import com.example.mvc.repository.MathProblemsRepository;
 import com.example.mvc.repository.MathSubCategoryRepository;
 //import com.example.mvc.mathtest.model.TestProblem;
 import com.example.mvc.util.TestSubjectType;
+
+import jakarta.persistence.NonUniqueResultException;
 
 @Service
 public class MathProblemService {
@@ -42,6 +45,35 @@ public class MathProblemService {
 	public void update(MathProblem mathProblem) {
 		mathProblemsRepository.save(mathProblem);
 		return;
+	}
+	
+	public boolean findByDescriptionAndCategory(String description, String category) {
+		 try {
+			 Optional<MathProblem> math = 
+				 mathProblemsRepository.findByDescriptionAndCategory(description, category);
+              
+			 if (math.isPresent()) {
+				 return true;
+			 }
+			 else {
+				 return false;
+			 }
+		 } catch (NonUniqueResultException e) {
+	            // Handle NonUniqueResultException
+	            // Example: Log the error and inform the user
+	            System.out.println("Multiple results found for the query.");
+	            e.printStackTrace(); // Log the stack trace for debugging
+	            // Other error handling logic can go here
+	            return true;
+	    }
+		 catch (IncorrectResultSizeDataAccessException e) {
+			    // Log the error and inform the user
+			    System.out.println("Incorrect result size for the query.");
+			    e.printStackTrace(); // Log the stack trace for debugging
+
+			    // Returning true might not be appropriate here, consider rethrowing the exception or handling it differently
+			    return true;
+			} 
 	}
 
 	public List<MathProblem> findMathProblems(TestSubjectType subject, 

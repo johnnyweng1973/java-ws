@@ -32,8 +32,9 @@
   <div class="container my-5">
   <a href="汉字笔画和部首名称表.pdf" target="_blank" th:text="'部首表'" class="btn btn-primary mb-3"></a>
     <div  class="text-primary mb-3">
-      已学部首：氵（三点水）木（木字旁）亻（单dan人旁）彳（双shuang人旁）讠（言yan字旁）扌（提ti手旁）忄（竖shu心旁） <br>  
-      现在学习：钅（金jin字旁）口（口字旁）宀（宝bao盖gai头）竹（竹zhu字头）辶（走zou之zhi旁）走（走zou字旁）
+      部首：氵（三点水）木（木字旁）亻（单dan人旁）彳（双shuang人旁）讠（言yan字旁）扌（提ti手旁）忄（竖shu心旁） <br>  
+      钅（金jin字旁）口（口字旁）宀（宝bao盖gai头）竹（竹zhu字头）辶（走zou之zhi旁）走（走zou字旁）女（女字旁）
+      心 （心字旁） 刂（立li刀dao旁）
     </div>
   
   <div>
@@ -293,7 +294,7 @@
 	                var description = row.querySelector('.problem-description').textContent.trim();
 	                
 	                if (category !== '生字' || !characterSet.has(description)) {
-	                	console.log("remove " + description);
+	                	//console.log("remove " + description);
 	                	row.remove(); // Remove the row that is out of range and not meeting the criteria
 	                }
 	            }
@@ -434,7 +435,7 @@
         
      // Randomly select 3 radicals from the array
         var selectedRadicals = [];
-        while (selectedRadicals.length < 2) {
+        while (selectedRadicals.length < 4) {
             var randomIndex = Math.floor(Math.random() * radicals.length);
             selectedRadicals.push(radicals[randomIndex]);
         }
@@ -446,6 +447,8 @@
     // Function to highlight rows containing radicals in their solutions
     function highlightRowsWithRadicals(radicals) {
         var rows = document.querySelectorAll("tbody tr");
+
+        console.log("select radicals:", radicals);
 
         radicals.forEach(function(radical) {
             // Array to store rows containing the current radical

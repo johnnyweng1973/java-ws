@@ -15,7 +15,10 @@
 
 <div class="container mt-5">
     <h2>Memo Table</h2>
+    <!-- Print the number of rows here -->
+    <p id="rowCount"></p>
     <button id="newMemoButton" onclick="window.location.href='/memo/add'" style="width: 100%; background-color: yellow; margin-bottom: 10px;">New Memo</button>
+    <button id="getArchive" style="width: 100%; background-color: green; color: white; margin-bottom: 10px;"> Archive</button>
     
     <!-- Nav tabs -->
     <ul class="nav nav-tabs" id="myTabs">
@@ -87,9 +90,6 @@
             </table>
         </div>
         <button id="updateSelected" style="background-color: blue; color: white;">Update Selected</button>
-        
-        <!-- Delete Selected button inside tab-content but outside tab-pane -->
-        <button id="deleteSelected" style="background-color: red;">Delete Selected</button>
     </div>
 </div>
 
@@ -99,6 +99,9 @@
 
 <script>
     $(document).ready(function(){
+        var rowCount = $('#all tbody tr').length;
+        $('#rowCount').text("Number of rows : " + rowCount);
+
         $('#myTabs a').click(function (e) {
             e.preventDefault();
             $(this).tab('show');
@@ -134,6 +137,14 @@
             console.log("id " + selectedIds);
         });
 
+        $('#getArchive').click(function() {
+            // Send GET request to /archive
+            $.get("/memo/archive", function(data, status){
+                // Display response message in a pop-up window
+                alert("Data: " + data + "\nStatus: " + status);
+            });
+        });
+        
         console.log("register update event listener:");
         $('#updateSelected').click(function() {
             var updatedMemos = [];

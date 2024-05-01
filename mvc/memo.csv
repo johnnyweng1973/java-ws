@@ -1,0 +1,328 @@
+"ID","Title","Description","Content","Category"
+"1","html and css","html and css","1. Declare Thymeleaf namespace to use Thyemleaf
+   <html xmlns=""http://www.w3.org/1999/xhtml"" xmlns:th=""https://www.thymeleaf.org"">
+    namespace is html and thymeleaf
+
+2. Use Bootstrap front-end framework 
+   a) Including the Bootstrap CSS file in the HTML document
+     <link rel=""stylesheet"" href=""https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"" integrity=""sha38..
+   b) Use the classes of my-5 container:
+     <div class=""container my-5"">
+
+3. Define two ""<div>"" elements to divide web page into two parts vertically.
+    Assign the class name ""left-container"" to one <div > and ""right-container"" to the other. Style the ""left-container"" to take up 20% page width and the ""right-container"" to take the remaining space horizontally.
+   
+4. Padding and Margin
+    They define the space between content and border and the space after border respectively.
+
+","Javascript and HTML"
+"2","Data Flow of Creating a test","SpringBoot","How a test is created
+1.At the test launch page /test, users can initiate a test with options of subject, category, and subcategory by clicking a button, which sends the request to the Test Service's endpoint /test_subject on port 8084.
+
+2 The Test Service queries the 'test_problem' table in the MySQL database to retrieve a list of previously tested problems. It then sends the IDs and subcategories of these problems in the JSON body of an HTTP request to the Problem Service's endpoint /math/test-rest on port 8080, with the purpose of requesting problems that have not been tested before.
+
+3. The Problem Service queries the 'problem_table' in the MySQL database to retrieve a problem list and send the list in the JSON body of an HTTP response back to the Test Service.
+
+4. The Test Service extracts the problem list by parsing the JSON body, adds it into an HTML template using Thymeleaf, and then sends the resulting page back to client.
+","HowItWorks"
+"3","How Web Browser Load HTML","Web browser load HTML file","   When a web browser parses an HTML file, it sequentially adds HTML elements to the DOM tree and executes any inline JavaScript code within <script> tags. If there's an external JavaScript file referenced, the browser can continue parsing HTML elements while simultaneously waiting for the JavaScript file to arrive. 
+   When all HTML elements have been loaded and JavaScript code has been parsed, the ""DOMContentLoaded"" event for document is triggered.
+   When all resources such as CSS files, image files and others have been loaded, the ""load"" event is triggered for document object.
+
+","HowItWorks"
+"4","How to Dockerize SpringBoot application","Installing docker desktop, creating jars for application, writing docker files, build images, run images  ","1. Steps to dockerizing
+	1. Install Docker Desktop.
+	    Administrative privileges are required for installation, but running Docker Desktop afterward doesn't need them.
+	2. Create a jar file.
+	    In pom.xml, include Maven JAR Plugin and specify the class containing the entrance method within the plugin configuration. 
+	3. Write a Dockerfile.
+	    This file, named Dockerfile as specified by Docker, is needed for building a Docker image..
+	4. Build an image.
+	    Execute the command ""docker build -t appname ."" to build a docker image.
+	5.  Run image
+	    Run the command "" docker run"" to run the image. A container will be created and you can see it in docker desktop.
+
+2. Configuration issues.
+        1. Replace all occurrences of localhost should with IP address
+        2. Configure MySQL to allow access to tables from the container. Due to a modification of domain names in SQL queries by Docker, MySQL denies access since they are new to MySQL. Therefore, we need to adjust MySQL settings to permit access from all hosts to the relevant tables.
+      ","HowTo"
+"5","Eclipse Debugging Problems","","1. Breakpoint doesn't work.
+  Please ensure the option ""Skip All Breakpoints"" is disabled, as it will disable all breakpoints.  When this option is enabled, the icons besides all breakpoints will appear prohibited.
+
+2. Compiler complains log functions cannot be found for classes which enable lombok module.
+   Lombok adds log field during compile time. my solution is to define the log member manually instead of using @slf4j. Slf4j module will be added by spring framework automatically.  maybe we can check out the output class file of controller class to see if log member is there.
+3. configuration change in applicaiton.properties cannot take effect.
+   rebuild the project doesn't work. finally after removing and restoring  some lines around the change, it take effect. maybe nexttime i should check the application.property file in jar file first to see it has changed.
+ 
+   ","Eclipse "
+"11","Form checkbox value send wrong","","The way it works is : if it is checked, the value will sent as a key-value pair in request parameter. by default this box is set to checked.  
+
+<div id=""noSpellingCheckboxDiv"" style=""display: none;"">
+        <input type=""checkbox"" id=""noSpellingCheckbox"" name=""noSpellingCheckbox"" value=""true"" checked>
+        <label for=""noSpellingCheckbox"">No Spelling</label>
+</div>
+
+In the handler at server-side, spring boot will bind the value to the input parameter you specified for this URL parameter. If it is defined as a boolean parameter, The value in the   corresponding URL parameter  must be ""true"" or ""false"",  otherwise exception will happen.
+	@GetMapping(""/test_subject"")
+	public String getATest(Model model, 
+			               @RequestParam TestSubjectType subject,
+			               @RequestParam(name = ""noSpellingCheckbox"", defaultValue = ""false"")boolean noSpelling) {
+","HowItWorks"
+"12","How to Add to a Table That Has a Foreign Key","","The SQL tables ""math_problem"" and ""subcategory"" are linked by a foreign key relationship. The steps to add a new problem is""
+1. The handler in Controller receives a problem object from a request body.
+2. Query the ""subcategory"" table to see if its subcategory name exists by calling ""findByName"" method from the repository. 
+2. A optional type will return. If no data is found, create an object of subcategory and save it to the table. If the category name is found, subcategory object is returned to the handler.
+3. The handler sets the subcategory field of the problem object and saves it to ""math_problem"" table.    
+","HowTo"
+"13","In the radical project , we utilize a ""map<Integer, List<Radical>>"" data structure.","","
+This map helps organize Chinese radicals extracted from a radical index page where radicals are categorized by their stroke count.  Each radical in this page  has its own page, listing all Chinese characters that are associated with this radical.  These characters are further categorized by their total stroke count.
+","HowTo"
+"15","Create a View to limit user access to a SQL table"," ","If you want user can only read a table, you can bind your model class to a view create from that table in MySQL. ","ToDo"
+"16","Create a mulitple module project in eclipse","","i want to export a package to a module in my project.
+but it requires my current project have a pom file that is a parent project type but unluckily. mine is not that type.
+to my understanding, i have to change my current pom file to create a new module in my project
+
+i don't have any clue now ","Configuration Management"
+"18","Run Spring Boot App on Raspberry Pi","","","ToDo"
+"19","Chinese Character Encoding in Java","","1. Relationship Between UTF-16 UTF-8 and Unicode
+Each character, whether ASCII or a Chinese character, corresponds to a Unicode code point. UTF-16 and UTF-8 are encoding schemes used to encode Unicode.
+
+2. How java store a Chinese character
+1)Java use strings to store Chinese characters. 
+2)From my experience, A character has two coding schemes:  physically it is stored as UTF-16 encodings, but as a char array, its value is a Unicode code point. 
+
+In java, a character is encoded with utf-16 and its length is two byte.
+For example 丰 0x4E30 E4 B8 B0 ,  its Unicode code point is 0x4e30   and  its raw data is E4b8b0. A Chinese character is represented  as a string to support lengths of greater than two. 
+
+3. How JSOUP Decodes Chinese Character
+1.) Specify charsetname in its parse method. In my case, it is ""GBK"".
+2)  Check HTML meta tag for its encoding type. In my case it is a Chinese encoding
+","HowItWorks"
+"20","JSOUP Dependency Not Included in Eclipse Maven Project JAR","","My Eclipse Maven project isn't bundling the JSOUP dependency into the JAR file, causing failures when running the JAR due to missing JSOUP. Upon inspecting the JAR file with an editor, I found no JSOUP information in its meta file, despite including the 'jsoup' dependency in my pom file.
+
+Workaround:
+Successfully ran the application via CLI  interface using ""java""  command .  In the command  I specified both JSOUP path and my project class file path in the parameter ""classpath"". 
+
+Next Steps:
+As suggested by ChatGPT, I'll explore using the JAR command to build the application JAR by specifying the JSOUP JAR.
+
+
+","Bug Fix"
+"21","maven project ","","maven project tips
+
+1. build plugins
+  plugins are tools used to complete code, create jar file, etc. 
+  to create a jar file, you need to include maven jar plugin in pom.xml. you must specify main class in its configuration tag.
+  normally you don't need to specify compiler plugin. but if you want to configure it you need to include this plugin and specify the configurations in configuration tab such as source and target java verion  ","deleted"
+"22","Improve Chinese Test","","1. Add testing for Chinese strokes, writing and so on.
+  ","ToDo"
+"23","Chinese Character Test Submit Wrong","","Issue Symptom:
+When submitted to the service endpoint ""/test"", all test problems created in the database have empty fields except IDs.
+                   
+Issue Diagnosis: 
+1. Check Transmission.
+    Analyzed HTTP messages captured by Wireshark, but relevant HTTP messages are too large to decode.
+2.  Inspect the Problem Objects 
+   It was observed that these object properties were all empty values, indicating an issue with data population.
+
+Root Cause: Data Population Issue:
+   The root cause of the problem lies in accessing problem fields by their indices within a table row. This method leads to errors when the row structure changes, as seen when a new field was added.
+
+Solution:
+  To address the issue, problem fields should be accessed by their names instead of their indices. This approach ensures that changes in the row structure do not affect data retrieval.
+
+","Bug Fix"
+"24","character test have some empty lines","","problem is the string end with 0d0a0d0a.
+1. use this command to determine if description field has 0d0a
+SELECT *
+FROM math_problem
+WHERE id = 197
+AND description LIKE CONCAT('%', CHAR(13), CHAR(10), '%');
+
+2. or use this to show description hex code
+SELECT id, HEX(description)
+FROM math_problem
+WHERE id = 197;
+
+3. use this to remove 0d0a
+UPDATE math_problem
+SET description = REPLACE(description, UNHEX('0D0A'), '')
+WHERE id = 197;","Database"
+"26","Add More Options at the Entrance Page ""test"".","","Issue Symptom:
+Chinese tests for ""短句"" 和 “生字” only offer the option ""一级"". Additional options such as ""二级“， ”三级“ and beyond are required.
+
+Solution:
+Add more options in ""select"" element as shown below.
+<div id=""subcategorySelectDiv"" style=""display: none;"">
+    <label for=""subcategory"">Subcategory:</label>
+    <select id=""subcategory"" name=""subcategory"">
+        <option value=""一级"">一级</option>
+        <option value=""二级"">二级</option>
+        <option value=""三级"">三级</option>
+    </select>
+</div>
+","Bug Fix"
+"27","""no spelling"" Option is not Working","","Issue Symptom:
+An option ""no spelling"" in the test page did not take effect.
+
+Issue Diagnosis:  
+1.  Check HTML 
+   Found no problem. This option is represented by a checkbox, and by default, it is not checked.  When checked and submitted,  the URL parameter should include ""noSpelling=true"" 
+
+2. Check Server Side Code
+   The server expects this parameter in the URL and will automatically convert it into a boolean type, passing it as an input parameter to corresponding handler. 
+
+Root Cause:
+Mismatch between the parameter name expected by the server-side (Spring) and that used in the client-side (JavaScript). Server-side expects parameter name ""noSpellingCheckBox"" but client-side uses ""noSpelling"".
+
+","Bug Fix"
+"28","add row index in 短句 table in html","obsolete","Index should be added to the rows of the HTML ""duanju"" table as in the HTML ""字""table
+ 
+To implement this, we can add a caption in the HTML table head and  a td element in HTML table body. The td element in the body should include a property of Thymeleaf style which will be evaluated by Thymeleaf to be the value of the row index.
+
+","ToDo"
+"29","The Application Within Docker Is Not Up-To-Date.","","I opened its JAR file with an editor  and discovered that an HTML was an old version.
+After running 'mvn clean compile' to generate a new JAR file, it now functions properly.
+","Bug Fix"
+"30","Create a batch file for Docker application. ","obsolete","The batch file perform the following tasks: create a JAR file, build a Docker image, and run the image.","ToDo"
+"32","Some tabs in the HTML table for memos are displaying no data.","","two important type of divs in this html.
+first is a list of tabs created by UL/LI with some bootstrap class like NAV. in each li , there is a link PREF point to id which is DIV marked by category name. Each of these divs contains a table of memos under a category. 
+Click event is registered for all these LI components and it will show the corresponding table once this link gets clicked.
+
+a map of list of memo is passed to HTML.
+you need to do two iterations to go through map. but for tr/td, there is only one iteration, so a th: block is used to do a iteration, this is a feature of thymeleaf to allow virtualization when rendering HTML. it is like embedded some code during HTML rendering
+
+another problem is id does not support space between words. so category with multiple words cannot be used as a valid id for a div, and href cannot link to it. the solution is use a thymeleaf expression to replace space with ""-""","Bug Fix"
+"33","chinese for daisy","","201	短句	三级	难过	nan guo	
+202	短句	三级	伤心	shang xin	
+203	短句	三级	简单	jian dan	
+204	短句	三级	方便	fang bian	
+205	短句	三级	了解	liao jie	
+206	短句	三级	有钱	you qian	
+207	短句	三级	没事	mei shi	
+209	短句	三级	认真	ren zhen	
+210	短句	三级	坏了	huai le	","短句"
+"35","Add a new category ""生字"" in the table ""math_problem""","obsolete","The subject ""chinese"" is for Chinese records in the ""math_problem"" table. It has category ""短句“/""生字“/”练习“ .              
+The project has a ""字库"" file which include all Chinese characters and their associated information such as pinyin and radical.
+For every new Chinese character in ""短句""record, we want to create a separate record  as ""生字"" category. Its description field stores the string of this character and its solution field stores the information for that character in the “字库"" file  
+","ToDo"
+"36","create a character dic from web site","","use jsoup json libraryto do this work
+jsoup can 
+1: connect to URL and download
+2. pare this web page to a jsoup document 
+3. iterate through the component list of this document.
+
+we have a URL that include all radicals ordered by stroke number
+then for each radical, there is a page for it and it has all Chinese character ordered by stroke number.
+
+we create a map of map<string, Character>, string is Chinese character.  this is actually a hash.
+
+then use json library write the map to the file.","deleted"
+"37","Javascript Manipulates the Properties of HTML Elements. ","","1. Control the display of a row in HTML table.
+    a) In the event listener for the event ""DOMContentLoaded"", iterate through the HMTL table.
+    b) Hide a row with:
+      row.style.display = ""none"";
+
+","Javascript and HTML"
+"39","Based on current chinese test paper, add a test function","","basic idea is: with all duanju and zi in the table. you start a test with a range of duanju selected. this test is a series of test include duanju and zi. duanju and zi will be tested twice with their location changed randomly.
+
+to do this, 
+
+1. remove the unwanted rows when starting the test.
+
+2. shuffle the rows of table
+","worklog"
+"42","How to Add 生字","how to use test","1） visit http://localhost:8080/math/add-chinese
+   input 一级 and click on fetch data. 
+   all 短句 and 生字表 will show up.
+   you choose 生字 since the latest in the database
+
+2) use add math problem web page, input category=生字 subcategory=x级 , it will batch add all .
+
+","HowTo"
+"43","Answers Not Removed for the Next Round of Test","","After submitting each round of the tests,  except for the last round, the answer fields should be cleared for the next round.","Bug Fix"
+"49","memo ui","","1. memo ui 功能
+
+/memo    button list of memos + new button + A form for update
+/memo/list  list in tabs + new button
+
+new memo:
+   1.  new button onclick=""window.location.href='/memo/add'""
+   2. The server returns a page including a form.    method for HTTP get at /memo/add
+   3.  post a form and the server will redirect to /memo/list    method for HTTP post at /memo/add
+   4.  client request to /memo/list
+   5.  server return a page for /memo/list     method for HTTP get at /memo/list
+summary: one get, one post, finally a redirect.
+
+button list and form  at /memo:
+    1. thymeleaf is used to render and ul/li is used to list memos, it add ID attribute to button  
+    2. on DOMContentLoded event, javascript register lambda function for button list click. this lambda will pass in 
+        event parameter, button reference is included in this event. and we will send fetch request for this button, and display
+        memo in json in the response to the form.
+    3.  update form. submit button will trigger a javascript function, it will send update request in ajax. response will be handled in a registered lambda function.
+summary:  register click function for  memo list buttons.    one click will locate the id of button and fill the form with its memo using fetch. Update with ajax send when submit.
+
+/memo/list
+new memo:  same as above
+
+tabs and its corresponding table.
+tabs are implmented with ul/li and bootstrap classes. each li has a <a> element which is called attachment . a HREF is defined in this. a link to table id is also defined. 
+thymeleaf is used to create a table for each li. which is an array of category names. each table has a id and connects to the tab. using thymeleaf we can use for loop to define table which will save a lot of space for html doc size. 
+a javascript jquery function is used to handle click function and show related tab table. 
+ ","deleted"
+"50","How the page /memo_obsolete works","JavaScript
+
+This page should be obsolete","This page enables users to perform three actions: create new memos, view a list of memo titles displayed as buttons, and edit existing memos using a form. Clicking on a memo button retrieves its details and displays them in the form for editing. After making changes, users can simply click the update button to submit their edits.
+
+
+1 Page Layout:
+    1. Divided into two containers: left and right.
+    2. Left container displays a list of memo buttons (rendered with UL/LI elements via Thymeleaf).
+    3. Right container hosts a form for editing the selected memo.
+    4. Form's default submit action is overwritten to submit to the endpoint ""/memo/update/{memo id}"". 
+
+2  Event Listeners:
+    1.  For the event ""DOMContentLoaded""
+          Register an event listener for click on UL/LI elements.
+     2.  For the click event on UL/LI
+          Identify the clicked button , extract its memo ID,
+          Send GET request to service point ""/memo/update/{memo id}""
+          Update the form with the memo details in the HTTP response. 
+     3.  For the form submit event
+          Disable default form submission. 
+          Using Ajax to send POST request with the form data to service point ""/memo/update/{memo id}""     
+
+","HowPageWorks"
+"52","How Page /memo Works","","","HowPageWorks"
+"53","Wrting Tips","1. for a long in/within/etc clause, you can use a comma to separate it with main sentence
+2. Assign the class name ""left-container"" to one '<div>'. This is simple way to say assign attribute ""class"" a value ""left-container"". ","","Writing"
+"54","JQeury","","1. Create a button click function that triggers a GET request and display the response message in an alert window.
+    This code simultaneously registers two functions: the first handles the button click event, and the second serves as the response handler
+  $('#getArchive').click(function() {  
+          // Send GET request to /archive
+          $.get(""/memo/archive"", function(data, status){
+           // Display response message in a pop-up window                         
+            alert(""Data: "" + data + ""\nStatus: "" + status); 
+           });
+        });
+      Please compare this button  with the ""new memo"" button above it. The ""new memo"" button click function is defined inside the HTML button element and it will trigger a switch to a new webpage to add new memo while this ""archive"" button will only trigger a save action at backend and will not switch page.   
+  
+
+","Javascript and HTML"
+"55","Create a SQL view","","","Database"
+"56","Maven","","1. Designate Maven Repository.
+   The ChineseTxt Project has only one dependency, a EPUB module, which requires its own repository rather than the default Maven ones. We introduce a repository entry for it to replace Maven default ones in the POM file. 
+    Note: Alternatively we can configure its repository address within the ""url"" parameter of the dependency entry for the EPUB module without changing the default repository for the whole project.
+
+2. Installation of a Java application ""Radical"" to the Maven repository allows the project ""MVC"" to use it.
+   The project ""MVC"" includes a resource file “中文字库.txt” which contains mappings for Chinese characters and their associated information, such as spelling and  stroke count.  
+   To parse this file , a JSON library is utilize to convert it into a map structure of Map<String, ChineseCharacter>. ChineseCharacter is defined in the project ""Radical"" , requiring the inclusion of ""Radical"" as a dependency of the project ""MVC"" .
+    
+3. Build plugins
+  Build plugins are tools or extension that execute during Maven build process. In my project's POM files, the following two plugins have been introduced 
+  1. maven-jar-plugin.
+      This plugin packages the compiled class files and resources into a JAR file.
+   2.  maven-compiler-plugin
+      By default  this extension will automatically be utilized by the build process to compiles the Java source files. By specifying  it explicitly you can overwrite its default configurations to tailor it to your project requirements. I include it to specify source java version  used by compiler to solve a compiler warning in one of my project.   
+
+","Configuration Management"

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,6 +132,21 @@ public class MathProblemsController {
 					}
 					mathProblem.setMathSubCategory(subcategory);
 					log.info("create a new problem {}", mathProblem.toString());
+					if ("练习".equals(newMathProblem.getCategory())) {
+						if (mathProblemService.findByDescriptionAndCategory(
+							mathProblem.getDescription(), mathProblem.getCategory())){
+							log.info("existing");
+							continue;
+						}else if(mathProblemService.findByDescriptionAndCategory(
+								mathProblem.getDescription(), "短句")) {
+							log.info("existing in 短句");
+							continue;
+							
+						}
+						else {
+							log.info("new");
+						}
+					}
 					problemList.add(mathProblem);		
 				}
 			}
