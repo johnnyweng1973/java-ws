@@ -15,6 +15,7 @@ public interface MathProblemsRepository extends JpaRepository<MathProblem, Long>
 	 List<MathProblem> findTop2ByMathSubCategory_IdAndSubject(Long subcategoryId, TestSubjectType subject);
 	 List<MathProblem> findBySubjectAndCategory(TestSubjectType subject,String category);
 	 List<MathProblem> findByMathSubCategory_IdAndSubjectAndCategory(Long subcategoryId, TestSubjectType subject, String category);
+	 List<MathProblem> findBySubject(TestSubjectType subject); 
 	  
 	 Optional<MathProblem> findByDescriptionAndCategory(String description, String category);
 	// @Query("SELECT * FROM MathProblem WHERE mathSubCategory.id = :subcategoryId AND id NOT IN :excludeProblemIds ORDER BY id LIMIT 2")

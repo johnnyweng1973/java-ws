@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -52,9 +54,7 @@ public class MathProblemsController {
 	@GetMapping
 	public String manageMathProblems(Model model) {
 		List<MathProblem> mathProblems = mathProblemService.getAll();
-		if(mathProblems == null){
-			mathProblems = new ArrayList<>();
-		}
+	
 		// Logging the number of elements in the 'memos' list
 		log.info("Number of elements in the 'problems' list: {}", mathProblems.size());
 
@@ -64,16 +64,45 @@ public class MathProblemsController {
 		return "manage_mathproblem";
 	}
 
-	@GetMapping("/add-chinese-character")
-	public String addCharacter() {
-			return "add_chinese_character_test";
+	@GetMapping("/tabs")
+	public String list(Model model) {
+		// JPA will return an empty list if empty
+		List<MathProblem> mathProblems = mathProblemService.getAll();
+		
+		Map<String, List<MathProblem>> map = new HashMap<>();
+		for (MathProblem problem: mathProblems) {
+			map.computeIfAbsent(problem.getCategory(), k->new ArrayList<>()).add(problem);
+		}
+		model.addAttribute("categories", map.keySet());
+		model.addAttribute("problemMap", map);
+		return "problem_list";
 	}
-
-	@GetMapping("/add-chinese")
+	
+	@GetMapping("/query-chinese")
 	public String addChinese() {
-			return "add_chinese_character_test_original";
+			return "qeury_chinese";
 	}
 
+	@GetMapping("/general")
+	public String getGeneralPage()
+	{
+        return "general_table";
+	}
+	
+	@GetMapping("/general/data")
+	public ResponseEntity<List<MathProblem>> general(
+		@RequestParam(name = "table") String tableName, 
+		@RequestParam(name = "subject") TestSubjectType subject)
+	{
+	    if ("math_problem".equals(tableName)) {
+	    	 return ResponseEntity.ok(mathProblemService.findBySubject(subject));
+	    }
+	    else {
+	    	 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+	    }
+	}
+
+	
 	@PostMapping("/add")
 	public String addMathProblem(@ModelAttribute("newMathProblem") MathProblem newMathProblem) {
 		MathSubCategory subcategory = mathSubcategoryService.findOrCreateSubcategory(newMathProblem.getMathSubCategory().getName());
@@ -214,4 +243,16 @@ public class MathProblemsController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing JSON data");
 		}
 	}
+    
+    @PutMapping("/update-all")
+    @ResponseBody
+    public ResponseEntity<String> updateAll(@RequestBody List<MathProblem> updatedProblems) {
+        try {
+          	mathProblemService.saveAll(updatedProblems);
+            return ResponseEntity.ok().body("Problems updated successfully.");
+         } catch (Exception e) {
+                return ResponseEntity.status(500).body("Error updating problems: " + e.getMessage());
+         }
+    }
+
 }

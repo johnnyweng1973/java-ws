@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>problem Table</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .table tbody tr {
+            height: 100px; /* Adjust the height as needed */
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>problem Table</h2>
+    <button id="newproblemButton" style="width: 100%; background-color: yellow; margin-bottom: 10px;">New problem</button>
+    <button id="updateSelectedButton" style="width: 100%; background-color: blue; color: white; margin-bottom: 10px;">Update Selected</button>
+    
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTabs">
+        <!-- Categories will be added dynamically here -->
+    </ul>
+    
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <!-- problem tables will be added dynamically here -->
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    // Function to fetch problem data from service endpoint
+    function fetchProblemData(table, subject) {
+        $.ajax({
+            url: '/math/general/data?table=' + table + '&subject=' + subject,
+            type: 'GET',
+            success: function(response) {
+                // Process the response data and populate the problem tables
+                populateProblemTables(response);
+            },
+            error: function(error) {
+                console.error('Error fetching problem data:', error);
+            }
+        });
+    }
+
+    // Dummy function to simulate problem data
+    function getDummyProblemData() {
+        return [
+            { id: 1, subject: "Subject 1", description: "Description 1", solution: "Solution 1", category: "Category 1", subcategory: "Subcategory 1" },
+            { id: 2, subject: "Subject 2", description: "Description 2", solution: "Solution 2", category: "Category 1", subcategory: "Subcategory 2" },
+            { id: 3, subject: "Subject 3", description: "Description 3", solution: "Solution 3", category: "Category 2", subcategory: "Subcategory 3" }
+        ];
+    }
+
+    // Function to populate problem tables with data
+    function populateProblemTables(problemData) {
+        // Clear existing problem tables
+        $('.tab-content').empty();
+        
+        // Extract categories from problem data
+        var categories = [];
+        problemData.forEach(function(problem) {
+            if (!categories.includes(problem.category)) {
+                categories.push(problem.category);
+            }
+        });
+
+     // Populate categories in nav tabs
+        categories.forEach(function(category) {
+            var categoryTab = $('<li class="nav-item"><a class="nav-link" href="#' + category.replace(/\s+/g, '-') + '">' + category + '</a></li>');
+            $('#myTabs').append(categoryTab);
+
+            // Create problem table for each category
+            var problemTable = $('<div id="' + category.replace(/\s+/g, '-') + '" class="tab-pane fade"></div>');
+            var problemTableHeader = $('<h3>Category: ' + category + '</h3>');
+            problemTable.append(problemTableHeader);
+
+            var problemTableContent = $('<table class="table table-bordered"><thead><tr><th></th><th>Index</th><th>ID</th><th>Subject</th><th>Description</th><th>Solution</th><th>Category</th><th>Subcategory</th><th>Subcategory ID</th></tr></thead><tbody></tbody></table>');
+            problemTable.append(problemTableContent);
+
+            // Populate problem table rows for this category
+            var categoryIndex = 1; // Initialize category index counter
+            problemData.forEach(function(problem) {
+                if (problem.category === category) {
+                    var row = $('<tr><td><input type="checkbox" class="problem-checkbox" value="' + problem.id + '"></td><td>' + categoryIndex + '</td><td class="problem-id">' + problem.id + '</td><td class="problem-subject" contenteditable="true">' + problem.subject + '</td><td class="problem-description" contenteditable="true">' + problem.description + '</td><td class="problem-solution" contenteditable="true">' + problem.solution + '</td><td class="problem-category" contenteditable="true">' + problem.category + '</td><td class="problem-subcategory" contenteditable="true">' + problem.mathSubCategory.name + '</td><td class="problem-subcategory-id">' + problem.mathSubCategory.id + '</td></tr>');
+                    problemTableContent.find('tbody').append(row);
+                    categoryIndex++;
+                }
+            });
+
+            // Append problem table to tab content
+            $('.tab-content').append(problemTable);
+        });
+    }
+
+    // Call the function to fetch problem data when the document is ready
+    fetchProblemData('math_problem', 'chinese');
+
+    // Register click function for nav tabs
+    $('#myTabs').on('click', 'a.nav-link', function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    });
+    
+ // Register click function for "Update Selected" button
+    $('#updateSelectedButton').click(function() {
+        var selectedProblems = [];
+        var activeTab = $('.tab-pane.active');
+        activeTab.find('.problem-checkbox:checked').each(function() {
+            var problemRow = $(this).closest('tr');
+            var problem = {
+                id: problemRow.find('.problem-id').text(),
+                subject: problemRow.find('.problem-subject').text(),
+                description: problemRow.find('.problem-description').text(),
+                solution: problemRow.find('.problem-solution').text(),
+                category: problemRow.find('.problem-category').text(),
+                mathSubCategory: {
+                    id: problemRow.find('.problem-subcategory-id').text(),
+                    name: problemRow.find('.problem-subcategory').text()
+                }
+            };
+            selectedProblems.push(problem);
+        });
+
+        // Send selected problems to server for update
+        $.ajax({
+            url: '/math/update-all',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(selectedProblems),
+            success: function(response) {
+                console.log('Successfully updated problems:', response);
+                window.alert("update success");
+                // Uncheck checkboxes of updated rows
+                activeTab.find('.problem-checkbox:checked').prop('checked', false);
+            },
+            error: function(error) {
+                console.error('Error updating problems:', error);
+                window.alert("update error");
+                // Optionally, you can display an error message here
+            }
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>

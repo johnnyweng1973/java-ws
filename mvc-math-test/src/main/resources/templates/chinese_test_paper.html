@@ -31,10 +31,20 @@
 <body>
   <div class="container my-5">
   <a href="汉字笔画和部首名称表.pdf" target="_blank" th:text="'部首表'" class="btn btn-primary mb-3"></a>
-    <div  class="text-primary mb-3">
+    <div  class="text-primary mb-3 radical">
       部首：氵（三点水）木（木字旁）亻（单dan人旁）彳（双shuang人旁）讠（言yan字旁）扌（提ti手旁）忄（竖shu心旁） <br>  
       钅（金jin字旁）口（口字旁）宀（宝bao盖gai头）竹（竹zhu字头）辶（走zou之zhi旁）走（走zou字旁）女（女字旁）
-      心 （心字旁） 刂（立li刀dao旁）
+      心 （心字旁） 刂（立li刀dao旁）<br>
+    </div>
+    <div  class="text-primary mb-3">
+      
+      带声调的字母如下：
+      【a】ā á ǎ à 
+      【o】ō ó ǒ ò
+      【e】ē é ě è
+      【i】ī í ǐ ì
+      【u】ū ú ǔ ù
+      【ü】ǖ ǘ ǚ ǜ
     </div>
   
   <div>
@@ -61,7 +71,7 @@
                  <tr th:each="problem, index : ${problems}">
                     <td class="framed-cell" style="width: 5%;font-family: 楷体, KaiTi, serif;font-size: 24px;" th:text="${index.index + 1}"></td> <!-- Displaying Index here -->
                    <td class="framed-cell problem-description" style="width: 40%;font-family: 楷体, KaiTi, serif;font-size: 48px;" th:text="${problem.problemDescription}"></td>
-                   <td class="framed-cell" style="width: 35%;">
+                   <td class="framed-cell" style="width: 35%;font-size: 36px;">
                         <textarea th:text="${problem.solution}" name="solution" class="input-match-height" id="'solutionField-' + ${index.index}"></textarea>
                         <!-- Hidden fields for other properties -->
                          <input type="hidden" th:value="${problem.id}" name="id"/>
@@ -419,7 +429,7 @@
  // Function to collect radicals
     function collectRadicals() {
         var radicals = []; // Array to store radicals
-        var text = document.querySelector('.text-primary').textContent.trim(); // Get the text content of the div
+        var text = document.querySelector('.text-primary.radical').textContent.trim(); // Get the text content of the div
         var matches = text.match(/[\u4e00-\u9fa5]+(?=（)/g); // Use regular expression to find radicals before '（'
         
         // Check if matches exist

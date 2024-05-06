@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Memo Table</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .table tbody tr {
+            height: 100px; /* Adjust the height as needed */
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Memo Table</h2>
+    <button id="newMemoButton" onclick="window.location.href='/memo/add'" style="width: 100%; background-color: yellow; margin-bottom: 10px;">New Memo</button>
+    
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTabs">
+        <li class="nav-item" th:each="category : ${categories}">
+            <a class="nav-link" th:href="'#'+${#strings.replace(category, ' ', '-')}" th:text="${category}"></a>
+        </li>
+    </ul>
+    
+    <!-- Tab panes -->
+    <div class="tab-content">
+        
+        <div th:each="category : ${categories}" th:id="${#strings.replace(category, ' ', '-')}" class="tab-pane fade">
+            <h3 th:text="'Category: '+${category}"></h3>
+            
+            <!-- Memo Table -->
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th></th> <!-- Select Box -->
+                        <th>ID</th>
+                        <th>Subject</th>
+                        <th>Description</th>
+                        <th>Solution</th> 
+                        <th>Category</th>
+                        <th>Subcategory</th>
+                    </tr>
+                </thead>
+                   <tr th:each="problem : ${problemMap['__${category}__']}">
+				        <td><input type="checkbox" class="problem-checkbox" th:attr="value=${problem.id}"></td>
+				        <td class="problem-id" th:text="${problem.id}"></td>
+				        <td class="problem-subject" contenteditable="true" th:text="${problem.subject}"></td>
+				        <td class="problem-description" contenteditable="true" th:text="${problem.description}"></td>
+				        <td class="problem-solution" contenteditable="true" th:text="${problem.solution}"></td>
+				        <td class="problem-category" contenteditable="true" th:text="${problem.category}"></td>
+				        <td class="problem-subcategory" contenteditable="true" th:text="${problem.mathSubCategory.name}"></td>
+				    </tr>
+			  </table>
+            <button id="updateSelected" style="background-color: blue; color: white;">Update Selected</button>
+        </div>
+        
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $('#myTabs a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+
+        
+        $('#updateSelected').click(function() {
+            var updatedProblems = [];
+            $('.tab-pane.active tbody tr').each(function() {
+                if ($(this).find('.problem-checkbox').is(':checked')) {
+                    var problem = {
+                        id: $(this).find('.problem-checkbox').val(),
+                        subject: $(this).find('.problem-subject').text(),
+                        description: $(this).find('.problem-description').text(),
+                        solution: $(this).find('.problem-solution').text(),
+                        category: $(this).find('.problem-category').text(),
+                        subcategory: $(this).find('.problem-subcategory').text()
+                    };
+                    updatedProblems.push(problem);
+                }
+            });
+            
+            // Send updatedMemos to server for update
+            $.ajax({
+                url: '/memo/updateAll',
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(updatedMemos),
+                success: function(response) {
+                    console.log('Successfully updated memos:', response);
+                },
+                error: function(error) {
+                    console.error('Error updating memos:', error);
+                }
+            });
+
+            // Log updatedMemos
+            console.log("Updated memos:", updatedMemos);
+        });
+    });
+</script>
+
+</body>
+</html>

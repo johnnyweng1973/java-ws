@@ -139,4 +139,9 @@ public class MathProblemService {
     	mathProblemsRepository.saveAll(problems);
     	mathProblemsRepository.flush();
     }
+	
+	public List<MathProblem> findBySubject(TestSubjectType subject){
+	    return mathProblemsRepository.findBySubject(subject);
+	}
+			
 }
