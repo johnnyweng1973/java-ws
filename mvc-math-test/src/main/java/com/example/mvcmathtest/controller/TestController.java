@@ -74,20 +74,14 @@ public class TestController {
 			               @RequestParam(name = "category", required = false)String category,
 			               @RequestParam(name = "subcategory", required = false)String subcategory,
 			               @RequestParam(name = "noSpelling", defaultValue = "false")boolean noSpelling) {
-		// get all test problems
-		List<TestProblem> oldTestProblems = testProblemService.getBySubject(subject);
-		// convert list to map and serialize map to json string, if map is empty, return
-		// {}
-		String excludeListString = ExcludeListGenerator.generateExcludeList(oldTestProblems);
+		String excludeListString = "1";
+	    if (subject != TestSubjectType.chinese) {
+	    	// get all test problems
+			List<TestProblem> oldTestProblems = testProblemService.getBySubject(subject);
+			excludeListString = ExcludeListGenerator.generateExcludeList(oldTestProblems);
+	    }
 		// Make a POST request to the math problem service
 		List<TestProblem> testProblems = restService.fetchMathProblems(subject, category, subcategory, excludeListString);
-		if(noSpelling) {
-			testProblems.forEach(testProblem -> testProblem.setSolution(null));
-		}
-		
-		if(noSpelling) {
-		    testProblems.forEach(testProblem -> testProblem.setSolution(null));
-		}
 		if (subject == TestSubjectType.chinese) {
 			log.info("categor is {}", category);
 		
