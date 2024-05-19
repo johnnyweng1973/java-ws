@@ -80,7 +80,7 @@ public class MathProblemsController {
 	
 	@GetMapping("/query-chinese")
 	public String addChinese() {
-			return "qeury_chinese";
+			return "query_chinese";
 	}
 
 	@GetMapping("/general")
@@ -142,7 +142,7 @@ public class MathProblemsController {
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }
-						return "redirect:/math";
+			return "redirect:/math";
 		}
 		String[] problemsArray = newMathProblem.getDescription().split("Problem:");
 		List<MathProblem> problemList = new ArrayList<>();
@@ -151,30 +151,24 @@ public class MathProblemsController {
 			for(String problem: problemsArray) {
 				if(problem.trim().length() > 0) {
 					MathProblem mathProblem = new MathProblem(newMathProblem);
-					String[] problemAnswer = problem.split("Answer:");
-					if (problemAnswer.length <= 1) {
-						problemAnswer = problem.split("Answers:");
-					}
-					mathProblem.setDescription(problemAnswer[0].trim());
-					if (problemAnswer.length > 1) {
-					    mathProblem.setAnswer(problemAnswer[1].trim());
-					}
+					// Edge case: ensure "Solution:" exists in the string
+			        if (problem.contains("Solution:")) {
+			            String[] problemSolution = problem.split("Solution:");
+
+			            mathProblem.setDescription(problemSolution[0].trim());
+			            mathProblem.setSolution(problemSolution[1].trim());
+			        } else {
+			        	mathProblem.setDescription(problem.trim());
+			        }
 					mathProblem.setMathSubCategory(subcategory);
 					log.info("create a new problem {}", mathProblem.toString());
-					if ("练习".equals(newMathProblem.getCategory())) {
-						if (mathProblemService.findByDescriptionAndCategory(
-							mathProblem.getDescription(), mathProblem.getCategory())){
-							log.info("existing");
-							continue;
-						}else if(mathProblemService.findByDescriptionAndCategory(
-								mathProblem.getDescription(), "短句")) {
-							log.info("existing in 短句");
-							continue;
-							
-						}
-						else {
-							log.info("new");
-						}
+					if (mathProblemService.findByDescriptionAndCategory(
+						mathProblem.getDescription(), mathProblem.getCategory())){
+						log.info("existing");
+						continue;
+					}
+					else {
+						log.info("new");
 					}
 					problemList.add(mathProblem);		
 				}

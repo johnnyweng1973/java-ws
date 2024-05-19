@@ -41,6 +41,8 @@
                         <th>Solution</th> 
                         <th>Category</th>
                         <th>Subcategory</th>
+                        <th>Importance</th> <!-- New field -->
+                        
                     </tr>
                 </thead>
                    <tr th:each="problem : ${problemMap['__${category}__']}">
@@ -51,6 +53,7 @@
 				        <td class="problem-solution" contenteditable="true" th:text="${problem.solution}"></td>
 				        <td class="problem-category" contenteditable="true" th:text="${problem.category}"></td>
 				        <td class="problem-subcategory" contenteditable="true" th:text="${problem.mathSubCategory.name}"></td>
+				        <td class="problem-importance" contenteditable="true" th:text="${problem.importance}"></td> <!-- New field -->
 				    </tr>
 			  </table>
             <button id="updateSelected" style="background-color: blue; color: white;">Update Selected</button>
@@ -81,7 +84,8 @@
                         description: $(this).find('.problem-description').text(),
                         solution: $(this).find('.problem-solution').text(),
                         category: $(this).find('.problem-category').text(),
-                        subcategory: $(this).find('.problem-subcategory').text()
+                        subcategory: $(this).find('.problem-subcategory').text(),
+                        importance: $(this).find('.problem-importance').text()
                     };
                     updatedProblems.push(problem);
                 }

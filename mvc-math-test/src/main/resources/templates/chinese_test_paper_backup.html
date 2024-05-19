@@ -132,6 +132,10 @@
 
   });
   
+  var onlyDuanju = false;
+//Array to store out-of-range rows
+  var outOfRangeRows = [];
+
 
   function filterRecords() {
 	    var startIndex = parseInt(document.getElementById("startIndexInput").value);
@@ -142,11 +146,17 @@
 	    var categoryToShow = null; // Initialize categoryToShow variable
 	    
 	    rows.forEach(function(row, index) {
-    	  	if (row.querySelector('input[name="category"]').value != "短句"){
+	        if (index === 0) { // When index is 0, set the categoryToShow
+	            if (row.querySelector('input[name="category"]').value == "短句"){
+	            	onlyDuanju = true;
+	            }
+	        } else { 
+	        	if (row.querySelector('input[name="category"]').value != "短句" && onlyDuanju){
 	        		row.style.display = "none";
 	        		return;
+	        	}
 	        }
-	        // For the rest of the rows
+	        	// For the rest of the rows
             if (index + 1 >= startIndex && index + 1 <= endIndex) {
                 row.style.display = "";
             } else {
@@ -260,43 +270,35 @@
             var startTestingButton = document.querySelector('button[onclick="startTesting()"]');
             startTestingButton.disabled = true;
              
-           	testMode = 1;
-       
+            // Enter test mode
+            if (onlyDuanju) {
+            	testMode = 1;
+            }
+            else{
+            	testMode = 3;
+            }
         }
         removeOutOfRangeRows();          
     }
-
-  //Array to store out-of-range rows
-    var characterRows = [];
-
-
+ 
     function removeOutOfRangeRows() {
- 	    	var startIndex = parseInt(document.getElementById("startIndexInput").value);
+        if (onlyDuanju){
+	    	var startIndex = parseInt(document.getElementById("startIndexInput").value);
 	        var endIndex = parseInt(document.getElementById("endIndexInput").value);
 	        
 	        var rows = document.querySelectorAll("tbody tr");
 	        var characterSet = new Set();
-	        var oldCharacterSet = new Set();
 	
 	        // Collect all descriptions within the range and add their characters to the set
 	        rows.forEach(function(row, index) {
-	            if (index < startIndex) {
-	                var description = row.querySelector('.problem-description').textContent.trim();
-	                for (let char of description) {
-	                    oldCharacterSet.add(char);
-	                }
-	            }
-	            
 	            if (index + 1 >= startIndex && index + 1 <= endIndex) {
 	                var description = row.querySelector('.problem-description').textContent.trim();
 	                for (let char of description) {
-                	   if (!oldCharacterSet.has(char)) { // Check if char is not in oldCharacterSet
-                           characterSet.add(char);
-                       }
+	                    characterSet.add(char);
 	                }
 	            }
 	        });
-	        
+	
 	        // Remove rows that are out of range and not '字' category or not having characters in characterSet
 	        rows.forEach(function(row, index) {
 	            if (index + 1 < startIndex || index + 1 > endIndex) {
@@ -304,27 +306,30 @@
 	                var description = row.querySelector('.problem-description').textContent.trim();
 	                
 	                if (category !== '生字' || !characterSet.has(description)) {
-	                	//characterRows.push(row);
 	                	//console.log("remove " + description);
 	                	row.remove(); // Remove the row that is out of range and not meeting the criteria
 	                }
-	                else {
-	                	row.style.display = "";
-	                	characterRows.push(row);
-	                	//console.log("remove " + description);
-	                	row.remove();
-	                }
 	            }
 	        });
-	        console.log(characterRows);     
-	        shuffleTable();
+	        shuffleRowsByCategory('短句');
+        }
+        else {
+        	collectRadicals();
+            shuffleRowsByCategory('生字');
+        }
     }
 
-    function shuffleTable() {
+    function shuffleRowsByCategory(categoryName) {
         var rows = document.querySelectorAll("tbody tr");
 
+        // Filter rows by the specified category
+        var filteredRows = Array.from(rows).filter(function(row) {
+            var category = row.querySelector('input[name="category"]').value;
+            return category === categoryName;
+        });
+
         // Shuffle the filtered rows
-        var shuffledRows = shuffleArray(Array.from(rows));
+        var shuffledRows = shuffleArray(filteredRows);
 
         // Clear the tbody
         var tbody = document.querySelector("tbody");
@@ -332,6 +337,21 @@
         // Append shuffled rows back to the tbody
         shuffledRows.forEach(function(row) {
         	row.querySelector('textarea[name="answer"]').value = '';
+            tbody.appendChild(row);
+        });
+    }
+
+    function shuffleRows() {
+        var rows = document.querySelectorAll("tbody tr");
+
+        // Shuffle the filtered rows
+        var shuffledRows = shuffleArray(rows);
+
+        // Clear the tbody
+        var tbody = document.querySelector("tbody");
+    
+        // Append shuffled rows back to the tbody
+        shuffledRows.forEach(function(row) {
             tbody.appendChild(row);
         });
     }
@@ -344,19 +364,27 @@
         return array;
     }
     
-    function emptyTable() {
+    function removeCategory(name) {
         var rows = document.querySelectorAll("tbody tr"); // Select all rows in the tbody
 
         rows.forEach(function(row) {
-            row.remove(); // Remove the row if its category matches the input name
+            var category = row.querySelector('input[name="category"]').value; // Get the category value of the current row
+
+            if (category === name) {
+                row.remove(); // Remove the row if its category matches the input name
+            }
         });
     }
+    
+    function enableCategory(name) {
+        var rows = document.querySelectorAll("tbody tr"); // Select all rows in the tbody
 
-        
-    function addRemovedRowsBack(removedRows) {
-        var tableBody = document.querySelector("table tbody");
-        removedRows.forEach(function(row) {
-            tableBody.appendChild(row);
+        rows.forEach(function(row) {
+            var category = row.querySelector('input[name="category"]').value; // Get the category value of the current row
+
+            if (category === name) {
+            	row.style.display = "";
+            }
         });
     }
     
@@ -370,23 +398,23 @@
             case 1:
                 // Re-enable the submit button
                 document.getElementById("submitButton").disabled = false;
-                shuffleTable();
+                shuffleRowsByCategory('短句');    
                 testMode = testMode + 1;
                 break;
             case 2:
                 // Re-enable the submit button
                 document.getElementById("submitButton").disabled = false;
-                emptyTable();
-                addRemovedRowsBack(characterRows);
+                removeCategory('短句');
+                enableCategory('生字');
                 collectRadicals();
-                shuffleTable();
+                shuffleRowsByCategory('生字');
                 testMode = testMode + 1;
                 break;
             case 3:
                 // Re-enable the submit button
                 document.getElementById("submitButton").disabled = false;
-            	shuffleTable();
-            	testMode = testMode + 1;
+            	shuffleRowsByCategory('生字');
+                testMode = testMode + 1;
   
                 break;
             case 4:

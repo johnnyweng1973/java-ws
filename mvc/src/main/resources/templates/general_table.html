@@ -82,14 +82,14 @@ $(document).ready(function(){
             var problemTableHeader = $('<h3>Category: ' + category + '</h3>');
             problemTable.append(problemTableHeader);
 
-            var problemTableContent = $('<table class="table table-bordered"><thead><tr><th></th><th>Index</th><th>ID</th><th>Subject</th><th>Description</th><th>Solution</th><th>Category</th><th>Subcategory</th><th>Subcategory ID</th></tr></thead><tbody></tbody></table>');
+            var problemTableContent = $('<table class="table table-bordered"><thead><tr><th></th><th>Index</th><th>ID</th><th>Subject</th><th>Description</th><th>Solution</th><th>Category</th><th>Subcategory</th><th>Subcategory ID</th><th>Importance</th></tr></thead><tbody></tbody></table>');
             problemTable.append(problemTableContent);
 
             // Populate problem table rows for this category
             var categoryIndex = 1; // Initialize category index counter
             problemData.forEach(function(problem) {
                 if (problem.category === category) {
-                    var row = $('<tr><td><input type="checkbox" class="problem-checkbox" value="' + problem.id + '"></td><td>' + categoryIndex + '</td><td class="problem-id">' + problem.id + '</td><td class="problem-subject" contenteditable="true">' + problem.subject + '</td><td class="problem-description" contenteditable="true">' + problem.description + '</td><td class="problem-solution" contenteditable="true">' + problem.solution + '</td><td class="problem-category" contenteditable="true">' + problem.category + '</td><td class="problem-subcategory" contenteditable="true">' + problem.mathSubCategory.name + '</td><td class="problem-subcategory-id">' + problem.mathSubCategory.id + '</td></tr>');
+                    var row = $('<tr><td><input type="checkbox" class="problem-checkbox" value="' + problem.id + '"></td><td>' + categoryIndex + '</td><td class="problem-id">' + problem.id + '</td><td class="problem-subject" contenteditable="true">' + problem.subject + '</td><td class="problem-description" contenteditable="true">' + problem.description + '</td><td class="problem-solution" contenteditable="true">' + problem.solution + '</td><td class="problem-category" contenteditable="true">' + problem.category + '</td><td class="problem-subcategory" contenteditable="true">' + problem.mathSubCategory.name + '</td><td class="problem-subcategory-id">' + problem.mathSubCategory.id + '</td><td class="problem-importance" contenteditable="true">' + problem.importance + '</td></tr>');
                     problemTableContent.find('tbody').append(row);
                     categoryIndex++;
                 }
@@ -124,7 +124,8 @@ $(document).ready(function(){
                 mathSubCategory: {
                     id: problemRow.find('.problem-subcategory-id').text(),
                     name: problemRow.find('.problem-subcategory').text()
-                }
+                },
+                importance: problemRow.find('.problem-importance').text()
             };
             selectedProblems.push(problem);
         });

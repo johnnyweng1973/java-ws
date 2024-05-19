@@ -93,8 +93,12 @@ public class TestController {
 		
 			model.addAttribute("sub", subject.toString());
 			model.addAttribute("problems", testProblems);
-			return "chinese_test_paper";
-		
+			if ("练习".equals(category) || "生字".equals(category)) {
+				return "chinese_practice";
+			}
+			else {
+			    return "chinese_test_paper";
+			}
 		}
 		else {
 			model.addAttribute("sub", subject.toString());

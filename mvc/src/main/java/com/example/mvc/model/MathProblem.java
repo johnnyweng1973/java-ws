@@ -41,6 +41,8 @@ public class MathProblem {
     @Column(name = "multiple_answers")
     private boolean multipleAnswers;
     
+    private Integer importance;
+    
     public MathProblem(MathProblem problem){
 		this.id = problem.id;
 		this.category = problem.category;
@@ -50,6 +52,7 @@ public class MathProblem {
 		this.answer = problem.answer;
 		this.subject = problem.subject;
 		this.multipleAnswers = problem.multipleAnswers;
+		this.importance = problem.importance;
 	}
 	
 }

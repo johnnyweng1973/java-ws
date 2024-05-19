@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <title>Manage MathProblems</title>
+    <style>
+        /* Style the text area to set width and height */
+        #textArea {
+            width: 800px; /* Set the width of the text area */
+            height: 200px; /* Set the height of the text area */
+            overflow-y: auto; /* Add a vertical scroll bar */
+            overflow-x:auto;
+            resize: none; /* Disable resizing of the text area */
+        }
+        .framed-cell {
+		    border: 1px solid black; /* Add frame */
+		    width: 50%; /* Set width to 50% */
+		}
+		.input-match-height {
+            width: 100%;
+            height: 100%;
+            border: none;
+            padding: 0;
+            margin: 0;
+            resize: none; /* Prevent resizing of textarea */
+            outline: none; /* Remove the outline when focused */
+        }
+     
+    </style>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+</head>
+<body>
+  <div class="container my-5">
+  <a href="汉字笔画和部首名称表.pdf" target="_blank" th:text="'部首表'" class="btn btn-primary mb-3"></a>
+    <div  class="text-primary mb-3 radical">
+      部首：氵（三点水）木（木字旁）亻（单dan人旁）彳（双shuang人旁）讠（言yan字旁）扌（提ti手旁）忄（竖shu心旁） <br>  
+      钅（金jin字旁）口（口字旁）宀（宝bao盖gai头）竹（竹zhu字头）辶（走zou之zhi旁）走（走zou字旁）女（女字旁）
+      心 （心字旁） 刂（立li刀dao旁）<br>
+    </div>
+    <div  class="text-primary mb-3">
+      
+      带声调的字母如下：
+      【a】ā á ǎ à 
+      【o】ō ó ǒ ò
+      【e】ē é ě è
+      【i】ī í ǐ ì
+      【u】ū ú ǔ ù
+      【ü】ǖ ǘ ǚ ǜ
+    </div>
+  
+  <div>
+    Start Index: <input type="number" id="startIndexInput" value="1">
+    End Index: <input type="number" id="endIndexInput" value="2000">
+    <button type="button" onclick="filterRecords()">Filter</button>
+      
+</div>
+    <form id="myForm">
+    <h2 th:text="${sub} + ' Test'"></h2>
+   
+        <table>
+          <thead>
+                <tr>
+                    <th>Index</th> <!-- Added Index column -->
+                    <th>Problem Description</th>
+                    <th>Solution</th>
+                    <th>Answer</th>
+                </tr>
+            </thead>
+            <tbody>
+                 <tr th:each="problem, index : ${problems}">
+                    <td class="framed-cell" style="width: 5%;font-family: 楷体, KaiTi, serif;font-size: 24px;" th:text="${index.index + 1}"></td> <!-- Displaying Index here -->
+                   <td class="framed-cell problem-description" style="width: 40%;font-family: 楷体, KaiTi, serif;font-size: 48px;" th:text="${problem.problemDescription}"></td>
+                   <td class="framed-cell" style="width: 35%;font-size: 36px;">
+                        <textarea th:text="${problem.solution}" name="solution" class="input-match-height" id="'solutionField-' + ${index.index}"></textarea>
+                        <!-- Hidden fields for other properties -->
+                         <input type="hidden" th:value="${problem.id}" name="id"/>
+                        <input type="hidden" th:value="${problem.problemId}" name="problemId"/>
+                        <input type="hidden"th:value="${problem.category}" name="category"/>
+                        <input type="hidden" th:value="${problem.subcategory}" name="subcategory"/>
+                        <input type="hidden" th:value="${problem.subcategoryId}" name="subcategoryId"/>
+                        </td>
+            
+                    <td class="framed-cell" style="width: 20%;">
+                        <textarea th:text="${problem.answer}" name="answer" onpaste="return false;" class="input-match-height"></textarea>
+                    </td>
+                  
+                </tr>
+            </tbody>
+        </table>
+        <button id="submitButton" type="button" onclick="submitForm()">Submit</button>
+    </form>
+  </div>
+  
+  <!-- Modal to display first 10 rows -->
+<!-- Modal to display first 10 rows -->
+<div class="modal" tabindex="-1" id="firstTenRowsModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">First 10 Rows</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table id="firstTenRowsTable" class="table">
+                    <!-- Rows will be populated here -->
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="shuffleRowsInModal()">Shuffle Rows</button> <!-- Added shuffle button -->
+            </div>
+        </div>
+    </div>
+</div>
+  
+<!-- jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap Bundle with Popper.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+  //Function to filter records when the document is loaded
+  document.addEventListener("DOMContentLoaded", function() {
+      filterRecords();
+  });
+  
+  function filterRecords() {
+	    var startIndex = parseInt(document.getElementById("startIndexInput").value);
+	    var endIndex = parseInt(document.getElementById("endIndexInput").value);
+	    
+	    var rows = document.querySelectorAll("tbody tr");
+	    
+	    var categoryToShow = null; // Initialize categoryToShow variable
+	    
+	    rows.forEach(function(row, index) {
+        	// For the rest of the rows
+            if (index + 1 >= startIndex && index + 1 <= endIndex) {
+                row.style.display = "";
+            } else {
+            	row.remove(); // Remove the row that is out of range and not meeting the criteria
+            }
+        });
+	}
+
+   function submitForm() {
+        //var subject = /*[[${sub}]]*/ ''; // Get the Thymeleaf subject variable value
+        var formData = []; 
+        document.querySelectorAll('tr').forEach(function(row, index) {
+            
+            if (index >= 1){
+            	var problem = {};
+            	problem['subject']="chinese";
+            	 // Retrieve problemDescription from the row using the new class name
+                var problemDescription = row.querySelector('.problem-description').textContent;
+                problem['problemDescription'] = problemDescription.trim();
+             // Retrieve solution from the textarea
+                var solutionTextarea = row.querySelector('textarea[name="solution"]');
+                problem['solution'] = solutionTextarea ? solutionTextarea.value : null;
+                
+                // Retrieve answer from the textarea
+                var answerTextarea = row.querySelector('textarea[name="answer"]');
+                problem['answer'] = answerTextarea ? answerTextarea.value : null;
+                
+                // Retrieve other properties from the hidden input fields
+                problem['id'] = getValueFromInput(row.querySelector('input[name="id"]'));
+                problem['problemId'] = getValueFromInput(row.querySelector('input[name="problemId"]'));
+                problem['category'] = getValueFromInput(row.querySelector('input[name="category"]'));
+                problem['subcategory'] = getValueFromInput(row.querySelector('input[name="subcategory"]'));
+                problem['subcategoryId'] = getValueFromInput(row.querySelector('input[name="subcategoryId"]'));
+                formData.push(problem);
+            }
+        });
+
+        function getValueFromInput(inputElement) {
+            return inputElement ? inputElement.value : null;
+        }
+        
+        fetch('/test', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        }).then(response => {
+        		  window.location.href = '/test-success';
+        }).catch(error => {
+            // Handle error
+            console.error('Error:', error);
+        });
+    }
+    
+</script>
+</body>
+</html>

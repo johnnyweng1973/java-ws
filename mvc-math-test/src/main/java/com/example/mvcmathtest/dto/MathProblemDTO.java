@@ -18,5 +18,6 @@ public class MathProblemDTO {
     private String solution;
     private String answer;
     private TestSubjectType subject;
+    private Integer importance;
     private boolean multipleAnswers;
 }

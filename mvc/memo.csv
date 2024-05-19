@@ -108,12 +108,7 @@ As suggested by ChatGPT, I'll explore using the JAR command to build the applica
 
 
 ","Bug Fix"
-"21","maven project ","","maven project tips
-
-1. build plugins
-  plugins are tools used to complete code, create jar file, etc. 
-  to create a jar file, you need to include maven jar plugin in pom.xml. you must specify main class in its configuration tag.
-  normally you don't need to specify compiler plugin. but if you want to configure it you need to include this plugin and specify the configurations in configuration tab such as source and target java verion  ","deleted"
+"21","Java Map ","","","Java"
 "22","Improve Chinese Test","","1. Add testing for Chinese strokes, writing and so on.
   ","ToDo"
 "23","Chinese Character Test Submit Wrong","","Issue Symptom:
@@ -193,31 +188,30 @@ a map of list of memo is passed to HTML.
 you need to do two iterations to go through map. but for tr/td, there is only one iteration, so a th: block is used to do a iteration, this is a feature of thymeleaf to allow virtualization when rendering HTML. it is like embedded some code during HTML rendering
 
 another problem is id does not support space between words. so category with multiple words cannot be used as a valid id for a div, and href cannot link to it. the solution is use a thymeleaf expression to replace space with ""-""","Bug Fix"
-"33","chinese for daisy","","201	短句	三级	难过	nan guo	
-202	短句	三级	伤心	shang xin	
-203	短句	三级	简单	jian dan	
-204	短句	三级	方便	fang bian	
-205	短句	三级	了解	liao jie	
-206	短句	三级	有钱	you qian	
-207	短句	三级	没事	mei shi	
-209	短句	三级	认真	ren zhen	
-210	短句	三级	坏了	huai le	","短句"
+"33","GIT/GITHUB","","git config --global user.name ""johnny weng""
+git config --global user.email ""johnny.weng@gmail.com ""
+git config --global init.default branch main
+git init   //create a repository
+git add  *  // track file
+git  rm --cache file1  // untrack file1, file1 is a file just added by ""git add""
+.gitignore for listing files to ignore
+git commit -m """" //commit","Configuration Management"
 "35","Add a new category ""生字"" in the table ""math_problem""","obsolete","The subject ""chinese"" is for Chinese records in the ""math_problem"" table. It has category ""短句“/""生字“/”练习“ .              
 The project has a ""字库"" file which include all Chinese characters and their associated information such as pinyin and radical.
 For every new Chinese character in ""短句""record, we want to create a separate record  as ""生字"" category. Its description field stores the string of this character and its solution field stores the information for that character in the “字库"" file  
 ","ToDo"
-"36","create a character dic from web site","","use jsoup json libraryto do this work
-jsoup can 
-1: connect to URL and download
-2. pare this web page to a jsoup document 
-3. iterate through the component list of this document.
+"36","Create a Character DIC From a Web Site",""," JSOUP library can do this work
+1: Connect to URL and download
+2. Parse this web page into a JSOUP document 
+3. Walk through the component list of this document.
 
-we have a URL that include all radicals ordered by stroke number
-then for each radical, there is a page for it and it has all Chinese character ordered by stroke number.
+There is a web site  that include the following:
+1 A page which include all radicals ordered by stroke number
+2 For each radical, there is a  page which includes  all associated Chinese characters ordered by stroke number.
 
-we create a map of map<string, Character>, string is Chinese character.  this is actually a hash.
-
-then use json library write the map to the file.","deleted"
+We create a  Chinese dictionary in the form of map<String, Character> by parsing this web site with JSOUP.  String represent a Chinese character and Character is an object that includes information about corresponding Chinese character.
+  
+JSON library is used to serialize the map to a JSON file.","Java"
 "37","Javascript Manipulates the Properties of HTML Elements. ","","1. Control the display of a row in HTML table.
     a) In the event listener for the event ""DOMContentLoaded"", iterate through the HMTL table.
     b) Hide a row with:
@@ -241,35 +235,18 @@ to do this,
 
 ","HowTo"
 "43","Answers Not Removed for the Next Round of Test","","After submitting each round of the tests,  except for the last round, the answer fields should be cleared for the next round.","Bug Fix"
-"49","memo ui","","1. memo ui 功能
-
-/memo    button list of memos + new button + A form for update
-/memo/list  list in tabs + new button
-
-new memo:
-   1.  new button onclick=""window.location.href='/memo/add'""
-   2. The server returns a page including a form.    method for HTTP get at /memo/add
-   3.  post a form and the server will redirect to /memo/list    method for HTTP post at /memo/add
-   4.  client request to /memo/list
-   5.  server return a page for /memo/list     method for HTTP get at /memo/list
-summary: one get, one post, finally a redirect.
-
-button list and form  at /memo:
-    1. thymeleaf is used to render and ul/li is used to list memos, it add ID attribute to button  
-    2. on DOMContentLoded event, javascript register lambda function for button list click. this lambda will pass in 
-        event parameter, button reference is included in this event. and we will send fetch request for this button, and display
-        memo in json in the response to the form.
-    3.  update form. submit button will trigger a javascript function, it will send update request in ajax. response will be handled in a registered lambda function.
-summary:  register click function for  memo list buttons.    one click will locate the id of button and fill the form with its memo using fetch. Update with ajax send when submit.
-
-/memo/list
-new memo:  same as above
-
-tabs and its corresponding table.
-tabs are implmented with ul/li and bootstrap classes. each li has a <a> element which is called attachment . a HREF is defined in this. a link to table id is also defined. 
-thymeleaf is used to create a table for each li. which is an array of category names. each table has a id and connects to the tab. using thymeleaf we can use for loop to define table which will save a lot of space for html doc size. 
-a javascript jquery function is used to handle click function and show related tab table. 
- ","deleted"
+"49","How ""chinese_test_paper"" html works","","1. This page is one of the pages for the service endpoint /test_subject. It is selected when it is a Chinese test.
+2. There are three cateogires: duanju, shengzi and lianxi. 
+    Duanju:  the table with all duanju and shengzi regardless the range preconfigured in the page 
+   shengzi:  the table will contain the shengzi in the category that the client request
+   lianxi:   same as shengzi
+3. filtering of the table
+   In the duanju test, server side returns all the records but only the records within the range specified will be displayed. The records that are out of the range will be masked by setting their display property to ""none"" during the initialization. All records of the shengzi category should also be masked.
+4. actions when click on starting test
+    almost all buttons should be disabled.
+    the records that are not in the test range should be removed.   
+    
+ ","HowPageWorks"
 "50","How the page /memo_obsolete works","JavaScript
 
 This page should be obsolete","This page enables users to perform three actions: create new memos, view a list of memo titles displayed as buttons, and edit existing memos using a form. Clicking on a memo button retrieves its details and displays them in the form for editing. After making changes, users can simply click the update button to submit their edits.
@@ -326,3 +303,13 @@ This page should be obsolete","This page enables users to perform three actions:
       By default  this extension will automatically be utilized by the build process to compiles the Java source files. By specifying  it explicitly you can overwrite its default configurations to tailor it to your project requirements. I include it to specify source java version  used by compiler to solve a compiler warning in one of my project.   
 
 ","Configuration Management"
+"57","parameter binding in Spring Boot controller method","Spring Boot controller method parameter binding ","@PostMapping(""/test-rest"")
+    public ResponseEntity<List<MathProblem>> handleRequestBody(
+    	    @RequestParam TestSubjectType subject,
+    	    @RequestParam(name = ""category"", required = false) String category,
+      	    @RequestParam(name = ""subcategory"", required = false) String subcategory,
+    	    @RequestBody String requestBody)
+    
+1. Spring Boot binds parameters annotated with @RequestParam to the corresponding query parameters in the Request URL.
+2. If required = false is set, this parameter is optional.
+3. A customized parameter can be  specified using 'name = """"' ","Java"
