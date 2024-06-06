@@ -1,5 +1,6 @@
 package com.example.mvc.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,10 @@ public class MathSubCategoryService {
 
     @Autowired
     private MathSubCategoryRepository subcategoryRepository;
+    
+    public List<MathSubCategory> findAll(){
+    	return subcategoryRepository.findAll();
+    }
 
     public MathSubCategory findOrCreateSubcategory(String subcategoryName) {
         // Try to find the subcategory by name

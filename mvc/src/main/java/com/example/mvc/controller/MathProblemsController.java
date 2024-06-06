@@ -44,6 +44,7 @@ public class MathProblemsController {
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	private static final Logger log = LoggerFactory.getLogger(MathProblemsController.class);
+	private static String csvFileName = new String("problem.csv");
 
 	@Autowired
 	private MathProblemService mathProblemService;
@@ -53,7 +54,7 @@ public class MathProblemsController {
 
 	@GetMapping
 	public String manageMathProblems(Model model) {
-		List<MathProblem> mathProblems = mathProblemService.getAll();
+		List<MathProblem> mathProblems = mathProblemService.findAll();
 	
 		// Logging the number of elements in the 'memos' list
 		log.info("Number of elements in the 'problems' list: {}", mathProblems.size());
@@ -67,7 +68,7 @@ public class MathProblemsController {
 	@GetMapping("/tabs")
 	public String list(Model model) {
 		// JPA will return an empty list if empty
-		List<MathProblem> mathProblems = mathProblemService.getAll();
+		List<MathProblem> mathProblems = mathProblemService.findAll();
 		
 		Map<String, List<MathProblem>> map = new HashMap<>();
 		for (MathProblem problem: mathProblems) {
@@ -248,5 +249,24 @@ public class MathProblemsController {
                 return ResponseEntity.status(500).body("Error updating problems: " + e.getMessage());
          }
     }
+//    
+//    @GetMapping("/archive")
+//	@ResponseBody
+//	public ResponseEntity<String> archiveMathProblem() {
+//    	List<MathSubCategory> subCategories = mathSubcategoryService.findAll();
+//    	
+//    	List<MathProblem> mathProblems = mathProblemService.findAll();
+//    	if (writeProblemsToCSV(mathProblems, csvFileName)) {
+//			
+//			return ResponseEntity.ok("Memo list archived successfully");
+//		} else {
+//			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//					.body("Failed to retrieve memo list from Memo Service");
+//		}
+//    	
+//    }
+// 
+    
+   
 
 }

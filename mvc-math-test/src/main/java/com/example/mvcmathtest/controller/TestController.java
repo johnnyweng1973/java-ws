@@ -30,8 +30,10 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import com.example.mvcmathtest.dto.MathProblemDTO;
 import com.example.mvcmathtest.model.TestProblem;
+import com.example.mvcmathtest.model.TimeStampedModel;
 import com.example.mvcmathtest.service.RestService;
 import com.example.mvcmathtest.service.TestProblemService;
+import com.example.mvcmathtest.service.TimeStampedService;
 import com.example.mvcmathtest.util.ExcludeListGenerator;
 import com.example.mvcmathtest.util.TestSubjectType;
 import com.example.radical.ChineseCharacter;
@@ -48,6 +50,9 @@ public class TestController {
 	@Autowired
 	private TestProblemService testProblemService;
 
+	@Autowired
+	private TimeStampedService timeStampedService;
+	
 	@Autowired
 	private RestService restService;
 
@@ -102,6 +107,18 @@ public class TestController {
 			
 	}
 
+	@GetMapping("/problems")
+	public ResponseEntity<List<TestProblem>> getProblems(
+			@RequestParam TestSubjectType subject,
+			@RequestParam(name = "category", required = false)String category,
+			@RequestParam(name = "subcategory", required = false)String subcategory) {
+		String excludeListString = "1";
+	   
+		// Make a POST request to the math problem service
+		List<TestProblem> problems = restService.fetchMathProblems(subject, category, subcategory, excludeListString);
+		return ResponseEntity.ok(problems);
+	}
+
 	@PostMapping("/test")
 	@ResponseBody
 	public ResponseEntity<String> handleFormSubmission(@RequestBody String jsonData) {
@@ -125,6 +142,14 @@ public class TestController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing JSON data");
 		}
 	}
+	
+	 @GetMapping("/latestChineseObjective")
+	 @ResponseBody
+	 public ResponseEntity<String> getLatesChineseObjective() {
+		 TimeStampedModel data = timeStampedService.getLatestRecord();
+		 log.info("record is {}", data.getData());
+		 return ResponseEntity.ok(data.getData());
+	 }
 	
 	
 }

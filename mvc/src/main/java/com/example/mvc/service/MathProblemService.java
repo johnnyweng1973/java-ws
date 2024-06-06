@@ -28,7 +28,7 @@ public class MathProblemService {
 	@Autowired
 	private MathSubCategoryRepository mathSubCategoryRepository;
 
-	public List<MathProblem> getAll() {
+	public List<MathProblem> findAll() {
 		return mathProblemsRepository.findAll();
 	}
 
