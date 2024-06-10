@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,54 +104,111 @@ public class MathProblemsController {
 	    }
 	}
 
+	private void handleAddDuanJu(
+	        MathProblem problem,
+	        List<MathProblem> problemList,
+	        Map<String, ChineseCharacter> map) 
+	{
+	    StringBuilder appendedSolution = new StringBuilder();
+	    
+	    for (char character : problem.getDescription().toCharArray()) {
+	        String characterString = String.valueOf(character);
+	        ChineseCharacter chineseCharacter = map.get(characterString);
+	        
+	        if (chineseCharacter != null) {
+	            appendedSolution.append(chineseCharacter.getPinyin()).append(" ");
+	        }
+	        
+	        if (!mathProblemService.findByDescriptionAndCategory(characterString, "生字")) {
+	            MathProblem newCharacterProblem = new MathProblem(problem);
+	            newCharacterProblem.setDescription(characterString);
+	            newCharacterProblem.setCategory("生字");
+	            
+	            if (chineseCharacter != null) {
+	                newCharacterProblem.setSolution(chineseCharacter.toString());
+	            } else {
+	                // Handle case where solution is not found in the map
+	                // Set solution to null or an empty string, depending on your requirements
+	                newCharacterProblem.setSolution(""); // Or null, depending on your use case
+	            }
+	            // Add the new MathProblem to the list or database, depending on your setup
+	            problemList.add(newCharacterProblem);
+	        }
+	    }
+	    
+	    // Append the accumulated pinyin to the solution of the incoming problem
+	    problem.setSolution(problem.getSolution() + " " + appendedSolution.toString().trim());
+	}
+
+	// Load the file and parse its contents into the characterWholeMap
+	private Map<String, ChineseCharacter> loadCharacterMap() {
+	    try {
+	        // Read JSON file and convert to Map
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        // Read the file from the classpath
+	        InputStream inputStream = MathProblemsController.class.getResourceAsStream("/中文字库.txt");
+	        
+	        return  objectMapper.readValue(
+	                    inputStream, 
+	                    new TypeReference<Map<String, ChineseCharacter>>() {}
+	        );
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	        return Collections.emptyMap(); // Return an empty map in case of an exception
+	    }
+	}
 	
+	private String handleAddShengZhi(
+			    MathProblem newMathProblem,
+			    Map<String, ChineseCharacter> characterWholeMap) {
+		// Create a list to hold the new MathProblem objects
+		List<MathProblem> mathProblems = new ArrayList<>();
+		
+		for (char character : newMathProblem.getDescription().toCharArray()) {
+		    String characterString = String.valueOf(character);
+		    ChineseCharacter chineseCharacter = characterWholeMap.get(characterString);
+		    
+		    if (chineseCharacter != null) {
+		        // Create a new MathProblem object
+		        MathProblem mathProblem = new MathProblem(newMathProblem);
+		        mathProblem.setDescription(characterString);
+		        mathProblem.setSolution(chineseCharacter.toString());
+		        
+		        // Add the new MathProblem object to the list
+		        mathProblems.add(mathProblem);
+		    }
+		}
+        mathProblemService.saveAll(mathProblems);
+		return "redirect:/math";
+	}
+   	
 	@PostMapping("/add")
 	public String addMathProblem(@ModelAttribute("newMathProblem") MathProblem newMathProblem) {
-		MathSubCategory subcategory = mathSubcategoryService.findOrCreateSubcategory(newMathProblem.getMathSubCategory().getName());
+		MathSubCategory subcategory = 
+		    mathSubcategoryService.findOrCreateSubcategory(newMathProblem.getMathSubCategory().getName());
+		// Set the subcategory back to the newMathProblem object
+	    newMathProblem.setMathSubCategory(subcategory);
 
-		if ("生字".equals(newMathProblem.getCategory())) {
-			try {
-	            // Read JSON file and convert to Map
-			    ObjectMapper objectMapper = new ObjectMapper();
-			    // Read the file from the classpath
-	            InputStream inputStream = MathProblemsController.class.getResourceAsStream("/中文字库.txt");
-	            
-	            Map<String, ChineseCharacter> characterWholeMap = objectMapper.readValue(
-	            		inputStream, 
-	                new TypeReference<Map<String, ChineseCharacter>>() {}
-	            );
-	            
-	            // Create a list to hold the new MathProblem objects
-	            List<MathProblem> mathProblems = new ArrayList<>();
-
-	            for (char character : newMathProblem.getDescription().toCharArray()) {
-	                String characterString = String.valueOf(character);
-	                ChineseCharacter chineseCharacter = characterWholeMap.get(characterString);
-	                
-	                if (chineseCharacter != null) {
-	                    // Create a new MathProblem object
-	                    MathProblem mathProblem = new MathProblem(newMathProblem);
-	                    mathProblem.setDescription(characterString);
-	                    mathProblem.setSolution(chineseCharacter.toString());
-	                    mathProblem.setMathSubCategory(subcategory);
-
-	                    // Add the new MathProblem object to the list
-	                    mathProblems.add(mathProblem);
-	                }
-	            }
-	            mathProblemService.saveAll(mathProblems);
-
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
-			return "redirect:/math";
+		Map<String, ChineseCharacter> characterWholeMap = null;
+		if (newMathProblem.getSubject() == TestSubjectType.chinese &&
+		    (newMathProblem.getCategory().equals("短句") || 
+			 newMathProblem.getCategory().equals("生字")))
+		{
+			characterWholeMap = loadCharacterMap();
 		}
+		
+		if (newMathProblem.getSubject() == TestSubjectType.chinese &&
+				"生字".equals(newMathProblem.getCategory()))
+		{
+           return handleAddShengZhi(newMathProblem, characterWholeMap);	
+		}
+		
 		String[] problemsArray = newMathProblem.getDescription().split("Problem:");
 		List<MathProblem> problemList = new ArrayList<>();
-		//newMathProblem.setId(1); 
 		if(problemsArray.length > 1) {
 			for(String problem: problemsArray) {
-				if(problem.trim().length() > 0) {
+				problem = problem.trim();
+				if(!problem.isEmpty()) {
 					MathProblem mathProblem = new MathProblem(newMathProblem);
 					// Edge case: ensure "Solution:" exists in the string
 			        if (problem.contains("Solution:")) {
@@ -159,24 +217,35 @@ public class MathProblemsController {
 			            mathProblem.setDescription(problemSolution[0].trim());
 			            mathProblem.setSolution(problemSolution[1].trim());
 			        } else {
-			        	mathProblem.setDescription(problem.trim());
+			        	mathProblem.setDescription(problem);
 			        }
 					mathProblem.setMathSubCategory(subcategory);
-					log.info("create a new problem {}", mathProblem.toString());
 					if (mathProblemService.findByDescriptionAndCategory(
-						mathProblem.getDescription(), mathProblem.getCategory())){
+							mathProblem.getDescription(),
+							mathProblem.getCategory()))
+					{
 						log.info("existing");
 						continue;
 					}
 					else {
-						log.info("new");
+						// Check if the subject is Chinese and the category is "duanju"
+			            if (mathProblem.getSubject() == TestSubjectType.chinese &&
+			            		mathProblem.getCategory().equals("短句"))
+			            {
+	                        handleAddDuanJu(mathProblem, problemList, characterWholeMap);
+			            }
+			            log.info("create a new problem {}", mathProblem.toString());
 					}
 					problemList.add(mathProblem);		
 				}
 			}
 		}
 		else {
-			newMathProblem.setMathSubCategory(subcategory);
+			if (newMathProblem.getSubject() == TestSubjectType.chinese &&
+            	newMathProblem.getCategory().equals("短句"))
+			{
+                handleAddDuanJu(newMathProblem, problemList, characterWholeMap);
+            }
 			problemList.add(newMathProblem);
 		}
 		mathProblemService.saveAll(problemList);
