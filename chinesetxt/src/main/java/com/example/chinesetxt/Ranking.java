@@ -1,19 +1,25 @@
 package com.example.chinesetxt;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class Ranking {
 
     public static void main(String[] args) {
         String charactersFile = "chinese-character.txt";
-        String sentencesFile = "pfsj-sentences.txt";
-        String outputFile = "pfsj-percentage-ranking-9.txt";
+        String sentencesFile = "jy-sentences.txt";
+        String outputFile = "jy-percentage-ranking-11.txt";
 
         try {
             String chineseCharacters = readChineseCharacters(charactersFile);
             Map<Integer, List<String>> percentageMap = calculateCharacterPercentages(sentencesFile, chineseCharacters);
             writePercentageRanking(percentageMap, outputFile);
+            int subcategoryDigit = extractDigitFromFileName(outputFile);
+            sendPostRequests(percentageMap, "http://localhost:8080/math/add", subcategoryDigit);
             System.out.println("Character percentage ranking has been written to " + outputFile);
         } catch (IOException e) {
             System.err.println("An error occurred: " + e.getMessage());
@@ -42,7 +48,7 @@ public class Ranking {
                     int percentage = result.getKey();
                     String missedCharacters = result.getValue();
                     if (percentage < 70 || missedCharacters.length() >= 2) {
-                    	continue;
+                        continue;
                     }
                     percentageMap.computeIfAbsent(percentage, k -> new ArrayList<>()).add(line.trim() + " (" + missedCharacters + ")");
                 } else if (line.length() > 10) {
@@ -82,6 +88,68 @@ public class Ranking {
                 }
                 writer.newLine();
             }
+        }
+    }
+
+    public static int extractDigitFromFileName(String filename) {
+        // Extract digit from filename
+        String digitStr = filename.replaceAll("\\D", "");
+        return digitStr.isEmpty() ? 0 : Integer.parseInt(digitStr);
+    }
+
+    public static void sendPostRequests(Map<Integer, List<String>> percentageMap, String urlString, int subcategoryDigit) {
+        List<String> sentences = percentageMap.get(100); // Get sentences with 100% percentage
+        if (sentences != null) {
+            for (String sentence : sentences) {
+                // Extract description from the sentence
+                String[] parts = sentence.split(" \\(");
+                String description = parts[0].trim(); // Extracting the description from the sentence
+                // Check if the description has four or more characters
+                if (description.length() < 4) {
+                    System.out.println("Skipping sentence: " + description + " as it contains less than 4 characters");
+                    continue; // Skip sentences with less than 4 characters
+                }
+                // Log the sentence
+                System.out.println("Sending POST request for sentence: " + description);
+              
+                // Send POST request
+                String subcategoryName = String.valueOf(subcategoryDigit);
+                sendPostRequest(urlString, subcategoryName, description);
+            }
+        }
+    }
+    public static void sendPostRequest(String urlString, String subcategoryName, String description) {
+        try {
+            // Constant category
+            String category = "练习";
+
+            // Encode the parameters
+            String encodedCategory = URLEncoder.encode(category, StandardCharsets.UTF_8.toString());
+            String encodedSubcategoryName = URLEncoder.encode(subcategoryName, StandardCharsets.UTF_8.toString());
+            String encodedDescription = URLEncoder.encode(description, StandardCharsets.UTF_8.toString());
+
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setDoOutput(true);
+
+            // Form data with customized fields
+            String formData = "subject=chinese&category=" + encodedCategory + "&mathSubCategory.name=" + encodedSubcategoryName +
+                              "&description=" + encodedDescription + "&solution=N/A&answer=N/A&multipleAnswers=false";
+
+            // Send the request
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = formData.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = conn.getResponseCode();
+            System.out.println("Response Code for description [" + description + "]: " + responseCode);
+
+            conn.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

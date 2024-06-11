@@ -227,7 +227,8 @@ public class MathProblemsController {
 						log.info("existing");
 						continue;
 					}
-					else {
+					else 
+					{
 						// Check if the subject is Chinese and the category is "duanju"
 			            if (mathProblem.getSubject() == TestSubjectType.chinese &&
 			            		mathProblem.getCategory().equals("短句"))
@@ -241,10 +242,18 @@ public class MathProblemsController {
 			}
 		}
 		else {
-			if (newMathProblem.getSubject() == TestSubjectType.chinese &&
-            	newMathProblem.getCategory().equals("短句"))
-			{
-                handleAddDuanJu(newMathProblem, problemList, characterWholeMap);
+			if (newMathProblem.getSubject() == TestSubjectType.chinese) {
+				if (mathProblemService.findByDescriptionAndCategory(
+						newMathProblem.getDescription(),
+						newMathProblem.getCategory()))
+				{
+					log.info("existing");
+					return "redirect:/math";
+				}
+				
+				if (newMathProblem.getCategory().equals("短句")){
+					handleAddDuanJu(newMathProblem, problemList, characterWholeMap);	
+				}
             }
 			problemList.add(newMathProblem);
 		}
