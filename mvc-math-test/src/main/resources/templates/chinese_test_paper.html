@@ -57,6 +57,7 @@
     <button type="button" onclick="toggleAllSolutions()">Toggle All Solutions</button>
       
 </div>
+    <div class="selectedRadicals"></div>
     <form id="myForm">
     <h2 th:text="${sub} + ' Test'"></h2>
    
@@ -434,45 +435,67 @@
         
         // Log the radicals array
         console.log(radicals);
-        
-     // Randomly select 3 radicals from the array
-        var selectedRadicals = [];
-        while (selectedRadicals.length < 4) {
-            var randomIndex = Math.floor(Math.random() * radicals.length);
-            selectedRadicals.push(radicals[randomIndex]);
-        }
       
         // Call the function to highlight rows containing radicals in their solutions
-        highlightRowsWithRadicals(selectedRadicals);
+        highlightRowsWithRadicals(radicals);
     }
 
-    // Function to highlight rows containing radicals in their solutions
     function highlightRowsWithRadicals(radicals) {
         var rows = document.querySelectorAll("tbody tr");
 
         console.log("select radicals:", radicals);
 
-        radicals.forEach(function(radical) {
-            // Array to store rows containing the current radical
-            var rowsWithRadical = [];
-            
-            rows.forEach(function(row) {
-                var category = row.querySelector('input[name="category"]').value;
-                var solution = row.querySelector('textarea[name="solution"]').value;
+        // Dictionary to store lists of rows for each radical
+        var radicalToRowsMap = {};
 
-                // Check if the row category is "生字" and the solution contains the current radical
-                if (category === "生字" && solution && solution.includes(radical)) {
-                    rowsWithRadical.push(row);
+        // Iterate through rows
+        rows.forEach(function(row) {
+            var category = row.querySelector('input[name="category"]').value;
+            var solution = row.querySelector('textarea[name="solution"]').value;
+
+            if (category === "生字" && solution) {
+                var solutionParts = solution.split(' ');
+                if (solutionParts.length > 1) {
+                    var radical = solutionParts[1]; // Assuming the second part is the radical
+                    if (radicals.includes(radical)) {
+                        if (!radicalToRowsMap[radical]) {
+                            radicalToRowsMap[radical] = [];
+                        }
+                        radicalToRowsMap[radical].push(row);
+                    }
                 }
-            });
+            }
+        });
 
-            // Randomly choose one row from rows containing the radical and set its background color to yellow
+        // Log the dictionary to see the rows grouped by radicals
+        console.log("Rows grouped by radicals:", radicalToRowsMap);
+
+        // Randomly highlight one row for each radical
+        var highlightedRadicals = Object.keys(radicalToRowsMap);
+        var selectedRadicals = [];
+
+        while (selectedRadicals.length < 4 && highlightedRadicals.length > 0) {
+            var randomIndex = Math.floor(Math.random() * highlightedRadicals.length);
+            var selectedRadical = highlightedRadicals.splice(randomIndex, 1)[0]; // This removes the selected key and stores it in selectedRadical
+            selectedRadicals.push(selectedRadical);
+        }
+
+        // Highlight rows for the selected radicals
+        selectedRadicals.forEach(function(radical) {
+            var rowsWithRadical = radicalToRowsMap[radical];
             if (rowsWithRadical.length > 0) {
-                var randomIndex = Math.floor(Math.random() * rowsWithRadical.length);
-                var chosenRow = rowsWithRadical[randomIndex];
+                var randomRowIndex = Math.floor(Math.random() * rowsWithRadical.length);
+                var chosenRow = rowsWithRadical[randomRowIndex];
                 chosenRow.style.backgroundColor = "yellow";
             }
         });
+        
+        // Display selected radicals as a string with spaces between them
+        var selectedRadicalsDiv = document.querySelector('.selectedRadicals');
+        if (selectedRadicalsDiv) {
+            selectedRadicalsDiv.textContent = "部首："+ selectedRadicals.join(' '); // Create a string with radicals separated by spaces
+        }
+        
     }
   </script>
 </body>
