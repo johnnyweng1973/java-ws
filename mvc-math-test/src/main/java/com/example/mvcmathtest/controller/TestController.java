@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ import com.example.mvcmathtest.util.ExcludeListGenerator;
 import com.example.mvcmathtest.util.TestSubjectType;
 import com.example.radical.ChineseCharacter;
 import com.example.radical.HanziRadicalCollection;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -78,15 +80,30 @@ public class TestController {
 			               @RequestParam TestSubjectType subject,
 			               @RequestParam(name = "category", required = false)String category,
 			               @RequestParam(name = "subcategory", required = false)String subcategory,
-			               @RequestParam(name = "noSpelling", defaultValue = "false")boolean noSpelling) {
-		String excludeListString = "1";
+			               @RequestParam(name = "para", required = false) String para) {
+		String contentString = "1";
 	    if (subject != TestSubjectType.chinese) {
 	    	// get all test problems
 			List<TestProblem> oldTestProblems = testProblemService.getBySubject(subject);
-			excludeListString = ExcludeListGenerator.generateExcludeList(oldTestProblems);
+			contentString = ExcludeListGenerator.generateExcludeList(oldTestProblems);
 	    }
-		// Make a POST request to the math problem service
-		List<TestProblem> testProblems = restService.fetchMathProblems(subject, category, subcategory, excludeListString);
+	    else {
+	        // Create contentString in JSON format for Chinese subject
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        try {
+	            // Create a map with only 'para' field
+	            Map<String, String> jsonMap = new HashMap<>();
+	            jsonMap.put("para", para);
+
+	            // Serialize map to JSON string
+	            contentString = objectMapper.writeValueAsString(jsonMap);
+	        } catch (JsonProcessingException e) {
+	            e.printStackTrace();
+	        }
+	    }
+		
+	    // Make a POST request to the math problem service
+		List<TestProblem> testProblems = restService.fetchMathProblems(subject, category, subcategory, contentString);
 		if (subject == TestSubjectType.chinese) {
 			log.info("categor is {}", category);
 		

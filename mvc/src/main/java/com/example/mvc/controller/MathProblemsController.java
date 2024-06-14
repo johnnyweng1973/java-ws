@@ -14,6 +14,9 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -261,42 +264,89 @@ public class MathProblemsController {
 		return "redirect:/math";
 	}
 	
-    @PostMapping("/test-rest")
-    public ResponseEntity<List<MathProblem>> handleRequestBody(
-    	    @RequestParam TestSubjectType subject,
-    	    @RequestParam(name = "category", required = false) String category,
-      	    @RequestParam(name = "subcategory", required = false) String subcategory,
-    	    @RequestBody String requestBody)
-    {
-    	try {
-    		 List<MathProblem> mathProblems;
-    		if (subject != TestSubjectType.chinese) {
+	@PostMapping("/test-rest")
+	public ResponseEntity<List<MathProblem>> handleRequestBody(
+	        @RequestParam TestSubjectType subject,
+	        @RequestParam(name = "category", required = false) String category,
+	        @RequestParam(name = "subcategory", required = false) String subcategory,
+	        @RequestBody String requestBody)
+	{
+	    List<MathProblem> mathProblems;
+
+	    if (subject != TestSubjectType.chinese) {
+	        try {
 	            // Convert the JSON string from the request body into a map
 	            Map<Long, List<Long>> requestBodyMap = objectMapper.readValue(
 	                    requestBody,
 	                    new TypeReference<Map<Long, List<Long>>>() {}
 	            );
 	            // Handle the map as needed (e.g., perform database queries)
-	            mathProblems = mathProblemService.findMathProblems(subject,category,subcategory, requestBodyMap);
+	            mathProblems = mathProblemService.findMathProblems(subject, category, subcategory, requestBodyMap);
+	            // Return the map in the response
+	            return ResponseEntity.ok(mathProblems);
+	        } catch (JsonParseException | JsonMappingException e) {
+	            // Handle JSON parsing or mapping exceptions
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+	        } catch (IOException e) {
+	            // Handle IO exceptions (including any other unexpected IO issues)
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	        }
-    		else {
-    			mathProblems = mathProblemService.findMathProblems(subject,category,subcategory, null);
-    		}
+	    } else {
+	        if ("练习".equals(category)) {
+	            // Handle the specific case for Chinese subject with 练习 category
+	            try {
+	                // Convert the JSON string from the request body into a map
+	                Map<String, String> map = objectMapper.readValue(
+	                        requestBody,
+	                        new TypeReference<Map<String, String>>() {}
+	                );
+	                // Handle specific logic for Chinese subject with 练习 category
+	                String paraValue = map.get("para");
+	                if (paraValue != null) {
+	                    // Parse the range
+	                    String[] rangeParts = paraValue.split("-");
+	                    if (rangeParts.length == 2) {
+	                        int start = Integer.parseInt(rangeParts[0].trim());
+	                        int end = Integer.parseInt(rangeParts[1].trim());
+	                        int pageSize = end - start + 1;
+	                        int pageNumber = start / pageSize;
 
-           
-            // Return the map in the response
-            return ResponseEntity.ok(mathProblems);
-        } catch (JsonParseException | JsonMappingException e) {
-            e.printStackTrace();
-            // Return a response for JSON parsing/mapping exception
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        } catch (IOException e) {
-            e.printStackTrace();
-            // Return a response for IO exception
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-    
+	                        // Fetch math problems from repository within the specified range using pageable
+	                        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+	                        Page<MathProblem> page = mathProblemService.findByCategoryWithPageable(category, pageable);
+	                        mathProblems = page.getContent();
+
+	                        // Return the page in the response
+	                        return ResponseEntity.ok(mathProblems);
+	                    } else {
+	                        // Handle invalid range format
+	                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+	                    }
+	                }
+	                // Since no math problems are retrieved here, assume an empty list
+	                mathProblems = Collections.emptyList();
+	                // Return an empty list in the response
+	                return ResponseEntity.ok(mathProblems);
+	            }catch (JsonParseException | JsonMappingException e) {
+		            // Handle JSON parsing or mapping exceptions
+		            e.printStackTrace();
+		            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+		        }catch (IOException e) {
+	                // Handle IO exceptions (including any other unexpected IO issues)
+	                e.printStackTrace();
+	                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	            }
+	        } else {
+	            // Handle other cases for Chinese subject where category is not 练习
+	            mathProblems = mathProblemService.findMathProblems(subject, category, subcategory, null);
+	            // Return the map in the response
+	            return ResponseEntity.ok(mathProblems);
+	        }
+	    }
+	}
+
     @PostMapping("/addAll")
 	@ResponseBody
 	public ResponseEntity<String> handleFormSubmission(@RequestBody String jsonData) {
