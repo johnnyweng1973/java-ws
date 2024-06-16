@@ -136,7 +136,7 @@ public class Ranking {
 
             // Form data with customized fields
             String formData = "subject=chinese&category=" + encodedCategory + "&mathSubCategory.name=" + encodedSubcategoryName +
-                              "&description=" + encodedDescription + "&solution=N/A&answer=N/A&multipleAnswers=false";
+                              "&description=" + encodedDescription + "&solution=&answer=&multipleAnswers=false";
 
             // Send the request
             try (OutputStream os = conn.getOutputStream()) {
