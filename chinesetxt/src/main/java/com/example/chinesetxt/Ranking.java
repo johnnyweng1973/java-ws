@@ -11,8 +11,8 @@ public class Ranking {
 
     public static void main(String[] args) {
         String charactersFile = "chinese-character.txt";
-        String sentencesFile = "jy-sentences.txt";
-        String outputFile = "jy-percentage-ranking-11.txt";
+        String sentencesFile = "zyj-sentences.txt";
+        String outputFile = "zyj-percentage-ranking-11.txt";
 
         try {
             String chineseCharacters = readChineseCharacters(charactersFile);
@@ -113,7 +113,7 @@ public class Ranking {
                 System.out.println("Sending POST request for sentence: " + description);
               
                 // Send POST request
-                String subcategoryName = String.valueOf(subcategoryDigit);
+                String subcategoryName = numberToChinese(subcategoryDigit);
                 sendPostRequest(urlString, subcategoryName, description);
             }
         }
@@ -151,5 +151,37 @@ public class Ranking {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
     }
+    public static String numberToChinese(int number) {
+        final String[] UNITS = {"", "十", "百", "千", "万"};
+        final String[] DIGITS = {"零", "一", "二", "三", "四", "五", "六", "七", "八", "九"};
+
+    	if (number < 0 || number >= 100) {
+            throw new IllegalArgumentException("Number must be between 0 and 99");
+        }
+
+        if (number == 0) {
+            return "零级";
+        }
+
+        StringBuilder chineseNumber = new StringBuilder();
+
+        if (number >= 10) {
+            int tens = number / 10;
+            if (tens > 1) {
+                chineseNumber.append(DIGITS[tens]);
+            }
+            chineseNumber.append("十");
+        }
+
+        int ones = number % 10;
+        if (ones > 0) {
+            chineseNumber.append(DIGITS[ones]);
+        }
+
+        chineseNumber.append("级");
+        return chineseNumber.toString();
+    }
+
 }
