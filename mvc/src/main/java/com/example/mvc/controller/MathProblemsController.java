@@ -317,6 +317,10 @@ public class MathProblemsController {
 	                        Pageable pageable = PageRequest.of(pageNumber, pageSize);
 	                        Page<MathProblem> page = mathProblemService.findByCategoryWithPageable(category, pageable);
 	                        mathProblems = page.getContent();
+	                        log.info("start {} end {}", start, end);
+	                        for (MathProblem problem: mathProblems) {
+	                        	log.info("problem: {}", problem.toString());
+	                        }
 
 	                        // Return the page in the response
 	                        return ResponseEntity.ok(mathProblems);

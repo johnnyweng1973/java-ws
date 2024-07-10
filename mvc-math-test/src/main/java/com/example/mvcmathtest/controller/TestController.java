@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import com.example.mvcmathtest.dto.MathProblemDTO;
+import com.example.mvcmathtest.model.DateRange;
 import com.example.mvcmathtest.model.TestProblem;
 import com.example.mvcmathtest.model.TimeStampedModel;
 import com.example.mvcmathtest.service.RestService;
@@ -167,6 +168,23 @@ public class TestController {
 		 log.info("record is {}", data.getData());
 		 return ResponseEntity.ok(data.getData());
 	 }
+	 
+
+    @GetMapping("/query")
+    public String queryPage() {
+        return "query_test";
+    }
+
+    @PostMapping("/query")
+    @ResponseBody
+    public List<TestProblem> queryProblems(@RequestBody DateRange dateRange) {
+        LocalDate startDate = LocalDate.parse(dateRange.getStartDate());
+        LocalDate endDate = LocalDate.parse(dateRange.getEndDate());
+        log.info("receive query start date {} end date is {}", startDate, endDate);
+        return testProblemService.findByTimestampBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+    }
+	 
 	
+	 
 	
 }

@@ -73,6 +73,10 @@ public class TestProblem {
     
     @Column(name = "multiple_answers")
     private boolean multipleAnswers;
+    
+    @Column(name = "audio_answer", columnDefinition = "BLOB")
+    private byte[] audioAnswer; // new field for storing audio data
+
   
     
  // Constructor
@@ -88,69 +92,7 @@ public class TestProblem {
         this.isCorrect = false;
         this.subject = dto.getSubject();
         this.multipleAnswers = dto.isMultipleAnswers();
+        this.audioAnswer = null;
     }
     
-    public static List<TestProblem> cloneAndModify(List<TestProblem> testProblems, boolean bRandomize) {
-        List<TestProblem> clonedProblems = new ArrayList<>();
-        Random random = new Random();
-
-        for (TestProblem originalProblem : testProblems) {
-            String originalDescription = originalProblem.getProblemDescription();
-            int length = originalDescription.length();
-
-            // Generate a sequence of integers from 0 to length - 1
-            List<Integer> indices = new ArrayList<>();
-            for (int i = 0; i < length; i++) {
-                indices.add(i);
-            }
-
-            // Shuffle the indices to randomize the order
-            shuffleList(indices);
-
-            for (int index = 0; index < length; index++) {
-            	
-            	log.info("index {} char{}", indices.get(index), originalDescription.charAt(indices.get(index)));
-                TestProblem clonedProblem = new TestProblem();
-                
-                String charString;
-                if (bRandomize) {
-                	charString = String.valueOf(originalDescription.charAt(indices.get(index)));
-                }
-                else {
-                	charString = String.valueOf(originalDescription.charAt(index));
-                }
-
-                // Set the problem description to the character at the shuffled index
-                clonedProblem.setProblemDescription(charString);
-
-                // Clone other fields using getters and setters
-                clonedProblem.setId(originalProblem.getId());
-                clonedProblem.setProblemId(originalProblem.getProblemId());
-                clonedProblem.setCategory(originalProblem.getCategory());
-                clonedProblem.setSubcategory(originalProblem.getSubcategory());
-                clonedProblem.setSubcategoryId(originalProblem.getSubcategoryId());
-                clonedProblem.setSolution(originalProblem.getSolution());
-                clonedProblem.setAnswer(originalProblem.getAnswer());
-                clonedProblem.setCorrect(originalProblem.isCorrect());
-                clonedProblem.setTimestamp(originalProblem.getTimestamp());
-                clonedProblem.setSubject(originalProblem.getSubject());
-                clonedProblem.setMultipleAnswers(originalProblem.isMultipleAnswers());
-
-                clonedProblems.add(clonedProblem);
-            }
-        }
-
-        return clonedProblems;
-    }
-
-    // Shuffle the given list
-    private static void shuffleList(List<Integer> list) {
-        Random random = new Random();
-        for (int i = list.size() - 1; i > 0; i--) {
-            int index = random.nextInt(i + 1);
-            int temp = list.get(index);
-            list.set(index, list.get(i));
-            list.set(i, temp);
-        }
-    }
-}
+   }

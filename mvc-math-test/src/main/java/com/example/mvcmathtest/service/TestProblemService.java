@@ -1,5 +1,6 @@
 package com.example.mvcmathtest.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,5 +41,9 @@ public class TestProblemService {
 
 	public List<TestProblem> getBySubject(TestSubjectType subject) {
 		return testProblemRepository.findBySubject(subject);
+	}
+	
+	public List<TestProblem> findByTimestampBetween(LocalDateTime startDateTime, LocalDateTime endDateTime){
+		return testProblemRepository.findByTimestampBetween(startDateTime, endDateTime);
 	}
 }
