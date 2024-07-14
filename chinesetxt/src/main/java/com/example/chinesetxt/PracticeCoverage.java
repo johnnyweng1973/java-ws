@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PracticeCoverage {
 
+	private static Map<Character, Integer> characterCount = new HashMap<>();
+    
 	public static String sendPostRequest(String urlString, String category, String subcategory, String subject, String requestBody) {
 	        StringBuilder descriptions = new StringBuilder();
 	        try {
@@ -77,7 +79,6 @@ public class PracticeCoverage {
 	    }
 	
 	 public static void countCharactersInFile(String concatenatedString, String filePath) throws IOException {
-	        Map<Character, Integer> characterCount = new HashMap<>();
 	        boolean startCounting = false;
 
 	        // Read lines from file until an empty line after "100%"
@@ -107,10 +108,22 @@ public class PracticeCoverage {
 	        }
 
 	        // Print character counts
-	        System.out.println("Character counts in relevant lines of the file:");
-	        for (Map.Entry<Character, Integer> entry : characterCount.entrySet()) {
-	            System.out.println(entry.getKey() + ": " + entry.getValue());
-	        }
+//	        System.out.println("Character counts in relevant lines of the file:");
+//	        characterCount.entrySet().stream()
+//            .sorted(Map.Entry.<Character, Integer>comparingByValue().reversed())
+//            .forEach(entry -> System.out.println(entry.getKey() + ": " + entry.getValue()));
+//	        
+	        // Create a new map<Integer, String> for counts to characters
+	        Map<Integer, String> countToCharacters = new HashMap<>();
+	        characterCount.forEach((character, count) -> {
+	            String currentChars = countToCharacters.getOrDefault(count, "");
+	            currentChars += character;
+	            countToCharacters.put(count, currentChars);
+	        });
+
+	        // Print the new map
+	        System.out.println("\nCharacters grouped by count:");
+	        countToCharacters.forEach((count, characters) -> System.out.println(count + ": " + characters + " (" + characters.length() + " characters)"));
 	    }
 
 	    // Helper method to count occurrences of a character in a string
@@ -133,12 +146,18 @@ public class PracticeCoverage {
         // Example usage
         String urlString = "http://localhost:8080/math/test-rest";
         String category = "生字";
-        String subcategory = "十级";
+        String subcategory = "全部";
         String subject="chinese";
         String requestBody="hello";
 
         String result = sendPostRequest(urlString, category, subcategory, subject, requestBody);
         System.out.println("Concatenated Descriptions: " + result);
-        countCharactersInFile(result,"zyj-percentage-ranking-10.txt");
+        countCharactersInFile(result,"zyj-percentage-ranking-13.txt");
+        countCharactersInFile(result,"pfsj-percentage-ranking-13.txt");
+        countCharactersInFile(result,"jy-percentage-ranking-13.txt");
+        countCharactersInFile(result,"jy2-percentage-ranking-13.txt");
+        countCharactersInFile(result,"jy3-percentage-ranking-13.txt");
+        countCharactersInFile(result,"jy4-percentage-ranking-13.txt");
+        countCharactersInFile(result,"sh-percentage-ranking-13.txt");
     }
 }

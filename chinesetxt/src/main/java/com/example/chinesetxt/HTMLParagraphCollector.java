@@ -4,8 +4,8 @@ import java.io.*;
 public class HTMLParagraphCollector {
     
     public static void main(String[] args) {
-        String inputFile = "jy.txt";
-        String outputFile = "jy-clean.txt";
+        String inputFile = "sh.txt";
+        String outputFile = "sh-clean.txt";
         
         try {
             collectParagraphs(inputFile, outputFile);

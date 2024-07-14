@@ -51,8 +51,8 @@ public class EpubConverter {
 
     public static void main(String[] args) {
         
-        String epubFilePath = "jy.epub";
-        String txtFilePath = "jy.txt";
+        String epubFilePath = "sh.epub";
+        String txtFilePath = "sh.txt";
 
         convertEpubToTxt(epubFilePath, txtFilePath);
     }

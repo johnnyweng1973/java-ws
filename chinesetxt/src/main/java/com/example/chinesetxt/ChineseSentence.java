@@ -5,8 +5,8 @@ import java.util.*;
 public class ChineseSentence {
 
     public static void main(String[] args) {
-        String inputFile = "jy-clean.txt";
-        String outputFile = "sorted_separated_sentences.txt";
+        String inputFile = "sh-clean.txt";
+        String outputFile = "sh-sentences.txt";
 
         try {
             Map<Integer, List<String>> sentenceMap = extractAndStoreSentences(inputFile);

@@ -30,6 +30,7 @@
         }
     </style>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
 </head>
 <body>
   <div class="container my-5">
@@ -55,7 +56,7 @@
                         <!-- Hidden fields for other properties -->
                          <input type="hidden" th:value="${problem.id}" name="id"/>
                         <input type="hidden" th:value="${problem.problemId}" name="problemId"/>
-                        <input type="hidden"th:value="${problem.category}" name="category"/>
+                        <input type="hidden" th:value="${problem.category}" name="category"/>
                         <input type="hidden" th:value="${problem.subcategory}" name="subcategory"/>
                         <input type="hidden" th:value="${problem.subcategoryId}" name="subcategoryId"/>
                         </td>
@@ -89,9 +90,9 @@
         document.querySelectorAll('tr').forEach(function(row, index) {
             
             if (index >= 1){
-                var problem = {};
-                problem['subject']="chinese";
-                 // Retrieve problemDescription from the row using the new class name
+            	var problem = {};
+            	problem['subject']="chinese";
+            	 // Retrieve problemDescription from the row using the new class name
                 var problemDescription = row.querySelector('.problem-description').textContent;
                 problem['problemDescription'] = problemDescription.trim();
              // Retrieve solution from the textarea
@@ -128,7 +129,7 @@
             },
             body: JSON.stringify(formData)
         }).then(response => {
-                  window.location.href = '/test-success';
+        		  window.location.href = '/test-success';
         }).catch(error => {
             // Handle error
             console.error('Error:', error);
@@ -136,8 +137,7 @@
     }
     
     // Audio recording
-    let mediaRecorder;
-    let audioChunks;
+    let recordRTC;
 
     function startRecording(button) {
         const row = button.closest('tr');
@@ -146,47 +146,42 @@
 
         navigator.mediaDevices.getUserMedia({ audio: true })
             .then(stream => {
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
+                recordRTC = RecordRTC(stream, {
+                    type: 'audio',
+                    mimeType: 'audio/webm',
+                    desiredSampRate: 8000, // Lower bitrate
+                    recorderType: StereoAudioRecorder,
+                    numberOfAudioChannels: 1
+                });
 
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-
-                mediaRecorder.onstop = () => {
-                    if (audioChunks.length > 0) {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                        alert('Audio data size: ' + audioBlob.size + ' bytes'); // Alert the size of the audio data
-                        const reader = new FileReader();
-                        reader.readAsDataURL(audioBlob);
-                        reader.onloadend = () => {
-                            const base64String = reader.result.split(',')[1];
-                            row.querySelector('input[name="audioAnswer"]').value = base64String;
-                            row.querySelector('audio').src = reader.result;
-                            row.querySelector('audio').hidden = false;
-                            row.querySelector('button[onclick="playRecording(this)"]').disabled = false;
-                        };
-                    } else {
-                        alert('No audio data available.');
-                    }
-                };
-
-                mediaRecorder.start();
+                recordRTC.startRecording();
             })
             .catch(error => {
                 console.error('Error accessing media devices.', error);
-                alert('Error accessing media devices: ' + error.message);
             });
     }
 
     function stopRecording(button) {
+        const row = button.closest('tr');
         button.previousElementSibling.disabled = false;
         button.disabled = true;
 
-        if (mediaRecorder) {
-            mediaRecorder.stop();
+        if (recordRTC) {
+            recordRTC.stopRecording(() => {
+                let audioBlob = recordRTC.getBlob();
+                alert('Audio data size: ' + audioBlob.size + ' bytes'); // Alert the size of the audio data
+                const reader = new FileReader();
+                reader.readAsDataURL(audioBlob);
+                reader.onloadend = () => {
+                    const base64String = reader.result.split(',')[1];
+                    row.querySelector('input[name="audioAnswer"]').value = base64String;
+                    row.querySelector('audio').src = reader.result;
+                    row.querySelector('audio').hidden = false;
+                    row.querySelector('button[onclick="playRecording(this)"]').disabled = false;
+                };
+            });
         } else {
-            alert('MediaRecorder not initialized.');
+            alert('RecordRTC not initialized.');
         }
     }
 
@@ -194,14 +189,7 @@
         const row = button.closest('tr');
         const audio = row.querySelector('audio');
         if (audio) {
-            alert('Playing audio.');
-            audio.play().then(() => {
-                alert('Audio is playing.');
-            }).catch(error => {
-                alert('Error playing audio: ' + error.message);
-            });
-        } else {
-            alert('No audio element found.');
+            audio.play();
         }
     }
     

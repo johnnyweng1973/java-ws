@@ -74,7 +74,7 @@ public class TestProblem {
     @Column(name = "multiple_answers")
     private boolean multipleAnswers;
     
-    @Column(name = "audio_answer", columnDefinition = "BLOB")
+    @Column(name = "audio_answer", columnDefinition = "LONGBLOB")
     private byte[] audioAnswer; // new field for storing audio data
 
   

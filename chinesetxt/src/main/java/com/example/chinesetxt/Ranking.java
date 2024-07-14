@@ -11,8 +11,8 @@ public class Ranking {
 
     public static void main(String[] args) {
         String charactersFile = "chinese-character.txt";
-        String sentencesFile = "pfsj-sentences.txt";
-        String outputFile = "pfsj-percentage-ranking-13.txt";
+        String sentencesFile = "sh-sentences.txt";
+        String outputFile = "sh-percentage-ranking-13.txt";
 
         try {
             String chineseCharacters = readChineseCharacters(charactersFile);
@@ -92,9 +92,16 @@ public class Ranking {
     }
 
     public static int extractDigitFromFileName(String filename) {
-        // Extract digit from filename
-        String digitStr = filename.replaceAll("\\D", "");
-        return digitStr.isEmpty() ? 0 : Integer.parseInt(digitStr);
+        // Use regular expression to find the digits between an underscore and a dot
+        String digitStr = filename.replaceAll(".*-(\\d+)\\..*", "$1");
+
+        // If no digits are found, return 0
+        if (digitStr.isEmpty()) {
+            return 0;
+        }
+        
+        // Parse the extracted string of digits into an integer
+        return Integer.parseInt(digitStr);
     }
 
     public static void sendPostRequests(Map<Integer, List<String>> percentageMap, String urlString, int subcategoryDigit) {
