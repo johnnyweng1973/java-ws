@@ -11,8 +11,8 @@ public class Ranking {
 
     public static void main(String[] args) {
         String charactersFile = "chinese-character.txt";
-        String sentencesFile = "sh-sentences.txt";
-        String outputFile = "sh-percentage-ranking-13.txt";
+        String sentencesFile = "sentences.txt";
+        String outputFile = "percentage-ranking-13.txt";
 
         try {
             String chineseCharacters = readChineseCharacters(charactersFile);
@@ -128,7 +128,7 @@ public class Ranking {
     public static void sendPostRequest(String urlString, String subcategoryName, String description) {
         try {
             // Constant category
-            String category = "练习";
+            String category = "备选练习";
 
             // Encode the parameters
             String encodedCategory = URLEncoder.encode(category, StandardCharsets.UTF_8.toString());

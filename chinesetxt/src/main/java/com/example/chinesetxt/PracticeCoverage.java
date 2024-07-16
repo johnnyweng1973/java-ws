@@ -158,6 +158,6 @@ public class PracticeCoverage {
         countCharactersInFile(result,"jy2-percentage-ranking-13.txt");
         countCharactersInFile(result,"jy3-percentage-ranking-13.txt");
         countCharactersInFile(result,"jy4-percentage-ranking-13.txt");
-        countCharactersInFile(result,"sh-percentage-ranking-13.txt");
+        countCharactersInFile(result,"percentage-ranking-13.txt");
     }
 }

@@ -94,6 +94,13 @@ public class MathProblemsController {
         return "general_table";
 	}
 	
+	@GetMapping("/choose")
+	public String getChoosePage()
+	{
+        return "choose_practice";
+	}
+
+	
 	@GetMapping("/general/data")
 	public ResponseEntity<List<MathProblem>> general(
 		@RequestParam(name = "table") String tableName, 

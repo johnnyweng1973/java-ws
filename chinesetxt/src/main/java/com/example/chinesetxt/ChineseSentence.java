@@ -18,6 +18,25 @@ public class ChineseSentence {
         }
     }
 
+    public static void extractAndStoreSentences(
+    		String inputFile,
+    		Map<Integer, List<String>> sentenceMap) throws IOException
+    {
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                List<String> sentences = extractSentencesFromLine(line);
+                for (String sentence : sentences) {
+                    int length = sentence.length();
+                    if (!isSentenceDuplicate(sentenceMap, length, sentence)) {
+                        sentenceMap.computeIfAbsent(length, k -> new ArrayList<>()).add(sentence);
+                    }
+                }
+            }
+        }
+    }
+
+    
     public static Map<Integer, List<String>> extractAndStoreSentences(String inputFile) throws IOException {
         Map<Integer, List<String>> sentenceMap = new TreeMap<>();
         try (BufferedReader reader = new BufferedReader(new FileReader(inputFile))) {

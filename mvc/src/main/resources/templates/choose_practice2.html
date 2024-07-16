@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Problem Table</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .table tbody tr {
+            height: 100px; /* Adjust the height as needed */
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2>Problem Table</h2>
+    <textarea id="sortingTextArea" class="form-control mb-2" rows="3" placeholder="Enter text for character count..."></textarea>
+    <button id="countCharactersButton" class="btn btn-primary mb-2">Count Characters</button>
+    <div id="outputWindow" class="alert alert-secondary" role="alert"></div>
+    <button id="updateSelectedButton" style="width: 100%; background-color: blue; color: white; margin-bottom: 10px;">Update Selected</button>
+    
+    <!-- Problem table will be added dynamically here -->
+    <div id="problemTableContainer"></div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+$(document).ready(function(){
+    var problemData = []; // Store problem data globally
+
+    // Function to fetch problem data from service endpoint
+    function fetchProblemData(table, subject) {
+        $.ajax({
+            url: '/math/general/data?table=' + table + '&subject=' + subject,
+            type: 'GET',
+            success: function(response) {
+                problemData = response;
+                populateProblemTable(problemData);
+            },
+            error: function(error) {
+                console.error('Error fetching problem data:', error);
+            }
+        });
+    }
+
+    // Function to populate the problem table with data
+    function populateProblemTable(data) {
+        // Clear existing problem table
+        $('#problemTableContainer').empty();
+
+        // Create problem table
+        var problemTable = $('<div class="table-responsive"><table class="table table-bordered"><thead><tr><th></th><th>Index</th><th>ID</th><th>Subject</th><th>Description</th><th>Solution</th><th>Category</th><th>Subcategory</th><th>Subcategory ID</th><th>Importance</th></tr></thead><tbody></tbody></table></div>');
+        var problemTableBody = problemTable.find('tbody');
+
+        // Populate problem table rows
+        data.forEach(function(problem, index) {
+            var row = $('<tr><td><input type="checkbox" class="problem-checkbox" value="' + problem.id + '"></td><td>' + (index + 1) + '</td><td class="problem-id">' + problem.id + '</td><td class="problem-subject" contenteditable="true">' + problem.subject + '</td><td class="problem-description" contenteditable="true">' + problem.description + '</td><td class="problem-solution" contenteditable="true">' + problem.solution + '</td><td class="problem-category" contenteditable="true">' + problem.category + '</td><td class="problem-subcategory" contenteditable="true">' + problem.mathSubCategory.name + '</td><td class="problem-subcategory-id" contenteditable="true">' + problem.mathSubCategory.id + '</td><td class="problem-importance" contenteditable="true">' + problem.importance + '</td></tr>');
+            problemTableBody.append(row);
+        });
+
+        // Append problem table to container
+        $('#problemTableContainer').append(problemTable);
+    }
+
+    // Function to count character appearances in all descriptions
+    function countCharAppearances(data, text) {
+        var charCounts = {};
+        text.split('').forEach(function(char) {
+            charCounts[char] = 0;
+        });
+
+        data.forEach(function(problem) {
+            var description = problem.description;
+            for (var i = 0; i < text.length; i++) {
+                var char = text[i];
+                if (description.includes(char)) {
+                    charCounts[char]++;
+                }
+            }
+        });
+        return charCounts;
+    }
+
+    // Function to display character counts in ascending order
+    function displayCharCounts(charCounts) {
+        var sortedCounts = {};
+        Object.keys(charCounts).sort((a, b) => charCounts[a] - charCounts[b]).forEach(function(key) {
+            if (!sortedCounts[charCounts[key]]) {
+                sortedCounts[charCounts[key]] = [];
+            }
+            sortedCounts[charCounts[key]].push(key);
+        });
+
+        var output = '';
+        Object.keys(sortedCounts).forEach(function(count) {
+            output += count + ': ' + sortedCounts[count].join(', ') + '<br>';
+        });
+
+        $('#outputWindow').html(output);
+    }
+
+    // Event handler for count characters button
+    $('#countCharactersButton').click(function() {
+        var text = $('#sortingTextArea').val();
+        var charCounts = countCharAppearances(problemData, text);
+        displayCharCounts(charCounts);
+    });
+
+    // Call the function to fetch problem data when the document is ready
+    fetchProblemData('math_problem', 'tmp');
+
+    // Register click function for "Update Selected" button
+    $('#updateSelectedButton').click(function() {
+        var selectedProblems = [];
+        $('#problemTableContainer').find('.problem-checkbox:checked').each(function() {
+            var problemRow = $(this).closest('tr');
+            var problem = {
+                id: problemRow.find('.problem-id').text(),
+                subject: problemRow.find('.problem-subject').text(),
+                description: problemRow.find('.problem-description').text(),
+                solution: problemRow.find('.problem-solution').text(),
+                category: problemRow.find('.problem-category').text(),
+                mathSubCategory: {
+                    id: problemRow.find('.problem-subcategory-id').text(),
+                    name: problemRow.find('.problem-subcategory').text()
+                },
+                importance: problemRow.find('.problem-importance').text()
+            };
+            selectedProblems.push(problem);
+        });
+
+        // Send selected problems to server for update
+        $.ajax({
+            url: '/math/update-all',
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(selectedProblems),
+            success: function(response) {
+                console.log('Successfully updated problems:', response);
+                window.alert("update success");
+                // Uncheck checkboxes of updated rows
+                $('#problemTableContainer').find('.problem-checkbox:checked').prop('checked', false);
+            },
+            error: function(error) {
+                console.error('Error updating problems:', error);
+                window.alert("update error");
+                // Optionally, you can display an error message here
+            }
+        });
+    });
+
+});
+</script>
+
+</body>
+</html>
