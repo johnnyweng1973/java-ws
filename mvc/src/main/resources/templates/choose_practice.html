@@ -21,6 +21,20 @@
     <button id="sortTableButton" class="btn btn-secondary mb-2">Sort Table</button>
     <button id="updateSelectedButton" style="width: 100%; background-color: blue; color: white; margin-bottom: 10px;">Update Selected</button>
     
+    <!-- Dropdowns for subject and category -->
+    <div class="mb-2">
+        <select id="subjectDropdown" class="form-control mb-2">
+            <option value="chinese">Chinese</option>
+            <option value="tmp">Temporary</option>
+        </select>
+        <select id="categoryDropdown" class="form-control mb-2">
+            <option value="练习">练习</option>
+            <option value="备选练习1">备选练习</option>
+        </select>
+    </div>
+    
+    <button id="fetchProblemDataButton" class="btn btn-success mb-2">Fetch Problem Data</button>
+    
     <!-- Problem table will be added dynamically here -->
     <div id="problemTableContainer"></div>
 </div>
@@ -34,9 +48,9 @@ $(document).ready(function(){
     var problemData = []; // Store problem data globally
 
     // Function to fetch problem data from service endpoint
-    function fetchProblemData(table, subject) {
+    function fetchProblemData(table, subject, category) {
         $.ajax({
-            url: '/math/general/data?table=' + table + '&subject=' + subject,
+            url: '/math/general/data?table=' + table + '&subject=' + subject + '&category=' + category,
             type: 'GET',
             success: function(response) {
                 problemData = response;
@@ -155,8 +169,12 @@ $(document).ready(function(){
         sortTableBasedOnOutput();
     });
 
-    // Call the function to fetch problem data when the document is ready
-    fetchProblemData('math_problem', 'tmp');
+    // Event handler for fetch problem data button
+    $('#fetchProblemDataButton').click(function() {
+        var selectedSubject = $('#subjectDropdown').val();
+        var selectedCategory = $('#categoryDropdown').val();
+        fetchProblemData('math_problem', selectedSubject, selectedCategory);
+    });
 
     // Register click function for "Update Selected" button
     $('#updateSelectedButton').click(function() {

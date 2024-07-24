@@ -10,23 +10,68 @@ import java.util.*;
 public class Ranking {
 
     public static void main(String[] args) {
-        String charactersFile = "chinese-character.txt";
-        String sentencesFile = "sentences.txt";
-        String outputFile = "percentage-ranking-13.txt";
+    	createPercentageFile(15);
+    	createSecondPercentageFile(15);
+    }
+    public static void createPercentageFile(int level) {
+        String[] sentencesFiles = {"jy1-sentences.txt", "pfsj-sentences.txt", "zyj-sentences.txt"};
+        String[] outputFiles = {
+            "jy1-percentage-ranking-" + level + ".txt",
+            "pfsj-percentage-ranking-" + level + ".txt",
+            "zyj-percentage-ranking-" + level + ".txt"
+        };
+        String[] outputRankingFiles = {
+            "jy1-ranking-" + level + ".txt",
+            "pfsj-ranking-" + level + ".txt",
+            "zyj-ranking-" + level + ".txt"
+        };
+        
+        List<String> filenames = List.of(outputRankingFiles);
+        String outputMainRankingFile = "main-ranking-" + level + ".txt";
+        String prevOutputMainRankingFile = "main-ranking-" + (level - 1) + ".txt";
+        String outputMainDeltaFile = "delta-main-ranking-" + level + ".txt";
+        
+        String chineseCharacters = PracticeCoverage.requestChinese("生字", "全部");
+        Map<Integer, List<String>> percentageMap;
 
         try {
-            String chineseCharacters = readChineseCharacters(charactersFile);
-            Map<Integer, List<String>> percentageMap = calculateCharacterPercentages(sentencesFile, chineseCharacters);
-            writePercentageRanking(percentageMap, outputFile);
-            int subcategoryDigit = extractDigitFromFileName(outputFile);
-            sendPostRequests(percentageMap, "http://localhost:8080/math/add", subcategoryDigit);
-            System.out.println("Character percentage ranking has been written to " + outputFile);
+            for (int i = 0; i < sentencesFiles.length; i++) {
+                percentageMap = calculateCharacterPercentages(sentencesFiles[i], chineseCharacters);
+                writePercentageRanking(percentageMap, outputFiles[i]);
+                System.out.println("Character percentage ranking has been written to " + outputFiles[i]);
+                PracticeCoverage.processLinesBetweenPercentages(outputFiles[i], outputRankingFiles[i], "");
+            }
+            
+            PracticeCoverage.combineFiles(filenames, outputMainRankingFile);
+            PracticeCoverage.createDeltaFile(outputMainDeltaFile, outputMainRankingFile, prevOutputMainRankingFile);
         } catch (IOException e) {
-            System.err.println("An error occurred: " + e.getMessage());
             e.printStackTrace();
         }
     }
+    
+    public static void createSecondPercentageFile(int level) {
+        String sentencesFile1 = "epubfolder-sentences.txt";
+        String outputFile1 = "epubfolder-percentage-ranking-" + level + ".txt";
+        String outputRankingFile1 = "epubfolder-ranking-" + level + ".txt";
+        String outputMainRankingFile = "epubfolder-ranking-" + level + ".txt";
+        String prevOutputMainRankingFile = "epubfolder-ranking-" + (level - 1) + ".txt";
+        String outputMainDeltaFile = "delta-epubfolder-ranking-" + level + ".txt";
 
+        String chineseCharacters = PracticeCoverage.requestChinese("生字", "全部");
+        Map<Integer, List<String>> percentageMap;
+
+        try {
+            percentageMap = calculateCharacterPercentages(sentencesFile1, chineseCharacters);
+            writePercentageRanking(percentageMap, outputFile1);
+            System.out.println("Character percentage ranking has been written to " + outputFile1);
+
+            PracticeCoverage.processLinesBetweenPercentages(outputFile1, outputRankingFile1, "");
+            PracticeCoverage.createDeltaFile(outputMainDeltaFile, outputMainRankingFile, prevOutputMainRankingFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public static String readChineseCharacters(String filename) throws IOException {
         StringBuilder chineseCharacters = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
@@ -128,7 +173,7 @@ public class Ranking {
     public static void sendPostRequest(String urlString, String subcategoryName, String description) {
         try {
             // Constant category
-            String category = "备选练习";
+            String category = "练习";
 
             // Encode the parameters
             String encodedCategory = URLEncoder.encode(category, StandardCharsets.UTF_8.toString());

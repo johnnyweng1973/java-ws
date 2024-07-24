@@ -18,7 +18,7 @@ public class EpubToSentences {
         String tmpFilePath2 = "tmp2.txt";
 
         // Output file in resources directory
-        String outputFilePath = "sentences.txt";
+        String outputFilePath = "epubfolder-sentences.txt";
 
 
         if (epubDirectory == null) {

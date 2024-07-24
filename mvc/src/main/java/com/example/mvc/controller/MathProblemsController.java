@@ -103,14 +103,18 @@ public class MathProblemsController {
 	
 	@GetMapping("/general/data")
 	public ResponseEntity<List<MathProblem>> general(
-		@RequestParam(name = "table") String tableName, 
-		@RequestParam(name = "subject") TestSubjectType subject)
+	    @RequestParam(name = "table") String tableName, 
+	    @RequestParam(name = "subject") TestSubjectType subject,
+	    @RequestParam(name = "category", required = false) String category)
 	{
 	    if ("math_problem".equals(tableName)) {
-	    	 return ResponseEntity.ok(mathProblemService.findBySubject(subject));
-	    }
-	    else {
-	    	 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+	        if (category == null || category.isEmpty()) {
+	            return ResponseEntity.ok(mathProblemService.findBySubject(subject));
+	        } else {
+	            return ResponseEntity.ok(mathProblemService.findBySubjectAndCategory(subject, category));
+	        }
+	    } else {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
 	    }
 	}
 
@@ -301,7 +305,7 @@ public class MathProblemsController {
 	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 	        }
 	    } else {
-	        if ("练习".equals(category)) {
+	        if ("练习".equals(category) && (subcategory == null || subcategory.isEmpty())) {
 	            // Handle the specific case for Chinese subject with 练习 category
 	            try {
 	                // Convert the JSON string from the request body into a map

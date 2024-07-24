@@ -149,5 +149,9 @@ public class MathProblemService {
 	public Page<MathProblem> findByCategoryWithPageable(String category, Pageable pageable) {
         return mathProblemsRepository.findByCategory(category, pageable);
 	}
+
+	public List<MathProblem> findBySubjectAndCategory(TestSubjectType subject, String category) {
+		return  mathProblemsRepository.findBySubjectAndCategory(subject, category);
+	}
 			
 }

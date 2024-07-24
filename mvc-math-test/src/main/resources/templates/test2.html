@@ -63,7 +63,7 @@
 	                    // Extract the parameter by taking the substring after '练习' and removing spaces
 	                    const param = line.split('练习')[1].trim().replace(/\s+/g, '');
 	                    // Replace the entire line with a clickable HTTP link
-	                    const replacedLine = `<a href="/test_subject?subject=chinese&category=练习&subcategory=全部&para=${encodeURIComponent(param)}">${line}</a>`;
+	                    const replacedLine = `<a href="/test_subject?subject=chinese&category=练习&para=${encodeURIComponent(param)}">${line}</a>`;
 	                    return replacedLine;
 	                } else {
 	                    return line;
