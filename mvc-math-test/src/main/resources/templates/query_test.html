@@ -37,6 +37,7 @@
                     <th>Solution</th>
                     <th>Answer</th>
                     <th>Audio Answer</th>
+                    <th>Radical</th>
                     <th>Timestamp</th>
                 </tr>
             </thead>
@@ -113,6 +114,11 @@
                     audioAnswerCell.appendChild(playButton);
                 }
                 row.appendChild(audioAnswerCell);
+
+                var radicalCell = document.createElement("td");
+                radicalCell.className = "framed-cell";
+                radicalCell.textContent = record.radical ? 'Yes' : 'No';
+                row.appendChild(radicalCell);
                 
                 var timestampCell = document.createElement("td");
                 timestampCell.className = "framed-cell";

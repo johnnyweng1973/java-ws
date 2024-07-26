@@ -214,6 +214,10 @@
                 problem['category'] = getValueFromInput(row.querySelector('input[name="category"]'));
                 problem['subcategory'] = getValueFromInput(row.querySelector('input[name="subcategory"]'));
                 problem['subcategoryId'] = getValueFromInput(row.querySelector('input[name="subcategoryId"]'));
+                // Check if the row's background color is yellow
+                var backgroundColor = row.style.backgroundColor;
+                problem['radical'] = (backgroundColor === 'yellow');
+
                 formData.push(problem);
             }
         });

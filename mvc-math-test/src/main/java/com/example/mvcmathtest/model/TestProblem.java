@@ -77,7 +77,9 @@ public class TestProblem {
     @Column(name = "audio_answer", columnDefinition = "LONGBLOB")
     private byte[] audioAnswer; // new field for storing audio data
 
-  
+    @Column(name = "radical")
+    private boolean radical; 
+
     
  // Constructor
     public TestProblem(MathProblemDTO dto) {
@@ -93,6 +95,7 @@ public class TestProblem {
         this.subject = dto.getSubject();
         this.multipleAnswers = dto.isMultipleAnswers();
         this.audioAnswer = null;
+        this.radical = false;
     }
     
    }
