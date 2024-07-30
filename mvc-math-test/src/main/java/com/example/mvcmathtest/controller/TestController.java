@@ -140,25 +140,30 @@ public class TestController {
 	@PostMapping("/test")
 	@ResponseBody
 	public ResponseEntity<String> handleFormSubmission(@RequestBody String jsonData) {
-		List<TestProblem> testProblems = new ArrayList<>();
-		try {
-			// MyClass myInstance = objectMapper.readValue(jsonData, MyClass.class);
-			List<TestProblem> problems = objectMapper.readValue(jsonData, new TypeReference<List<TestProblem>>() {
-			});
-		    
-			// Setting the date with current system date after deserialization
-			problems.forEach(problem -> problem.setTimestamp(LocalDateTime.now()));
+	    List<TestProblem> testProblems = new ArrayList<>();
+	    try {
+	        // Log the input JSON data
+	        System.out.println("Received JSON data: " + jsonData);
 
-			// Save all entities to the database as a batch operation
-			testProblemService.saveAll(problems);
+	        // Deserialize the JSON data
+	        List<TestProblem> problems = objectMapper.readValue(jsonData, new TypeReference<List<TestProblem>>() {});
 
-			// Return a success message
-			String message = "Form submitted successfully";
-			return ResponseEntity.status(HttpStatus.OK).body(message);
-		} catch (Exception e) {
-			// Handle any exceptions that occur during JSON decoding
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing JSON data");
-		}
+	        // Setting the date with current system date after deserialization
+	        problems.forEach(problem -> problem.setTimestamp(LocalDateTime.now()));
+
+	        // Save all entities to the database as a batch operation
+	        testProblemService.saveAll(problems);
+
+	        // Return a success message
+	        String message = "Form submitted successfully";
+	        return ResponseEntity.status(HttpStatus.OK).body(message);
+	    } catch (Exception e) {
+	        // Log the exception details
+	        e.printStackTrace();
+
+	        // Return error message
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error processing JSON data");
+	    }
 	}
 	
 	 @GetMapping("/latestChineseObjective")

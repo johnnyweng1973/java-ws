@@ -80,7 +80,9 @@ public class TestProblem {
     @Column(name = "radical")
     private boolean radical; 
 
-    
+    @Column(name = "canvas", columnDefinition = "LONGBLOB")
+    private byte[] canvas; // new field for storing audio data
+
  // Constructor
     public TestProblem(MathProblemDTO dto) {
     	this.id = (long) 0;
@@ -96,6 +98,7 @@ public class TestProblem {
         this.multipleAnswers = dto.isMultipleAnswers();
         this.audioAnswer = null;
         this.radical = false;
+        this.canvas = null;
     }
     
    }

@@ -39,6 +39,7 @@
                     <th>Audio Answer</th>
                     <th>Radical</th>
                     <th>Timestamp</th>
+                    <th>Canvas</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
@@ -75,58 +76,77 @@
         }
         
         function populateTable(data) {
-            var tableBody = document.getElementById("tableBody");
-            tableBody.innerHTML = "";
-            
-            data.forEach(function(record) {
-                var row = document.createElement("tr");
-                
-                var problemDescriptionCell = document.createElement("td");
-                problemDescriptionCell.className = "framed-cell";
-                problemDescriptionCell.textContent = record.problemDescription;
-                row.appendChild(problemDescriptionCell);
-                
-                var solutionCell = document.createElement("td");
-                solutionCell.className = "framed-cell";
-                solutionCell.textContent = record.solution;
-                row.appendChild(solutionCell);
-                
-                var answerCell = document.createElement("td");
-                answerCell.className = "framed-cell";
-                answerCell.textContent = record.answer;
-                row.appendChild(answerCell);
-                
-                var audioAnswerCell = document.createElement("td");
-                audioAnswerCell.className = "framed-cell audio-answer";
-                if (record.audioAnswer) {
-                    var audioElement = document.createElement("audio");
-                    audioElement.controls = true;
-                    var sourceElement = document.createElement("source");
-                    sourceElement.src = 'data:audio/wav;base64,' + record.audioAnswer;
-                    sourceElement.type = 'audio/wav';
-                    audioElement.appendChild(sourceElement);
-                    audioAnswerCell.appendChild(audioElement);
-                } else {
-                    var playButton = document.createElement("button");
-                    playButton.type = "button";
-                    playButton.textContent = "No Audio";
-                    playButton.disabled = true;
-                    audioAnswerCell.appendChild(playButton);
-                }
-                row.appendChild(audioAnswerCell);
-
-                var radicalCell = document.createElement("td");
-                radicalCell.className = "framed-cell";
-                radicalCell.textContent = record.radical ? 'Yes' : 'No';
-                row.appendChild(radicalCell);
-                
-                var timestampCell = document.createElement("td");
-                timestampCell.className = "framed-cell";
-                timestampCell.textContent = record.timestamp;
-                row.appendChild(timestampCell);
-                
-                tableBody.appendChild(row);
-            });
+		    var tableBody = document.getElementById("tableBody");
+		    tableBody.innerHTML = "";
+		    
+		    data.forEach(function(record) {
+		        var row = document.createElement("tr");
+		        
+		        var problemDescriptionCell = document.createElement("td");
+		        problemDescriptionCell.className = "framed-cell";
+		        problemDescriptionCell.textContent = record.problemDescription;
+		        row.appendChild(problemDescriptionCell);
+		        
+		        var solutionCell = document.createElement("td");
+		        solutionCell.className = "framed-cell";
+		        solutionCell.textContent = record.solution;
+		        row.appendChild(solutionCell);
+		        
+		        var answerCell = document.createElement("td");
+		        answerCell.className = "framed-cell";
+		        answerCell.textContent = record.answer;
+		        row.appendChild(answerCell);
+		        
+		        var audioAnswerCell = document.createElement("td");
+		        audioAnswerCell.className = "framed-cell audio-answer";
+		        if (record.audioAnswer) {
+		            var audioElement = document.createElement("audio");
+		            audioElement.controls = true;
+		            var sourceElement = document.createElement("source");
+		            sourceElement.src = 'data:audio/wav;base64,' + record.audioAnswer;
+		            sourceElement.type = 'audio/wav';
+		            audioElement.appendChild(sourceElement);
+		            audioAnswerCell.appendChild(audioElement);
+		        } else {
+		            var playButton = document.createElement("button");
+		            playButton.type = "button";
+		            playButton.textContent = "No Audio";
+		            playButton.disabled = true;
+		            audioAnswerCell.appendChild(playButton);
+		        }
+		        row.appendChild(audioAnswerCell);
+		
+		        var radicalCell = document.createElement("td");
+		        radicalCell.className = "framed-cell";
+		        radicalCell.textContent = record.radical ? 'Yes' : 'No';
+		        row.appendChild(radicalCell);
+		        
+		        var timestampCell = document.createElement("td");
+		        timestampCell.className = "framed-cell";
+		        timestampCell.textContent = record.timestamp;
+		        row.appendChild(timestampCell);
+		
+		        // Canvas image cell
+		        var canvasCell = document.createElement("td");
+		        canvasCell.className = "framed-cell";
+		        if (record.canvas) {
+		            var canvas = document.createElement("canvas");
+		            var ctx = canvas.getContext("2d");
+		            var img = new Image();
+		            img.onload = function() {
+		                canvas.width = img.width;
+		                canvas.height = img.height;
+		                ctx.drawImage(img, 0, 0);
+		                canvasCell.appendChild(canvas);
+		            };
+		            img.src = 'data:image/png;base64,' + record.canvas;
+		        } else {
+		            canvasCell.textContent = "No Image";
+		        }
+		        row.appendChild(canvasCell);
+		        
+		        tableBody.appendChild(row);
+           });
         }
     </script>
 </body>
