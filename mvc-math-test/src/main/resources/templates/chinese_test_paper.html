@@ -183,7 +183,7 @@
                     problem['problemDescription'] = problemDescription.trim();
                     var solutionTextarea = row.querySelector('textarea[name="solution"]');
                     problem['solution'] = solutionTextarea ? solutionTextarea.value : null;
-                    var answerInput = row.querySelector('input[name="answer"]');
+                    var answerInput = row.querySelector('textarea[name="answer"]');
                     problem['answer'] = answerInput ? answerInput.value : null;
                     var answerCanvas = row.querySelector('canvas');
                     if (answerCanvas) {
