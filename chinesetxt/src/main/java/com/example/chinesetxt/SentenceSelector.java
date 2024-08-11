@@ -6,15 +6,15 @@ import java.util.*;
 public class SentenceSelector {
 
     public static void main(String[] args) throws IOException {
-//    	 String outputSelecFilePath1 = "main-selection-15.txt"; // Replace with your desired output file path
+    	 String outputSelecFilePath = "main-selection-16.txt"; // Replace with your desired output file path
 //         addSentencesRequests(outputSelecFilePath1);
 //         String outputSelecFilePath = "epubfolder-selection-15.txt"; // Replace with your desired output file path
-//         addSentencesRequests(outputSelecFilePath);
+         addSentencesRequests(outputSelecFilePath);
 //        
-         //initSelection(15);
+        // initSelection(16);
 
     	//nextSelection(15);
-    	globalSelection(15);
+    	//globalSelection(15);
         }
     
        
@@ -22,7 +22,7 @@ public class SentenceSelector {
     	// File paths
         String inputFilePath = "delta-main-ranking-" + Integer.toString(level) + ".txt"; // Replace with your input file path
         String outputFilePath = "main-selection-" + Integer.toString(level) + ".txt"; // Replace with your desired output file path
-        int numOfSentences = 200;
+        int numOfSentences = 240;
         
         // the range of characters to search in the candidate sentences, initially all. 
         int endKey = Integer.MAX_VALUE;
@@ -109,7 +109,7 @@ public class SentenceSelector {
         if (!sentences.isEmpty()) {
             for (String sentence : sentences) {
                 String description = sentence; // Assuming the entire sentence is the description
-                Ranking.sendPostRequest(urlString, subcategoryName, description);
+                Ranking.sendPostRequest(urlString, "chinese", "练习",subcategoryName, description, null);
             }
         }
     }

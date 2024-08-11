@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import com.example.mvcmathtest.dto.MathProblemDTO;
-import com.example.mvcmathtest.model.DateRange;
+import com.example.mvcmathtest.model.QueryRequest;
 import com.example.mvcmathtest.model.TestProblem;
 import com.example.mvcmathtest.model.TimeStampedModel;
 import com.example.mvcmathtest.service.RestService;
@@ -104,7 +104,7 @@ public class TestController {
 	    }
 		
 	    // Make a POST request to the math problem service
-		List<TestProblem> testProblems = restService.fetchMathProblems(subject, category, subcategory, contentString);
+		List<TestProblem> testProblems = restService.fetchMathProblemsByPost(subject, category, subcategory, contentString);
 		if (subject == TestSubjectType.chinese) {
 			log.info("categor is {}", category);
 		
@@ -130,10 +130,9 @@ public class TestController {
 			@RequestParam TestSubjectType subject,
 			@RequestParam(name = "category", required = false)String category,
 			@RequestParam(name = "subcategory", required = false)String subcategory) {
-		String excludeListString = "1";
 	   
 		// Make a POST request to the math problem service
-		List<TestProblem> problems = restService.fetchMathProblems(subject, category, subcategory, excludeListString);
+		List<TestProblem> problems = restService.fetchMathProblemsByGet("math_problem",subject, category, subcategory);
 		return ResponseEntity.ok(problems);
 	}
 
@@ -182,14 +181,32 @@ public class TestController {
 
     @PostMapping("/query")
     @ResponseBody
-    public List<TestProblem> queryProblems(@RequestBody DateRange dateRange) {
-        LocalDate startDate = LocalDate.parse(dateRange.getStartDate());
-        LocalDate endDate = LocalDate.parse(dateRange.getEndDate());
-        log.info("receive query start date {} end date is {}", startDate, endDate);
-        return testProblemService.findByTimestampBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+    public List<TestProblem> queryProblems(@RequestBody QueryRequest queryRequest) {
+    	  String queryType = queryRequest.getQueryType();
+    	    
+    	    if ("dateRange".equals(queryType)) {
+    	        LocalDate startDate = LocalDate.parse(queryRequest.getStartDate());
+    	        LocalDate endDate = LocalDate.parse(queryRequest.getEndDate());
+    	        log.info("Received date range query: start date {} end date {}", startDate, endDate);
+    	        return testProblemService.findByTimestampBetween(startDate.atStartOfDay(), endDate.atTime(23, 59, 59));
+    	    } else if ("category".equals(queryType)) {
+    	        String category = queryRequest.getCategory();
+    	        log.info("Received category query: category {}", category);
+    	        return testProblemService.findByCategory(category);
+    	    } else if ("subcategory".equals(queryType)) {
+    	        String subCategory = queryRequest.getSubCategory();
+    	        log.info("Received category query: subcategory {}", subCategory);
+    	        return testProblemService.findBySubCategory(subCategory);
+    	    } else {
+    	        throw new IllegalArgumentException("Unsupported query type: " + queryType);
+    	    }
     }
 	 
-	
+    @GetMapping("/pascal")
+    public String pascalPage() {
+        return "pascal_test";
+    }
+
 	 
 	
 }

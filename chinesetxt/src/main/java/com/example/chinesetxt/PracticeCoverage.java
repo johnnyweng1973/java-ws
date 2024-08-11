@@ -1,8 +1,10 @@
 package com.example.chinesetxt;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -436,8 +439,84 @@ public class PracticeCoverage {
 	          processLinesBetweenPercentages("epubfolder-percentage-ranking-14.txt", "epubfolder-ranking-14.txt","");
 	          createDeltaFile("delta-epubfolder-ranking-14.txt","epubfolder-ranking-14.txt","epubfolder-ranking-13.txt");
 		    }
+    
+	    public static String sendGetRequest(String urlString, String subject, String category, String subcategory) {
+	        StringBuilder descriptions = new StringBuilder();
+	        try {
+	            String encodedCategory = URLEncoder.encode(category, StandardCharsets.UTF_8.toString());
+	            String encodedSubcategory = URLEncoder.encode(subcategory, StandardCharsets.UTF_8.toString());
+	            String encodedSubject = URLEncoder.encode(subject, StandardCharsets.UTF_8.toString());
 
-	    
+	            String completeUrlString = urlString + "?table=math_problem&subject=" + encodedSubject;
+
+	            if (!category.isEmpty()) {
+	                completeUrlString += "&category=" + encodedCategory;
+	            }
+
+	            if (!subcategory.isEmpty()) {
+	                completeUrlString += "&subcategory=" + encodedSubcategory;
+	            }
+
+	            URL url = new URL(completeUrlString);
+
+	            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	            conn.setRequestMethod("GET");
+	            conn.setRequestProperty("Accept", "application/json");
+
+	            int responseCode = conn.getResponseCode();
+	            System.out.println("Response Code: " + responseCode);
+	            
+	            // Create the "saved" directory if it doesn't exist
+	            File savedDir = new File("saved");
+	            if (!savedDir.exists()) {
+	                savedDir.mkdir();
+	            }
+
+	            if (responseCode == HttpURLConnection.HTTP_OK) { // success
+	                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+	                String inputLine;
+	                StringBuilder response = new StringBuilder();
+
+	                while ((inputLine = in.readLine()) != null) {
+	                    response.append(inputLine);
+	                }
+	                in.close();
+
+	                ObjectMapper objectMapper = new ObjectMapper();
+	                JsonNode jsonArray = objectMapper.readTree(response.toString());
+
+	                for (JsonNode jsonObject : jsonArray) {
+
+	                    if (jsonObject.has("image")) {
+	                        String imageBase64 = jsonObject.get("image").asText();
+	                        byte[] imageBytes = Base64.getDecoder().decode(imageBase64);
+	                     // Perform a second decode
+	                        byte[] doubleDecodedBytes = Base64.getDecoder().decode(imageBytes);
+
+
+	                        // Save the image in the "saved" directory
+	                        String imageName = jsonObject.get("description").asText() + ".png";
+	                        File imageFile = new File(savedDir, imageName);
+	                        try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(imageFile))) {
+	                            bos.write(doubleDecodedBytes);
+	                            System.out.println("Saved image as: " + imageFile.getAbsolutePath());
+	                        }
+	                        System.out.println("original len " + imageBase64.length());
+	                        System.out.println("decode len " + imageBytes.length);
+	                        System.out.println("double decode len " + doubleDecodedBytes.length);
+	                    }
+	                }
+	            } else {
+	                System.out.println("GET request not worked");
+	            }
+
+	            conn.disconnect();
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return descriptions.toString();
+	    }    
+
 	    public static void main(String[] args) throws IOException {
         // Example usage
 //        List<String> filenames = List.of("pfsj-ranking-14.txt", "jy1-ranking-14.txt", "zyj-ranking-14.txt");

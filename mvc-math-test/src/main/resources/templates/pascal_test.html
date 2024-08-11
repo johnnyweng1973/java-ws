@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Problems</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+        }
+        #buttons-container {
+            flex: 0.43;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+        }
+        #problems-container {
+            flex: 2.57;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .year-row {
+            margin-bottom: 10px;
+        }
+        .problem-item {
+            margin-bottom: 15px;
+        }
+        .btn-custom {
+            background-color: #28a745;
+            color: #fff;
+            border-color: #28a745;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+        }
+        .btn-custom:hover {
+            background-color: #218838;
+            border-color: #218838;
+        }
+        .btn-yes {
+            background-color: #ffc107; /* Yellow color for "yes" */
+            color: #000;
+            border-color: #ffc107;
+        }
+        .solution-field {
+            width: 600px;
+            height: 150px;
+        }
+        .answer-field {
+            width: 50px;
+            height: 50px;
+        }
+        .save-button-container {
+            text-align: right;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="buttons-container" class="border-end">
+        <div id="years-container"></div>
+    </div>
+    <div id="problems-container">
+        <div id="problems-list"></div>
+        <div class="save-button-container">
+            <button id="save-button" class="btn btn-custom">Save</button>
+        </div>
+    </div>
+
+    <script>
+        let problems = []; 
+        let testInfos = []; 
+
+        function fetchTestInfos() {
+            const url = 'https://localhost:8084/query';
+
+            const payload = {
+                category: 'pascal9group',
+                queryType: 'category'
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched test problems data:', data);
+                testInfos = data;
+                generateYearButtons(data);
+            })
+            .catch(error => {
+                console.error('Error fetching test problems:', error);
+            });
+        }
+
+        function generateYearButtons(testInfos) {
+            const yearsContainer = document.getElementById('years-container');
+
+            const yearGroups = {};
+            testInfos.forEach(testInfo => {
+                const year = testInfo.problemDescription.split(/[ABC]/)[0];
+                if (!yearGroups[year]) {
+                    yearGroups[year] = [];
+                }
+                yearGroups[year].push(testInfo);
+            });
+
+            Object.keys(yearGroups).forEach(year => {
+                const yearRow = document.createElement('div');
+                yearRow.className = 'year-row';
+
+                const yearLabel = document.createElement('h5');
+                yearLabel.textContent = year;
+                yearRow.appendChild(yearLabel);
+
+                yearGroups[year].forEach(testInfo => {
+                    const button = document.createElement('button');
+                    button.textContent = testInfo.problemDescription.replace(/^\d{4}/, '');
+                    button.className = 'btn btn-custom me-2 mb-2';
+
+                    if (testInfo.answer && testInfo.answer === 'yes') {
+                        button.classList.add('btn-yes');
+                        button.addEventListener('click', () => {
+                            fetchSubmmittedProblems(testInfo);
+                        });
+                    } else {
+                        button.addEventListener('click', () => {
+                            fetchProblems(testInfo);
+                        });
+                    }
+
+                    yearRow.appendChild(button);
+                });
+
+                yearsContainer.appendChild(yearRow);
+            });
+        }
+
+        function fetchProblems(testInfo) {
+            const subject = 'math';
+            const category = 'pascal9';
+            const subcategory = testInfo.problemDescription;
+
+            const baseUrl = '/problems';
+            const queryParams = `?subject=${encodeURIComponent(subject)}` +
+                               `&category=${encodeURIComponent(category)}` +
+                               `&subcategory=${encodeURIComponent(subcategory)}`;
+            const url = `${baseUrl}${queryParams}`;
+
+            fetch(url, {
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                problems = data;
+                displayProblems(data);
+            })
+            .catch(error => {
+                console.error('Error fetching problems:', error);
+            });
+        }
+
+        function fetchSubmmittedProblems(testInfo) {
+            const url = '/query';
+            console.log("request ", testInfo);
+            const payload = {
+                queryType: 'subcategory',
+                subCategory: testInfo.problemDescription
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                problems = data;
+                displayProblems(data);
+            })
+            .catch(error => {
+                console.error('Error fetching subcategory problems:', error);
+            });
+        }
+
+        function displayProblems(problems) {
+            const problemsList = document.getElementById('problems-list');
+            console.log('Received problems:', problems);
+
+            function base64DecodeOnce(base64Str) {
+                const binaryString = atob(base64Str);
+                return binaryString;
+            }
+
+            const processedProblems = problems.map(problem => {
+                if (problem.image) {
+                    const decodedImage = base64DecodeOnce(problem.image);
+                    return { ...problem, image: decodedImage };
+                }
+                return problem;
+            });
+
+            problems = processedProblems;
+
+            problemsList.innerHTML = problems.map(problem => `
+                <div class="problem-item">
+                    ${problem.image ? `
+                        <img src="data:image/png;base64,${problem.image}" alt="Problem Image" style="max-width: 100%; height: auto;" />
+                    ` : ''}
+                    <p><strong>Solution:</strong></p>
+                    <textarea id="solution-${problem.problemId}" class="editable-field solution-field">${problem.solution}</textarea>
+                    <p><strong>Answer:</strong></p>
+                    <textarea id="answer-${problem.problemId}" class="editable-field answer-field">${problem.answer}</textarea>
+                </div>
+            `).join('');
+        }
+
+        function saveProblems() {
+            problems = problems.map(problem => {
+                const solution = document.getElementById(`solution-${problem.problemId}`).value;
+                const answer = document.getElementById(`answer-${problem.problemId}`).value;
+
+                return {
+                    ...problem,
+                    solution,
+                    answer
+                };
+            });
+
+            fetch('/test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(problems)
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('Problems saved successfully');
+                    alert('Problems saved successfully');
+                    updateTestInfoRecord();
+                } else {
+                    console.error('Failed to save problems');
+                    alert('Failed to save problems');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving problems:', error);
+            });
+        }
+
+        function updateTestInfoRecord() {
+            const currentSubcategory = problems[0].subcategory;
+
+            const matchingTestInfo = testInfos.find(testInfo => testInfo.problemDescription === currentSubcategory);
+
+            if (matchingTestInfo) {
+                matchingTestInfo.answer = 'yes';
+                matchingTestInfo.timestamp = null;
+
+                const dataToSend = [matchingTestInfo];
+
+                fetch('/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dataToSend)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('TestInfo record updated successfully');
+                    } else {
+                        console.error('Failed to update TestInfo record');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating TestInfo record:', error);
+                });
+            }
+        }
+
+        document.getElementById('save-button').addEventListener('click', saveProblems);
+
+        window.onload = fetchTestInfos;
+    </script>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

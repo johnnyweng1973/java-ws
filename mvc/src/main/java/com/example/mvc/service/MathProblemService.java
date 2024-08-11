@@ -153,5 +153,21 @@ public class MathProblemService {
 	public List<MathProblem> findBySubjectAndCategory(TestSubjectType subject, String category) {
 		return  mathProblemsRepository.findBySubjectAndCategory(subject, category);
 	}
+
+	public List<MathProblem> findBySubCategory(String subCategory) {
+        List<MathProblem> mathProblems = new ArrayList<>();
+	    Optional<MathSubCategory> optionalMathSubCategory = mathSubCategoryRepository.findByName(subCategory);
+	    if (optionalMathSubCategory.isPresent()) {
+	    	MathSubCategory mathSubCategory = optionalMathSubCategory.get();
+	    	Long subcategoryId = mathSubCategory.getId();
+	    	List<MathProblem> list1 = 
+	    	    mathProblemsRepository.findByMathSubCategory_Id(subcategoryId);
+	    	
+	    	return list1;
+	    }
+	    else {
+	    	return mathProblems;
+	    }
+	}
 			
 }

@@ -11,4 +11,6 @@ import com.example.mvcmathtest.util.TestSubjectType;
 public interface TestProblemRepository extends JpaRepository<TestProblem, Long> {
     List<TestProblem> findBySubject(TestSubjectType subject);
 	List<TestProblem> findByTimestampBetween(LocalDateTime startDateTime, LocalDateTime endDateTime);
+	List<TestProblem> findByCategory(String category);
+	List<TestProblem> findBySubcategory(String subCategory);
 }

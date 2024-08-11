@@ -105,10 +105,24 @@ public class MathProblemsController {
 	public ResponseEntity<List<MathProblem>> general(
 	    @RequestParam(name = "table") String tableName, 
 	    @RequestParam(name = "subject") TestSubjectType subject,
-	    @RequestParam(name = "category", required = false) String category)
+	    @RequestParam(name = "category", required = false) String category,
+	    @RequestParam(name = "subcategory", required = false) String subCategory)
 	{
 	    if ("math_problem".equals(tableName)) {
-	        if (category == null || category.isEmpty()) {
+			if (category.equals("pascal9") && subCategory != null && !subCategory.isEmpty()) {
+				List<MathProblem> mathProblems = mathProblemService.findBySubCategory(subCategory);
+
+				for (MathProblem mathProblem : mathProblems) {
+					if (mathProblem.getImage() != null) {
+						int imageSize = mathProblem.getImage().length; // Get the size directly
+						System.out.println("Image size for MathProblem with ID " + mathProblem.getId() + ": "
+								+ imageSize + " bytes");
+					} else {
+						System.out.println("No image for MathProblem with ID " + mathProblem.getId());
+					}
+				}
+				return ResponseEntity.ok(mathProblems);
+			} else if (category == null || category.isEmpty()) {
 	            return ResponseEntity.ok(mathProblemService.findBySubject(subject));
 	        } else {
 	            return ResponseEntity.ok(mathProblemService.findBySubjectAndCategory(subject, category));

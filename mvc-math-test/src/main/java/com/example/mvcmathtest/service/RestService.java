@@ -1,5 +1,7 @@
 package com.example.mvcmathtest.service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +35,14 @@ public class RestService {
 	
 	@Value("${math.service.url}")
 	private String mathProblemServiceUrl;
-    // Create ObjectMapper instance
+    
+	@Value("${math.service.url2}")
+	private String mathProblemServiceUrl2;
+    
+	// Create ObjectMapper instance
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public List<TestProblem> fetchMathProblems(TestSubjectType subject,String category, String subcategory, String excludeListString) {
+    public List<TestProblem> fetchMathProblemsByPost(TestSubjectType subject,String category, String subcategory, String excludeListString) {
     	List<TestProblem> testProblems = new ArrayList<>();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -81,4 +87,53 @@ public class RestService {
 		}
         return testProblems;
     }
+    
+    public List<TestProblem> fetchMathProblemsByGet(String tableName, TestSubjectType subject, String category, String subcategory) {
+        List<TestProblem> testProblems = new ArrayList<>();
+
+        try {
+            StringBuilder urlBuilder = new StringBuilder(mathProblemServiceUrl2);
+            
+            if (tableName != null && !tableName.isEmpty()) {
+                urlBuilder.append("?table=").append(URLEncoder.encode(tableName, StandardCharsets.UTF_8));
+            }
+            
+            urlBuilder.append("&subject=").append(URLEncoder.encode(subject.toString(), StandardCharsets.UTF_8));
+
+            if (category != null && !category.isEmpty()) {
+                urlBuilder.append("&category=").append(URLEncoder.encode(category, StandardCharsets.UTF_8));
+            }
+
+            if (subcategory != null && !subcategory.isEmpty()) {
+                urlBuilder.append("&subcategory=").append(URLEncoder.encode(subcategory, StandardCharsets.UTF_8));
+            }
+
+            String url = urlBuilder.toString();
+
+            ResponseEntity<String> problemListResponse = restTemplate.getForEntity(url, String.class);
+
+            if (problemListResponse.getStatusCode() == HttpStatus.OK) {
+                String jsonString = problemListResponse.getBody();
+                log.info("json data from service {}", jsonString);
+
+                // Deserialize JSON string into MathProblemDTO object
+                List<MathProblemDTO> mathProblems = objectMapper.readValue(jsonString, new TypeReference<List<MathProblemDTO>>() {});
+                for (MathProblemDTO problem : mathProblems) {
+                    TestProblem testProblem = new TestProblem(problem);
+                    testProblems.add(testProblem);
+                }
+            } else {
+                throw new RestClientException("Failed to retrieve problem list from math problem service");
+            }
+        } catch (RestClientException e) {
+            throw new RestClientException("Error occurred while retrieving problem list from math problem service", e);
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        
+        return testProblems;
+    }
+
 }

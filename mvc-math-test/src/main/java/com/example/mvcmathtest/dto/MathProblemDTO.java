@@ -20,4 +20,5 @@ public class MathProblemDTO {
     private TestSubjectType subject;
     private Integer importance;
     private boolean multipleAnswers;
+    private byte[] image; 
 }

@@ -10,18 +10,16 @@ import java.util.*;
 public class Ranking {
 
     public static void main(String[] args) {
-    	createPercentageFile(15);
-    	createSecondPercentageFile(15);
+    	createPercentageFile(16);
+    	createSecondPercentageFile(16);
     }
     public static void createPercentageFile(int level) {
-        String[] sentencesFiles = {"jy1-sentences.txt", "pfsj-sentences.txt", "zyj-sentences.txt"};
+        String[] sentencesFiles = { "pfsj-sentences.txt", "zyj-sentences.txt"};
         String[] outputFiles = {
-            "jy1-percentage-ranking-" + level + ".txt",
             "pfsj-percentage-ranking-" + level + ".txt",
             "zyj-percentage-ranking-" + level + ".txt"
         };
         String[] outputRankingFiles = {
-            "jy1-ranking-" + level + ".txt",
             "pfsj-ranking-" + level + ".txt",
             "zyj-ranking-" + level + ".txt"
         };
@@ -149,36 +147,32 @@ public class Ranking {
         return Integer.parseInt(digitStr);
     }
 
-    public static void sendPostRequests(Map<Integer, List<String>> percentageMap, String urlString, int subcategoryDigit) {
-        List<String> sentences = percentageMap.get(100); // Get sentences with 100% percentage
-        if (sentences != null) {
-            for (String sentence : sentences) {
-                // Extract description from the sentence
-                String[] parts = sentence.split(" \\(");
-                String description = parts[0].trim(); // Extracting the description from the sentence
-                // Check if the description has four or more characters
-                if (description.length() < 4) {
-                    System.out.println("Skipping sentence: " + description + " as it contains less than 4 characters");
-                    continue; // Skip sentences with less than 4 characters
-                }
-                // Log the sentence
-                System.out.println("Sending POST request for sentence: " + description);
-              
-                // Send POST request
-                String subcategoryName = numberToChinese(subcategoryDigit);
-                sendPostRequest(urlString, subcategoryName, description);
-            }
-        }
-    }
-    public static void sendPostRequest(String urlString, String subcategoryName, String description) {
+    public static void sendPostRequest(String urlString, String subject, String category, String subcategoryName, String description, File imageFile) {
         try {
-            // Constant category
-            String category = "练习";
-
             // Encode the parameters
+            String encodedSubject = URLEncoder.encode(subject, StandardCharsets.UTF_8.toString());
             String encodedCategory = URLEncoder.encode(category, StandardCharsets.UTF_8.toString());
             String encodedSubcategoryName = URLEncoder.encode(subcategoryName, StandardCharsets.UTF_8.toString());
             String encodedDescription = URLEncoder.encode(description, StandardCharsets.UTF_8.toString());
+
+            StringBuilder formData = new StringBuilder();
+            formData.append("subject=").append(encodedSubject)
+                    .append("&category=").append(encodedCategory)
+                    .append("&mathSubCategory.name=").append(encodedSubcategoryName)
+                    .append("&description=").append(encodedDescription)
+                    .append("&solution=&answer=&multipleAnswers=false");
+
+            // Convert image to Base64 if it's not null
+            if (imageFile != null) {
+                try (FileInputStream imageInFile = new FileInputStream(imageFile)) {
+                    byte[] imageData = new byte[(int) imageFile.length()];
+                    imageInFile.read(imageData);
+                    String encodedImage = Base64.getEncoder().encodeToString(imageData);
+                    formData.append("&image=").append(URLEncoder.encode(encodedImage, StandardCharsets.UTF_8.toString()));
+                    System.out.println("encode len " + encodedImage.length());
+                    System.out.println("original " + imageData.length);
+                }
+            }
 
             URL url = new URL(urlString);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -186,13 +180,9 @@ public class Ranking {
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             conn.setDoOutput(true);
 
-            // Form data with customized fields
-            String formData = "subject=chinese&category=" + encodedCategory + "&mathSubCategory.name=" + encodedSubcategoryName +
-                              "&description=" + encodedDescription + "&solution=&answer=&multipleAnswers=false";
-
             // Send the request
             try (OutputStream os = conn.getOutputStream()) {
-                byte[] input = formData.getBytes("utf-8");
+                byte[] input = formData.toString().getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
 
@@ -203,7 +193,6 @@ public class Ranking {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
     }
     public static String numberToChinese(int number) {
         final String[] UNITS = {"", "十", "百", "千", "万"};

@@ -43,6 +43,10 @@ public class MathProblem {
     
     private Integer importance;
     
+    @Column(name = "image", columnDefinition = "LONGBLOB")
+    private byte[] image; // new field for storing audio data
+
+    
     public MathProblem(MathProblem problem){
 		this.id = problem.id;
 		this.category = problem.category;
@@ -53,6 +57,7 @@ public class MathProblem {
 		this.subject = problem.subject;
 		this.multipleAnswers = problem.multipleAnswers;
 		this.importance = problem.importance;
+		this.image = null;
 	}
 	
 }

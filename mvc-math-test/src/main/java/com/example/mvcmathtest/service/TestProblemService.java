@@ -46,4 +46,12 @@ public class TestProblemService {
 	public List<TestProblem> findByTimestampBetween(LocalDateTime startDateTime, LocalDateTime endDateTime){
 		return testProblemRepository.findByTimestampBetween(startDateTime, endDateTime);
 	}
+
+	public List<TestProblem> findByCategory(String category) {
+		return testProblemRepository.findByCategory(category);
+	}
+
+	public List<TestProblem> findBySubCategory(String subCategory) {
+		return testProblemRepository.findBySubcategory(subCategory);
+	}
 }
