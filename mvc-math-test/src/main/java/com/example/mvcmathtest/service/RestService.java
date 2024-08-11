@@ -114,7 +114,7 @@ public class RestService {
 
             if (problemListResponse.getStatusCode() == HttpStatus.OK) {
                 String jsonString = problemListResponse.getBody();
-                log.info("json data from service {}", jsonString);
+               // log.info("json data from service {}", jsonString);
 
                 // Deserialize JSON string into MathProblemDTO object
                 List<MathProblemDTO> mathProblems = objectMapper.readValue(jsonString, new TypeReference<List<MathProblemDTO>>() {});
