@@ -195,6 +195,9 @@
             const problemsList = document.getElementById('problems-list');
             console.log('Received problems:', problems);
 
+            // Assuming all problems have the same subcategory since they are fetched together
+            const subcategory = problems.length > 0 ? problems[0].subcategory : '';
+
             function base64DecodeOnce(base64Str) {
                 const binaryString = atob(base64Str);
                 return binaryString;
@@ -210,17 +213,21 @@
 
             problems = processedProblems;
 
-            problemsList.innerHTML = problems.map(problem => `
-                <div class="problem-item">
-                    ${problem.image ? `
-                        <img src="data:image/png;base64,${problem.image}" alt="Problem Image" style="max-width: 100%; height: auto;" />
-                    ` : ''}
-                    <p><strong>Solution:</strong></p>
-                    <textarea id="solution-${problem.problemId}" class="editable-field solution-field">${problem.solution}</textarea>
-                    <p><strong>Answer:</strong></p>
-                    <textarea id="answer-${problem.problemId}" class="editable-field answer-field">${problem.answer}</textarea>
-                </div>
-            `).join('');
+            // Clear the existing problems list and add the subcategory display
+            problemsList.innerHTML = `
+                <h2>${subcategory}</h2>
+                ${problems.map(problem => `
+                    <div class="problem-item">
+                        ${problem.image ? `
+                            <img src="data:image/png;base64,${problem.image}" alt="Problem Image" style="max-width: 100%; height: auto;" />
+                        ` : ''}
+                        <p><strong>Solution:</strong></p>
+                        <textarea id="solution-${problem.problemId}" class="editable-field solution-field">${problem.solution}</textarea>
+                        <p><strong>Answer:</strong></p>
+                        <textarea id="answer-${problem.problemId}" class="editable-field answer-field">${problem.answer}</textarea>
+                    </div>
+                `).join('')}
+            `;
         }
 
         function saveProblems() {

@@ -144,7 +144,7 @@ public class ExtractMathProblems {
                     		72, 
                     		(int) currentY -10,
                     		450,
-                    		(int) (minY - currentY - 10)));
+                    		(int) (minY - currentY )));
                 }
                 currentY = minY;
                 isFirstProblem = false;

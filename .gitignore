@@ -3,6 +3,7 @@
 chinesetxt/*.txt
 chinesetxt/*.epub
 chinesetxt/*.pdf
+chinesetxt/saved
 
 chinesetxt/math/pascal/problems
 chinesetxt/math/pascal/problems.bak
