@@ -4,6 +4,9 @@ chinesetxt/*.txt
 chinesetxt/*.epub
 chinesetxt/*.pdf
 
+chinesetxt/math/pascal/problems
+chinesetxt/math/pascal/problems.bak
+
 ### eclpse log folder ###
 none/
 
