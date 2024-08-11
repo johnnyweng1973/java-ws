@@ -115,8 +115,6 @@ public class MathProblemsController {
 				for (MathProblem mathProblem : mathProblems) {
 					if (mathProblem.getImage() != null) {
 						int imageSize = mathProblem.getImage().length; // Get the size directly
-						System.out.println("Image size for MathProblem with ID " + mathProblem.getId() + ": "
-								+ imageSize + " bytes");
 					} else {
 						System.out.println("No image for MathProblem with ID " + mathProblem.getId());
 					}
