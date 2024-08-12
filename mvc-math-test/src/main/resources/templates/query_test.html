@@ -65,7 +65,7 @@
                 url: '/query',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ startDate: startDate, endDate: endDate, queryTpey: "Date"}),
+                data: JSON.stringify({ startDate: startDate, endDate: endDate, queryType: "dateRange"}),
                 success: function(response) {
                     populateTable(response);
                 },

@@ -234,9 +234,13 @@
             problems = problems.map(problem => {
                 const solution = document.getElementById(`solution-${problem.problemId}`).value;
                 const answer = document.getElementById(`answer-${problem.problemId}`).value;
+                
+
+                // Destructure the problem object to exclude the timestamp field
+                const { timestamp, ...problemWithoutTimestamp } = problem;
 
                 return {
-                    ...problem,
+                    ...problemWithoutTimestamp,
                     solution,
                     answer
                 };
