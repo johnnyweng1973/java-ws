@@ -10,8 +10,8 @@ import java.util.*;
 public class Ranking {
 
     public static void main(String[] args) {
-    	createPercentageFile(16);
-    	createSecondPercentageFile(16);
+    	createPercentageFile(17);
+    	createSecondPercentageFile(17);
     }
     public static void createPercentageFile(int level) {
         String[] sentencesFiles = { "pfsj-sentences.txt", "zyj-sentences.txt"};

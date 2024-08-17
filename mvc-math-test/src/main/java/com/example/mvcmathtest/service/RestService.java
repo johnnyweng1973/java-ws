@@ -66,7 +66,7 @@ public class RestService {
             if (problemListResponse.getStatusCode() == HttpStatus.OK) {
             	String jsonString = problemListResponse.getBody(); 
             	 // Deserialize JSON string into MathProblemDTO object
-            	log.info("json data from service {}", jsonString);
+            	//log.info("json data from service {}", jsonString);
                 
                 List<MathProblemDTO> mathProblems= objectMapper.readValue(jsonString, new TypeReference<List<MathProblemDTO>>(){});
                 for(MathProblemDTO problem : mathProblems) {
@@ -95,18 +95,18 @@ public class RestService {
             StringBuilder urlBuilder = new StringBuilder(mathProblemServiceUrl2);
             
             if (tableName != null && !tableName.isEmpty()) {
-                urlBuilder.append("?table=").append(URLEncoder.encode(tableName, StandardCharsets.UTF_8));
+                urlBuilder.append("?table=").append(tableName);
             }
             
-            urlBuilder.append("&subject=").append(URLEncoder.encode(subject.toString(), StandardCharsets.UTF_8));
+            urlBuilder.append("&subject=").append(subject.toString());
 
-            if (category != null && !category.isEmpty()) {
-                urlBuilder.append("&category=").append(URLEncoder.encode(category, StandardCharsets.UTF_8));
-            }
+        	if (category != null && !category.isEmpty()) {
+        	    urlBuilder.append("&category=").append(category);
+        	}
 
-            if (subcategory != null && !subcategory.isEmpty()) {
-                urlBuilder.append("&subcategory=").append(URLEncoder.encode(subcategory, StandardCharsets.UTF_8));
-            }
+        	if (subcategory != null && !subcategory.isEmpty()) {
+        	    urlBuilder.append("&subcategory=").append(subcategory);
+        	}
 
             String url = urlBuilder.toString();
 
@@ -114,7 +114,7 @@ public class RestService {
 
             if (problemListResponse.getStatusCode() == HttpStatus.OK) {
                 String jsonString = problemListResponse.getBody();
-               // log.info("json data from service {}", jsonString);
+                log.info("get restful , json data from service {}", jsonString);
 
                 // Deserialize JSON string into MathProblemDTO object
                 List<MathProblemDTO> mathProblems = objectMapper.readValue(jsonString, new TypeReference<List<MathProblemDTO>>() {});

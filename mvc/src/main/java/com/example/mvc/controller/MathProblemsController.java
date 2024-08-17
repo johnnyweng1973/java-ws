@@ -58,12 +58,12 @@ public class MathProblemsController {
 
 	@GetMapping
 	public String manageMathProblems(Model model) {
-		List<MathProblem> mathProblems = mathProblemService.findAll();
+		//List<MathProblem> mathProblems = mathProblemService.findAll();
 	
 		// Logging the number of elements in the 'memos' list
-		log.info("Number of elements in the 'problems' list: {}", mathProblems.size());
+	   //	log.info("Number of elements in the 'problems' list: {}", mathProblems.size());
 
-		model.addAttribute("mathProblems", mathProblems);
+		//model.addAttribute("mathProblems", mathProblems);
         model.addAttribute("subjects", TestSubjectType.values());
 		model.addAttribute("newMathProblem", new MathProblem());
 		return "manage_mathproblem";
@@ -109,7 +109,7 @@ public class MathProblemsController {
 	    @RequestParam(name = "subcategory", required = false) String subCategory)
 	{
 	    if ("math_problem".equals(tableName)) {
-			if (category.equals("pascal9") && subCategory != null && !subCategory.isEmpty()) {
+			if (category != null && category.equals("pascal9") && subCategory != null && !subCategory.isEmpty()) {
 				List<MathProblem> mathProblems = mathProblemService.findBySubCategory(subCategory);
 
 				for (MathProblem mathProblem : mathProblems) {
@@ -123,6 +123,7 @@ public class MathProblemsController {
 			} else if (category == null || category.isEmpty()) {
 	            return ResponseEntity.ok(mathProblemService.findBySubject(subject));
 	        } else {
+	        	log.info("/general/data category " + category);
 	            return ResponseEntity.ok(mathProblemService.findBySubjectAndCategory(subject, category));
 	        }
 	    } else {
@@ -341,9 +342,9 @@ public class MathProblemsController {
 	                        Page<MathProblem> page = mathProblemService.findByCategoryWithPageable(category, pageable);
 	                        mathProblems = page.getContent();
 	                        log.info("start {} end {}", start, end);
-	                        for (MathProblem problem: mathProblems) {
-	                        	log.info("problem: {}", problem.toString());
-	                        }
+//	                        for (MathProblem problem: mathProblems) {
+//	                        	log.info("problem: {}", problem.toString());
+//	                        }
 
 	                        // Return the page in the response
 	                        return ResponseEntity.ok(mathProblems);

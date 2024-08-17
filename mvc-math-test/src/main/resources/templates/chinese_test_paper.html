@@ -127,7 +127,7 @@
         });
 
         function loadRadicals() {
-            fetch('/problems?subject=chinese&category=部首&subcategory=全部')
+            fetch('/problems?subject=chinese&category=部首')
                 .then(response => response.json())
                 .then(data => {
                     const radicalDiv = document.querySelector('.radical');

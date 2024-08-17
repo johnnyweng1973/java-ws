@@ -132,6 +132,7 @@ public class TestController {
 			@RequestParam(name = "subcategory", required = false)String subcategory) {
 	   
 		// Make a POST request to the math problem service
+		log.info("/problems category is {}", category);
 		List<TestProblem> problems = restService.fetchMathProblemsByGet("math_problem",subject, category, subcategory);
 		return ResponseEntity.ok(problems);
 	}

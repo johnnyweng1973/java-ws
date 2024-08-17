@@ -37,5 +37,24 @@
 
     <hr/>
 
-    </body>
+    <h2>Existing MathProblems</h2>
+    <table border="1">
+        <tr>
+            <th>Id</th>
+            <th>Category</th>
+            <th>Subcategory</th>
+            <th>Description</th>
+            <th>Solution</th>
+            <th>Answer</th>
+        </tr>
+        <tr th:each="mathproblem : ${mathProblems}">
+            <td th:text="${mathproblem.id}"></td>
+            <td th:text="${mathproblem.category}"></td>
+            <td th:text="${mathproblem.mathSubCategory.name}"></td>
+            <td th:text="${mathproblem.description}"></td>
+            <td th:text="${mathproblem.solution}"></td>
+            <td th:text="${mathproblem.answer}"></td>
+        </tr>
+    </table>
+</body>
 </html>
