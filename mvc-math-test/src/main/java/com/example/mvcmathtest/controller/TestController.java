@@ -85,7 +85,7 @@ public class TestController {
 		String contentString = "1";
 	    if (subject != TestSubjectType.chinese) {
 	    	// get all test problems
-			List<TestProblem> oldTestProblems = testProblemService.getBySubject(subject);
+			List<TestProblem> oldTestProblems = testProblemService.findBySubject(subject);
 			contentString = ExcludeListGenerator.generateExcludeList(oldTestProblems);
 	    }
 	    else {
@@ -143,7 +143,7 @@ public class TestController {
 	    List<TestProblem> testProblems = new ArrayList<>();
 	    try {
 	        // Log the input JSON data
-	        System.out.println("Received JSON data: " + jsonData);
+	       // System.out.println("Received JSON data: " + jsonData);
 
 	        // Deserialize the JSON data
 	        List<TestProblem> problems = objectMapper.readValue(jsonData, new TypeReference<List<TestProblem>>() {});
@@ -198,7 +198,10 @@ public class TestController {
     	        String subCategory = queryRequest.getSubCategory();
     	        log.info("Received category query: subcategory {}", subCategory);
     	        return testProblemService.findBySubCategory(subCategory);
-    	    } else {
+    	    } else if ("subject".equals(queryType)) {
+    	        return testProblemService.findBySubject(queryRequest.getSubject()); 
+    	    }
+    	    else {
     	        throw new IllegalArgumentException("Unsupported query type: " + queryType);
     	    }
     }
@@ -208,6 +211,10 @@ public class TestController {
         return "pascal_test";
     }
 
-	 
+    @GetMapping("/pascaltmp")
+    public String pascalPage2() {
+        return "pascal_test2";
+    }
+ 
 	
 }

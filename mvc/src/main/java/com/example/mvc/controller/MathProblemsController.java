@@ -109,7 +109,7 @@ public class MathProblemsController {
 	    @RequestParam(name = "subcategory", required = false) String subCategory)
 	{
 	    if ("math_problem".equals(tableName)) {
-			if (category != null && category.equals("pascal9") && subCategory != null && !subCategory.isEmpty()) {
+			if (category != null  && subCategory != null && !subCategory.isEmpty()) {
 				List<MathProblem> mathProblems = mathProblemService.findBySubCategory(subCategory);
 
 				for (MathProblem mathProblem : mathProblems) {

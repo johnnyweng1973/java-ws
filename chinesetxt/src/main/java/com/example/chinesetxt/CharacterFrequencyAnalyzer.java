@@ -12,8 +12,8 @@ public class CharacterFrequencyAnalyzer {
     public static void main(String[] args) {
         // Replace with your actual file names
     	 String[] filenames = {
-                 "pfsj-percentage-ranking-17.txt",
-                 "zyj-percentage-ranking-17.txt"
+                 "pfsj-percentage-ranking-18.txt",
+                 "zyj-percentage-ranking-18.txt"
              };
 
         for (String filename : filenames) {

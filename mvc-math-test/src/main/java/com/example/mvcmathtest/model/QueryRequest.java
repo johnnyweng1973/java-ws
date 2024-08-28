@@ -1,11 +1,14 @@
 package com.example.mvcmathtest.model;
 
+import com.example.mvcmathtest.util.TestSubjectType;
+
 public class QueryRequest {
 	private String queryType;
     private String startDate;
     private String endDate;
     private String category;
     private String subCategory;
+    private TestSubjectType subject;
     
     // Getters and setters
     public String getQueryType() {
@@ -47,4 +50,12 @@ public class QueryRequest {
 	public void setSubCategory(String subCategory) {
         this.subCategory = subCategory;
     }
+	
+	public TestSubjectType getSubject() {
+		return subject;
+	}
+	
+	public void setSubject(TestSubjectType subject) {
+		this.subject = subject;
+	}
 }

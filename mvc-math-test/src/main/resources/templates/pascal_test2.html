@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Problems</title>
+    <title>Expandable Tree</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -11,24 +12,50 @@
             display: flex;
             height: 100vh;
         }
+        .tree-node {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .tree-node .toggle-icon {
+            margin-right: 5px;
+            font-weight: bold;
+        }
+
+        .nested {
+            display: none;
+            margin-left: 20px;
+        }
+
+        .active {
+            display: block;
+        }
+
+   
         #buttons-container {
-            flex: 0.43;
-            padding: 20px;
-            border-right: 1px solid #ddd;
+            flex: 35%;
+            border-right: 1px solid #ccc;
+            padding: 10px;
             overflow-y: auto;
         }
-        #problems-container {
-            flex: 2.57;
+
+        #problem-display {
+            flex: 65%;
             padding: 20px;
             overflow-y: auto;
-        }
-        .year-row {
-            margin-bottom: 10px;
         }
         .problem-item {
             margin-bottom: 15px;
         }
-        .btn-custom {
+        .solution-field {
+            width: 600px;
+            height: 150px;
+        }
+        .answer-field {
+            width: 50px;
+            height: 50px;
+        }
+         .btn-custom {
             background-color: #28a745;
             color: #fff;
             border-color: #28a745;
@@ -44,90 +71,82 @@
             color: #000;
             border-color: #ffc107;
         }
-        .solution-field {
-            width: 600px;
-            height: 150px;
-        }
-        .answer-field {
-            width: 50px;
-            height: 50px;
-        }
-        .save-button-container {
-            text-align: right;
-            margin-top: 20px;
-        }
+       
     </style>
 </head>
+
 <body>
-    <div id="buttons-container" class="border-end">
-        <div id="years-container"></div>
-    </div>
-    <div id="problems-container">
-        <div id="problems-list"></div>
-        <div class="save-button-container">
-            <button id="save-button" class="btn btn-custom">Save</button>
+        <div id="buttons-container" class="border-end">
+            <div id="tree-root">
+                <div class="tree-node" onclick="toggleNode('math-node')">
+                    <span class="toggle-icon" id="math-node-toggle">+</span> math
+                </div>
+                <div id="math-node" class="nested"></div>
+            </div>
         </div>
-    </div>
+
+        <div id="problems-container">
+            <div id="problems-list"></div>
+            <div class="save-button-container">
+                <button id="save-button" class="btn btn-custom">Save</button>
+            </div>
+        </div>
 
     <script>
         let problems = []; 
-        let testInfos = []; 
+        function toggleNode(nodeId) {
+            const node = document.getElementById(nodeId);
+            const toggleIcon = document.querySelector(`#${nodeId}-toggle`);
 
-        function fetchTestInfos() {
-            const url = '/query';
-
-            const payload = {
-                subject: 'test_info',
-                queryType: 'subject'
-            };
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Fetched test problems data:', data);
-                testInfos = data;
-                generateYearButtons(data);
-            })
-            .catch(error => {
-                console.error('Error fetching test problems:', error);
-            });
+            if (node.classList.contains('active')) {
+                node.classList.remove('active');
+                toggleIcon.textContent = '+';
+            } else {
+                node.classList.add('active');
+                toggleIcon.textContent = '-';
+            }
         }
 
-        function generateYearButtons(testInfos) {
-            const yearsContainer = document.getElementById('years-container');
+        function generateCategoryNodes(testInfos) {
+            const mathNode = document.getElementById('math-node');
+            const categories = {};
 
-            const yearGroups = {};
+            // Group the testInfos by category
             testInfos.forEach(testInfo => {
-                const year = testInfo.problemDescription.split(/[ABC]/)[0];
-                if (!yearGroups[year]) {
-                    yearGroups[year] = [];
+                if (!categories[testInfo.category]) {
+                    categories[testInfo.category] = [];
                 }
-                yearGroups[year].push(testInfo);
+                categories[testInfo.category].push(testInfo);
             });
 
-            Object.keys(yearGroups).forEach(year => {
-                const yearRow = document.createElement('div');
-                yearRow.className = 'year-row';
+            // Create a node for each category and add buttons
+            Object.keys(categories).forEach(category => {
+                const categoryNode = document.createElement('div');
+                categoryNode.className = 'tree-node';
+                categoryNode.onclick = () => toggleNode(`${category}-node`);
+                categoryNode.innerHTML = `<span class="toggle-icon" id="${category}-node-toggle">+</span> ${category}`;
 
-                const yearLabel = document.createElement('h5');
-                yearLabel.textContent = year;
-                yearRow.appendChild(yearLabel);
+                const nestedNode = document.createElement('div');
+                nestedNode.id = `${category}-node`;
+                nestedNode.className = 'nested';
 
-                yearGroups[year].forEach(testInfo => {
+                let buttonContainer = null;
+                categories[category].forEach((testInfo, index) => {
+                    if (index % 3 === 0) {
+                        // Create a new container for every three buttons
+                        buttonContainer = document.createElement('div');
+                        buttonContainer.className = 'd-flex mb-2';
+                        nestedNode.appendChild(buttonContainer);
+                    }
+
                     const button = document.createElement('button');
-                    button.textContent = testInfo.problemDescription.replace(/^\d{4}/, '');
+                    button.textContent = testInfo.problemDescription;
                     button.className = 'btn btn-custom me-2 mb-2';
 
                     if (testInfo.answer && testInfo.answer === 'yes') {
                         button.classList.add('btn-yes');
                         button.addEventListener('click', () => {
-                            fetchSubmmittedProblems(testInfo);
+                            fetchSubmittedProblems(testInfo);
                         });
                     } else {
                         button.addEventListener('click', () => {
@@ -135,16 +154,17 @@
                         });
                     }
 
-                    yearRow.appendChild(button);
+                    buttonContainer.appendChild(button);
                 });
 
-                yearsContainer.appendChild(yearRow);
+                mathNode.appendChild(categoryNode);
+                mathNode.appendChild(nestedNode);
             });
         }
 
         function fetchProblems(testInfo) {
             const subject = 'math';
-            const category = 'pascal9';
+            const category = testInfo.category;
             const subcategory = testInfo.problemDescription;
 
             const baseUrl = '/problems';
@@ -153,12 +173,14 @@
                                `&subcategory=${encodeURIComponent(subcategory)}`;
             const url = `${baseUrl}${queryParams}`;
 
+            console.log('request subcategory :', subcategory);
             fetch(url, {
                 method: 'GET',
             })
             .then(response => response.json())
             .then(data => {
                 problems = data;
+                console.log('Fetched test problems data:', data);
                 displayProblems(data);
             })
             .catch(error => {
@@ -166,7 +188,7 @@
             });
         }
 
-        function fetchSubmmittedProblems(testInfo) {
+        function fetchSubmittedProblems(testInfo) {
             const url = '/query';
             console.log("request ", testInfo);
             const payload = {
@@ -212,15 +234,16 @@
             });
 
             problems = processedProblems;
-
-            // Clear the existing problems list and add the subcategory display
+         // Clear the existing problems list and add the subcategory display
             problemsList.innerHTML = `
                 <h2>${subcategory}</h2>
                 ${problems.map(problem => `
                     <div class="problem-item">
                         ${problem.image ? `
                             <img src="data:image/png;base64,${problem.image}" alt="Problem Image" style="max-width: 100%; height: auto;" />
-                        ` : ''}
+                        ` : `
+                            <p>${problem.problemDescription}</p>
+                        `}
                         <p><strong>Solution:</strong></p>
                         <textarea id="solution-${problem.problemId}" class="editable-field solution-field">${problem.solution}</textarea>
                         <p><strong>Answer:</strong></p>
@@ -228,8 +251,34 @@
                     </div>
                 `).join('')}
             `;
-        }
 
+        }
+        
+        function fetchTestInfos() {
+            const url = '/query';
+
+            const payload = {
+                subject: 'test_info',
+                queryType: 'subject'
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched test problems data:', data);
+                testInfos = data;
+                generateCategoryNodes(data);
+            })
+            .catch(error => {
+                console.error('Error fetching test problems:', error);
+            });
+        }
         function saveProblems() {
             problems = problems.map(problem => {
                 const solution = document.getElementById(`solution-${problem.problemId}`).value;
@@ -301,10 +350,12 @@
 
         document.getElementById('save-button').addEventListener('click', saveProblems);
 
+
         window.onload = fetchTestInfos;
     </script>
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

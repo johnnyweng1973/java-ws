@@ -6,7 +6,7 @@ import java.util.*;
 public class SentenceSelector {
 
     public static void main(String[] args) throws IOException {
-    	 String outputSelecFilePath = "selection-comma-16.txt"; // Replace with your desired output file path
+    	 String outputSelecFilePath = "delta-main-ranking-17.txt"; // Replace with your desired output file path
 //         addSentencesRequests(outputSelecFilePath1);
 //         String outputSelecFilePath = "epubfolder-selection-15.txt"; // Replace with your desired output file path
          addSentencesRequests(outputSelecFilePath);

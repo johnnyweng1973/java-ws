@@ -39,7 +39,7 @@ public class TestProblemService {
     	testProblemRepository.saveAll(problems);
     }
 
-	public List<TestProblem> getBySubject(TestSubjectType subject) {
+	public List<TestProblem> findBySubject(TestSubjectType subject) {
 		return testProblemRepository.findBySubject(subject);
 	}
 	

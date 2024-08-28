@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Meal Planner</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .meal-box {
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            min-height: 60px;
+            cursor: pointer;
+        }
+        .meal-box.breakfast {
+            background-color: #ffebcd; /* Blanched Almond for breakfast */
+        }
+        .meal-box.lunch {
+            background-color: #fffacd; /* Lemon Chiffon for lunch */
+        }
+        .meal-box.dinner {
+            background-color: #e6e6fa; /* Lavender for dinner */
+        }
+        .meal-box.highlighted {
+            border-color: #007bff;
+            background-color: #e9f7fe;
+        }
+        .dish-list {
+            margin-bottom: 20px;
+        }
+        .dish-item {
+            cursor: pointer;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            background-color: #e9ecef;
+        }
+        .dish-item:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .week-navigation {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0;
+        }
+        .calendar-day {
+            border-right: 2px solid #ccc;
+            border-bottom: 2px solid #ccc;
+        }
+        .calendar-day:last-child {
+            border-right: none;
+        }
+        .calendar-header {
+            text-align: center;
+            font-weight: bold;
+            background-color: #007bff;
+            color: white;
+            padding: 5px 0;
+            border-radius: 5px 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-center my-4">Weekly Meal Planner</h1>
+
+    <div class="week-navigation">
+        <button id="prev-week" class="btn btn-primary">Previous Week</button>
+        <h2 id="week-title"></h2>
+        <button id="next-week" class="btn btn-primary">Next Week</button>
+    </div>
+
+    <div class="calendar-grid">
+        <!-- Days will be generated dynamically by JavaScript -->
+    </div>
+
+    <!-- Dish List in Columns -->
+     <!-- Dish List in Columns -->
+    <div class="row">
+        <div th:each="category : ${categories}" class="col-md-3">
+            <div class="dish-list">
+                <h4 th:text="${category}"></h4>
+                <div th:each="dish : ${dishes}" th:if="${dish.category == category}" class="dish-item" th:data-dish="${dish.name}">
+		            <span th:text="${dish.name}"></span>
+		            <button type="button" class="close" aria-label="Close" onclick="removeDish(this)">
+		                <span aria-hidden="true">&times;</span>
+		            </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="save-meals" class="btn btn-primary mt-4">Save All Meals</button>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    let selectedDish = null;
+    let highlightedBox = null;
+    let currentDate = new Date();
+
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    function updateCalendar() {
+        const calendarGrid = document.querySelector('.calendar-grid');
+        calendarGrid.innerHTML = '';
+
+        const firstDayOfWeek = getFirstDayOfWeek(new Date(currentDate));
+        const lastDayOfWeek = getLastDayOfWeek(new Date(currentDate));
+        document.getElementById('week-title').textContent = `Week of ${formatDate(firstDayOfWeek)} - ${formatDate(lastDayOfWeek)}`;
+
+        for (let d = 0; d < 7; d++) {
+            const dayContainer = document.createElement('div');
+            dayContainer.classList.add('calendar-day');
+
+            const date = new Date(firstDayOfWeek);
+            date.setDate(date.getDate() + d);
+            const dateStr = formatDate(date);
+
+            const header = document.createElement('div');
+            header.classList.add('calendar-header');
+            header.textContent = `${daysOfWeek[d]} (${dateStr})`;
+            dayContainer.appendChild(header);
+
+            ["breakfast", "lunch", "dinner"].forEach(mealType => {
+                const mealBox = document.createElement('div');
+                mealBox.classList.add('meal-box', mealType); // Add meal type as a class
+                mealBox.setAttribute('data-mealtype', mealType);
+                mealBox.setAttribute('data-date', dateStr);
+
+                mealBox.addEventListener('click', function() {
+                    if (highlightedBox) {
+                        highlightedBox.classList.remove('highlighted');
+                    }
+                    this.classList.add('highlighted');
+                    highlightedBox = this;
+                });
+
+                dayContainer.appendChild(mealBox);
+            });
+
+            calendarGrid.appendChild(dayContainer);
+        }
+    }
+
+    function getFirstDayOfWeek(date) {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(date.setDate(diff));
+    }
+
+    function getLastDayOfWeek(date) {
+        const firstDay = getFirstDayOfWeek(date);
+        return new Date(firstDay.getTime() + 6 * 24 * 60 * 60 * 1000);
+    }
+
+    function formatDate(date) {
+        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+    }
+
+    document.getElementById('prev-week').addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() - 7);
+        updateCalendar();
+    });
+
+    document.getElementById('next-week').addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() + 7);
+        updateCalendar();
+    });
+
+    document.querySelectorAll('.dish-item').forEach(item => {
+        item.addEventListener('click', function() {
+            selectedDish = this.getAttribute('data-dish');
+            if (highlightedBox) {
+                highlightedBox.innerHTML += `<span class="badge badge-primary mr-2">${selectedDish} <span class="close" onclick="removeDish(this)">&times;</span></span>`;
+            }
+        });
+    });
+
+    function removeDish(element) {
+        element.parentNode.remove();  // Removes the badge (dish)
+    }
+
+    document.getElementById('save-meals').addEventListener('click', () => {
+        let mealData = [];
+
+        document.querySelectorAll('.meal-box').forEach(box => {
+            let date = box.getAttribute('data-date');
+            let mealType = box.getAttribute('data-mealtype');
+            let dishes = Array.from(box.querySelectorAll('span.badge')).map(span => span.innerText.trim());
+
+            mealData.push({
+                date: date,
+                mealType: mealType,
+                dishes: dishes
+            });
+        });
+
+        fetch('/save-meals', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mealData)
+        }).then(response => {
+            if (response.ok) {
+                alert('Meals saved successfully!');
+            } else {
+                alert('Failed to save meals.');
+            }
+        });
+    });
+
+    updateCalendar();
+</script>
+
+</body>
+</html>

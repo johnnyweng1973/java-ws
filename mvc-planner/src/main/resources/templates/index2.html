@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weekly Meal Planner</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .meal-box {
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            min-height: 60px;
+            cursor: pointer;
+        }
+        .meal-box.breakfast {
+            background-color: #ffebcd; /* Blanched Almond for breakfast */
+        }
+        .meal-box.lunch {
+            background-color: #fffacd; /* Lemon Chiffon for lunch */
+        }
+        .meal-box.dinner {
+            background-color: #e6e6fa; /* Lavender for dinner */
+        }
+        .meal-box.highlighted {
+            border-color: #007bff;
+            background-color: #e9f7fe;
+        }
+        .dish-list {
+            margin-bottom: 20px;
+        }
+        .dish-item {
+            cursor: pointer;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            background-color: #e9ecef;
+        }
+        .dish-item:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        .week-navigation {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0;
+        }
+        .calendar-day {
+            border-right: 2px solid #ccc;
+            border-bottom: 2px solid #ccc;
+        }
+        .calendar-day:last-child {
+            border-right: none;
+        }
+        .calendar-header {
+            text-align: center;
+            font-weight: bold;
+            background-color: #007bff;
+            color: white;
+            padding: 5px 0;
+            border-radius: 5px 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-center my-4">Weekly Meal Planner</h1>
+
+    <div class="week-navigation">
+        <button id="prev-week" class="btn btn-primary">Previous Week</button>
+        <h2 id="week-title"></h2>
+        <button id="next-week" class="btn btn-primary">Next Week</button>
+    </div>
+
+    <div class="calendar-grid">
+        <!-- Days will be generated dynamically by JavaScript -->
+    </div>
+
+    <!-- Dish List in Columns -->
+    <div class="row">
+        <!-- Column for Main Dishes -->
+        <div class="col-md-3">
+            <div class="dish-list">
+                <h4>Main Dishes</h4>
+                <div class="dish-item" data-dish="青椒猪肉丝">青椒猪肉丝</div>
+                <div class="dish-item" data-dish="青椒牛肉丝">青椒牛肉丝</div>
+                <div class="dish-item" data-dish="烧豆腐">烧豆腐</div>
+                <div class="dish-item" data-dish="西兰花">西兰花</div>
+                <div class="dish-item" data-dish="花菜">花菜</div>
+                <div class="dish-item" data-dish="糖醋排骨">糖醋排骨</div>
+                <div class="dish-item" data-dish="酸菜鱼">酸菜鱼</div>
+                <div class="dish-item" data-dish="番茄炒蛋">番茄炒蛋</div>
+                <div class="dish-item" data-dish="三文鱼">三文鱼</div>
+                <div class="dish-item" data-dish="炒竹笋">炒竹笋</div>
+                <div class="dish-item" data-dish="时蔬">时蔬 (上海青, 奶白菜, 四季豆, 菜心, 芥兰)</div>
+                <div class="dish-item" data-dish="宫保鸡丁">宫保鸡丁</div>
+                <div class="dish-item" data-dish="咖喱菜">咖喱菜 (西兰花, 土豆)</div>
+                <div class="dish-item" data-dish="炒青豆">炒青豆</div>
+                <div class="dish-item" data-dish="炒苦瓜">炒苦瓜</div>
+                <div class="dish-item" data-dish="烧茄子">烧茄子</div>
+                <div class="dish-item" data-dish="凉拌鸡">凉拌鸡</div>
+                <div class="dish-item" data-dish="火锅">火锅</div>
+                <div class="dish-item" data-dish="炒猪肝">炒猪肝</div>
+                <div class="dish-item" data-dish="炒腰花">炒腰花</div>
+            </div>
+        </div>
+        
+        <!-- Column for Chinese Specialties -->
+        <div class="col-md-3">
+            <div class="dish-list">
+                <h4>Chinese Specialties</h4>
+                <div class="dish-item" data-dish="馄饨">馄饨</div>
+                <div class="dish-item" data-dish="饺子">饺子</div>
+                <div class="dish-item" data-dish="炒饭">炒饭</div>
+                <div class="dish-item" data-dish="炒面">炒面</div>
+                <div class="dish-item" data-dish="炒面片">炒面片</div>
+                <div class="dish-item" data-dish="京酱肉丝">京酱肉丝</div>
+                <div class="dish-item" data-dish="炒黄瓜">炒黄瓜</div>
+            </div>
+        </div>
+
+        <!-- Column for Western Dishes -->
+        <div class="col-md-3">
+            <div class="dish-list">
+                <h4>Western Dishes</h4>
+                <div class="dish-item" data-dish="pita">pita</div>
+                <div class="dish-item" data-dish="pizza">pizza</div>
+            </div>
+        </div>
+
+        <!-- Column for Desserts & Snacks -->
+        <div class="col-md-3">
+            <div class="dish-list">
+                <h4>Desserts & Snacks</h4>
+                <div class="dish-item" data-dish="汤圆">汤圆</div>
+                <div class="dish-item" data-dish="南瓜粥">南瓜粥</div>
+                <div class="dish-item" data-dish="八宝粥">八宝粥</div>
+            </div>
+
+            <div class="dish-list">
+                <h4>Baked Goods</h4>
+                <div class="dish-item" data-dish="馒头">馒头</div>
+                <div class="dish-item" data-dish="花卷">花卷</div>
+                <div class="dish-item" data-dish="面包">面包</div>
+                <div class="dish-item" data-dish="蛋糕">蛋糕</div>
+            </div>
+
+            <div class="dish-list">
+                <h4>Marinated Dishes</h4>
+                <div class="dish-item" data-dish="卤猪蹄">卤猪蹄</div>
+                <div class="dish-item" data-dish="卤蛋">卤蛋</div>
+            </div>
+        </div>
+    </div>
+
+    <button id="save-meals" class="btn btn-primary mt-4">Save All Meals</button>
+</div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    let selectedDish = null;
+    let highlightedBox = null;
+    let currentDate = new Date();
+
+    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    function updateCalendar() {
+        const calendarGrid = document.querySelector('.calendar-grid');
+        calendarGrid.innerHTML = '';
+
+        const firstDayOfWeek = getFirstDayOfWeek(new Date(currentDate));
+        const lastDayOfWeek = getLastDayOfWeek(new Date(currentDate));
+        document.getElementById('week-title').textContent = `Week of ${formatDate(firstDayOfWeek)} - ${formatDate(lastDayOfWeek)}`;
+
+        for (let d = 0; d < 7; d++) {
+            const dayContainer = document.createElement('div');
+            dayContainer.classList.add('calendar-day');
+
+            const date = new Date(firstDayOfWeek);
+            date.setDate(date.getDate() + d);
+            const dateStr = formatDate(date);
+
+            const header = document.createElement('div');
+            header.classList.add('calendar-header');
+            header.textContent = `${daysOfWeek[d]} (${dateStr})`;
+            dayContainer.appendChild(header);
+
+            ["breakfast", "lunch", "dinner"].forEach(mealType => {
+                const mealBox = document.createElement('div');
+                mealBox.classList.add('meal-box', mealType); // Add meal type as a class
+                mealBox.setAttribute('data-mealtype', mealType);
+                mealBox.setAttribute('data-date', dateStr);
+
+                mealBox.addEventListener('click', function() {
+                    if (highlightedBox) {
+                        highlightedBox.classList.remove('highlighted');
+                    }
+                    this.classList.add('highlighted');
+                    highlightedBox = this;
+                });
+
+                dayContainer.appendChild(mealBox);
+            });
+
+            calendarGrid.appendChild(dayContainer);
+        }
+    }
+
+    function getFirstDayOfWeek(date) {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(date.setDate(diff));
+    }
+
+    function getLastDayOfWeek(date) {
+        const firstDay = getFirstDayOfWeek(date);
+        return new Date(firstDay.getTime() + 6 * 24 * 60 * 60 * 1000);
+    }
+
+    function formatDate(date) {
+        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+    }
+
+    document.getElementById('prev-week').addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() - 7);
+        updateCalendar();
+    });
+
+    document.getElementById('next-week').addEventListener('click', () => {
+        currentDate.setDate(currentDate.getDate() + 7);
+        updateCalendar();
+    });
+
+    document.querySelectorAll('.dish-item').forEach(item => {
+        item.addEventListener('click', function() {
+            selectedDish = this.getAttribute('data-dish');
+            if (highlightedBox) {
+                highlightedBox.innerHTML += `<span class="badge badge-primary mr-2">${selectedDish}</span>`;
+            }
+        });
+    });
+
+    document.getElementById('save-meals').addEventListener('click', () => {
+        let mealData = [];
+
+        document.querySelectorAll('.meal-box').forEach(box => {
+            let date = box.getAttribute('data-date');
+            let mealType = box.getAttribute('data-mealtype');
+            let dishes = Array.from(box.querySelectorAll('span')).map(span => span.innerText);
+
+            mealData.push({
+                date: date,
+                mealType: mealType,
+                dishes: dishes
+            });
+        });
+
+        fetch('/save-meals', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mealData)
+        }).then(response => {
+            if (response.ok) {
+                alert('Meals saved successfully!');
+            } else {
+                alert('Failed to save meals.');
+            }
+        });
+    });
+
+    updateCalendar();
+</script>
+
+</body>
+</html>

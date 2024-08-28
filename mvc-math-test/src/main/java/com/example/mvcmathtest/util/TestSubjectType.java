@@ -3,5 +3,6 @@ package com.example.mvcmathtest.util;
 public enum TestSubjectType {
     math,
     science,
-    chinese
+    chinese,
+    test_info,
 }
