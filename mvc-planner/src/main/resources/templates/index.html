@@ -109,123 +109,166 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 <script>
-    let selectedDish = null;
-    let highlightedBox = null;
-    let currentDate = new Date();
+	let selectedDish = null;
+	let highlightedBox = null;
+	let currentDate = new Date();
+	
+	const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+	
+	function updateCalendar() {
+	    const calendarGrid = document.querySelector('.calendar-grid');
+	    calendarGrid.innerHTML = '';
 
-    const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	    const firstDayOfWeek = getFirstDayOfWeek(new Date(currentDate));
+	    const lastDayOfWeek = getLastDayOfWeek(new Date(currentDate));
+	    document.getElementById('week-title').textContent = `Week of ${formatDate(firstDayOfWeek)} - ${formatDate(lastDayOfWeek)}`;
 
-    function updateCalendar() {
-        const calendarGrid = document.querySelector('.calendar-grid');
-        calendarGrid.innerHTML = '';
+	    const startDate = formatDate(firstDayOfWeek);
+	    const endDate = formatDate(lastDayOfWeek);
 
-        const firstDayOfWeek = getFirstDayOfWeek(new Date(currentDate));
-        const lastDayOfWeek = getLastDayOfWeek(new Date(currentDate));
-        document.getElementById('week-title').textContent = `Week of ${formatDate(firstDayOfWeek)} - ${formatDate(lastDayOfWeek)}`;
+	    // Create calendar elements first
+	    const dayContainers = [];
+	    for (let d = 0; d < 7; d++) {
+	        const dayContainer = document.createElement('div');
+	        dayContainer.classList.add('calendar-day');
 
-        for (let d = 0; d < 7; d++) {
-            const dayContainer = document.createElement('div');
-            dayContainer.classList.add('calendar-day');
+	        const date = new Date(firstDayOfWeek);
+	        date.setDate(date.getDate() + d);
+	        const dateStr = formatDate(date);
 
-            const date = new Date(firstDayOfWeek);
-            date.setDate(date.getDate() + d);
-            const dateStr = formatDate(date);
+	        const header = document.createElement('div');
+	        header.classList.add('calendar-header');
+	        header.textContent = `${daysOfWeek[d]} (${dateStr})`;
+	        dayContainer.appendChild(header);
 
-            const header = document.createElement('div');
-            header.classList.add('calendar-header');
-            header.textContent = `${daysOfWeek[d]} (${dateStr})`;
-            dayContainer.appendChild(header);
+	        ["breakfast", "lunch", "dinner"].forEach(mealType => {
+	            const mealBox = document.createElement('div');
+	            mealBox.classList.add('meal-box', mealType);
+	            mealBox.setAttribute('data-mealtype', mealType);
+	            mealBox.setAttribute('data-date', dateStr);
 
-            ["breakfast", "lunch", "dinner"].forEach(mealType => {
-                const mealBox = document.createElement('div');
-                mealBox.classList.add('meal-box', mealType); // Add meal type as a class
-                mealBox.setAttribute('data-mealtype', mealType);
-                mealBox.setAttribute('data-date', dateStr);
+	            mealBox.addEventListener('click', function () {
+	                if (highlightedBox) {
+	                    highlightedBox.classList.remove('highlighted');
+	                }
+	                this.classList.add('highlighted');
+	                highlightedBox = this;
+	            });
 
-                mealBox.addEventListener('click', function() {
-                    if (highlightedBox) {
-                        highlightedBox.classList.remove('highlighted');
-                    }
-                    this.classList.add('highlighted');
-                    highlightedBox = this;
-                });
+	            dayContainer.appendChild(mealBox);
+	        });
 
-                dayContainer.appendChild(mealBox);
-            });
+	        calendarGrid.appendChild(dayContainer);
+	        dayContainers.push({ dateStr, dayContainer });
+	    }
 
-            calendarGrid.appendChild(dayContainer);
-        }
-    }
+	 // Fetch meal data from the server after creating the elements
+	    fetch(`/current-week?start=${startDate}&end=${endDate}`)
+	        .then(response => response.json())
+	        .then(data => {
+	            console.log("Data received from backend:", data);  // Log the data received
 
-    function getFirstDayOfWeek(date) {
-        const day = date.getDay();
-        const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-        return new Date(date.setDate(diff));
-    }
+	            // Iterate through each object in the data array
+	            data.forEach(item => {
+	                const { date, breakfast = '', lunch = '', dinner = '' } = item;
 
-    function getLastDayOfWeek(date) {
-        const firstDay = getFirstDayOfWeek(date);
-        return new Date(firstDay.getTime() + 6 * 24 * 60 * 60 * 1000);
-    }
+	                // Find the dayContainer that matches the date from the data item
+	                const dayContainer = dayContainers.find(container => container.dateStr === date);
 
-    function formatDate(date) {
-        return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-    }
+	                if (dayContainer) {
+	                    ["breakfast", "lunch", "dinner"].forEach(mealType => {
+	                        const mealBox = dayContainer.dayContainer.querySelector(`.meal-box.${mealType}`);
+	                        if (item[mealType]) {
+	                            console.log("Processing data:", item);
+	                            const meals = item[mealType].split(', ');
+	                            meals.forEach(meal => {
+	                                mealBox.innerHTML += `<span class="badge badge-primary mr-2">${meal} <span class="close" onclick="removeDish(this)">&times;</span></span>`;
+	                            });
+	                        }
+	                    });
+	                }
+	            });
+	        })
+	        .catch(error => {
+	            console.error('Error fetching meal data:', error);
+	        });
 
-    document.getElementById('prev-week').addEventListener('click', () => {
-        currentDate.setDate(currentDate.getDate() - 7);
-        updateCalendar();
-    });
+	}
 
-    document.getElementById('next-week').addEventListener('click', () => {
-        currentDate.setDate(currentDate.getDate() + 7);
-        updateCalendar();
-    });
+	
+	function getFirstDayOfWeek(date) {
+	    const day = date.getDay();
+	    const diff = date.getDate() - (day === 0 ? 6 : day - 1); // Adjust so Monday is the first day
+	    return new Date(date.setDate(diff));
+	}
+	
+	function getLastDayOfWeek(date) {
+	    const firstDay = getFirstDayOfWeek(date);
+	    return new Date(firstDay.getTime() + 6 * 24 * 60 * 60 * 1000);
+	}
+	
+	function formatDate(date) {
+	    return date.toISOString().split('T')[0]; // This will return the date in 'YYYY-MM-DD' format
+	}
+	
+	document.getElementById('prev-week').addEventListener('click', () => {
+	    currentDate.setDate(currentDate.getDate() - 7);
+	    updateCalendar();
+	});
+	
+	document.getElementById('next-week').addEventListener('click', () => {
+	    currentDate.setDate(currentDate.getDate() + 7);
+	    updateCalendar();
+	});
+	
+	document.querySelectorAll('.dish-item').forEach(item => {
+	    item.addEventListener('click', function() {
+	        selectedDish = this.getAttribute('data-dish');
+	        if (highlightedBox) {
+	            highlightedBox.innerHTML += `<span class="badge badge-primary mr-2">${selectedDish} <span class="close" onclick="removeDish(this)">&times;</span></span>`;
+	        }
+	    });
+	});
+	
+	function removeDish(element) {
+	    element.parentNode.remove();  // Removes the badge (dish)
+	}
+	
+	document.getElementById('save-meals').addEventListener('click', () => {
+	    let mealsByDate = {};
 
-    document.querySelectorAll('.dish-item').forEach(item => {
-        item.addEventListener('click', function() {
-            selectedDish = this.getAttribute('data-dish');
-            if (highlightedBox) {
-                highlightedBox.innerHTML += `<span class="badge badge-primary mr-2">${selectedDish} <span class="close" onclick="removeDish(this)">&times;</span></span>`;
-            }
-        });
-    });
+	    document.querySelectorAll('.meal-box').forEach(box => {
+	        let date = box.getAttribute('data-date');
+	        let mealType = box.getAttribute('data-mealtype');
+	        let dishes = Array.from(box.querySelectorAll('span.badge')).map(span => span.innerText.trim());
 
-    function removeDish(element) {
-        element.parentNode.remove();  // Removes the badge (dish)
-    }
+	        if (!mealsByDate[date]) {
+	            mealsByDate[date] = { date: date, breakfast: '', lunch: '', dinner: '' };
+	        }
 
-    document.getElementById('save-meals').addEventListener('click', () => {
-        let mealData = [];
+	        mealsByDate[date][mealType] = dishes.join(', ');
+	    });
 
-        document.querySelectorAll('.meal-box').forEach(box => {
-            let date = box.getAttribute('data-date');
-            let mealType = box.getAttribute('data-mealtype');
-            let dishes = Array.from(box.querySelectorAll('span.badge')).map(span => span.innerText.trim());
+	    // Convert the mealsByDate object into an array of meal records
+	    let mealData = Object.values(mealsByDate);
 
-            mealData.push({
-                date: date,
-                mealType: mealType,
-                dishes: dishes
-            });
-        });
+	    fetch('/save-week', {
+	        method: 'POST',
+	        headers: {
+	            'Content-Type': 'application/json'
+	        },
+	        body: JSON.stringify(mealData)
+	    }).then(response => {
+	        if (response.ok) {
+	            alert('Meals saved successfully!');
+	        } else {
+	            alert('Failed to save meals.');
+	        }
+	    });
+	});
 
-        fetch('/save-meals', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(mealData)
-        }).then(response => {
-            if (response.ok) {
-                alert('Meals saved successfully!');
-            } else {
-                alert('Failed to save meals.');
-            }
-        });
-    });
-
-    updateCalendar();
+	
+	updateCalendar();
 </script>
 
 </body>

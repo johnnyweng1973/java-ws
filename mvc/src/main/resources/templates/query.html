@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Character Checker</title>
+</head>
+<body>
+    <h1>Character Checker</h1>
+    <textarea id="inputTextArea" rows="10" cols="50" placeholder="Enter your text here..."></textarea><br>
+    <button id="submitBtn">Submit</button>
+
+    <h2>Characters not found in descriptions:</h2>
+    <p id="output"></p>
+
+    <script>
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const inputText = document.getElementById('inputTextArea').value;
+
+            const url = new URL('http://localhost:8080/math/general/data');
+            url.searchParams.append('table', 'math_problem');
+            url.searchParams.append('subject', 'chinese');
+            url.searchParams.append('category', '生字');
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const descriptions = data.map(item => item.description).join('');
+                    const notFoundChars = [];
+
+                    for (const char of inputText) {
+                        if (!descriptions.includes(char) && /[\u4e00-\u9fa5]/.test(char)) {
+                            notFoundChars.push(char);
+                        }
+                    }
+
+                    document.getElementById('output').textContent = notFoundChars.join(', ');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+</body>
+</html>

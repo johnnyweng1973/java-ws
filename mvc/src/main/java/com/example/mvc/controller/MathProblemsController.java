@@ -88,6 +88,11 @@ public class MathProblemsController {
 			return "query_chinese";
 	}
 
+	@GetMapping("/query")
+	public String query() {
+			return "query";
+	}
+	
 	@GetMapping("/general")
 	public String getGeneralPage()
 	{

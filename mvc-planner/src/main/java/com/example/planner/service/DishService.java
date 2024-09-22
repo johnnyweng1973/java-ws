@@ -1,20 +1,20 @@
 package com.example.planner.service;
 
 import com.example.planner.model.Dish;
-import com.example.planner.repository.PlannerRepository;
+import com.example.planner.repository.DishRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class PlannerService {
+public class DishService {
 
  @Autowired
- private PlannerRepository dishesRepository;
+ private DishRepository dishRepository;
 
  public List<Dish> getAllDishes() {
-     return dishesRepository.findAll();
+     return dishRepository.findAll();
  }
 
  // Additional service methods can be added here
